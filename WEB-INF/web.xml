@@ -213,6 +213,7 @@
     <welcome-file>Default.aspx</welcome-file>
   </welcome-file-list>
 
+<!--
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Reports</web-resource-name>
@@ -223,10 +224,11 @@
     </auth-constraint>
   </security-constraint>
 
-  <!-- Define the Login Configuration for this Application -->
+-->
+  <!-- Define the Login Configuration for this Application 
   <login-config>
     <auth-method>DRUPAL</auth-method>
     <realm-name>Actuos Insights</realm-name>
   </login-config>
-
+-->
 </web-app>
