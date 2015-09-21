@@ -1040,7 +1040,7 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 										</Row>
 										<Row ID="rowAddGroup">
 											<Column>
-												<Label Caption="Add" ID="lblGroupOk" Class="rdAgCommand">
+												<Label Caption="Add" ID="lblGroupOk" Class="rdAgCommand btn btn-primary btn-apply-filter">
 													<Action Type="Report" ID="actAddGroup">
 														<Target Type="Report" ID="tgtAddGroup"/>
 														<LinkParams rdAgCommand="GroupAdd" rdAgCommandID="@Function.GUID~" dtAnalysisGrid-PageNr="1"/>
