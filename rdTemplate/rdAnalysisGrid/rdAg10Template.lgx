@@ -1056,6 +1056,17 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 													<Label ID="lblGroupError-DuplicateGroupColumn" Class="rdAgError" Caption="This column is already grouped.">
 													</Label>
 												</Division>
+												<Label Caption="&#8226; " ID="lblBulletGroup" Format="HTML"/>
+												<Label Caption="Exclude Detail Rows" ID="lblExcludeDetailRows" For="rdAgExcludeDetailRowsCheckbox" />
+												<Spaces Size="8"/>
+												<InputCheckbox ID="rdAgExcludeDetailRowsCheckbox" DefaultValue="@Request.rdAgExcludeDetailRowsCheckbox~" CheckedValue="True">
+													<EventHandler DhtmlEvent="onclick" ID="rdAgExcludeDetailRowsEventHandler">
+														<Action Type="Report" ID="actExcludeDetailRows">
+															<Target Type="Report" ID="tgtExcludeDetailRows" />
+															<LinkParams rdAgCommandExcludeDetailRows="True" />
+														</Action>
+													</EventHandler>
+												</InputCheckbox>
 											</Column>
 										</Row>
 									</Rows>
@@ -1066,23 +1077,21 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 									<DataTable ID="dtGroups">
 										<DataLayer Type="Static" ID="dlGroups"/>
 										<DataTableColumn ID="colGroupColumnName" Width="50" WidthScale="%">
-											<Label Caption="&#8226; " ID="lblBulletGroup" Format="HTML">
-											</Label>
 											<Label Caption="@Data.Indent~" ID="lblGroupIndent">
 											</Label>
 											<Label Caption="@Data.Name~" ID="lblGroupName">
 											</Label>
 											<Spaces Size="3"/>
 										</DataTableColumn>
-										<DataTableColumn ID="colGroupRemove">
+										<DataTableColumn ID="colGroupRemove" Class="colGroupRemove">
 											<Label Caption="Replace" ID="lblGroupReplace" Class="rdAgCommand">
-												<Action Type="Report" ConfirmMessage="Replace?  Are you sure?" ID="actGroupReplace">
+												<Action Type="Report" ConfirmMessage="Replace?  Are you sure?" ID="actGroupReplace" Class="hidden">
 													<Target Type="Report" ID="tgtAddGroup"/>
 													<LinkParams rdAgCommand="GroupReplace" rdAgCommandID="@Function.GUID~" rdAgGroupID="@Data.ID~" dtAnalysisGrid-PageNr="1"/>
 												</Action>
 											</Label>
 											<Label Caption="Remove" ID="lblGroupRemove" Class="rdAgCommand">
-												<Action Type="Report" ConfirmMessage="Remove?  Are you sure?" ID="actGroupRemove">
+												<Action Type="Report" ConfirmMessage="Remove?  Are you sure?" ID="actGroupRemove" Class="actGroupRemove">
 													<Target Type="Report" ID="tgtGroupRemove"/>
 													<LinkParams rdAgCommand="GroupRemove" rdAgCommandID="@Function.GUID~" rdAgGroupColumn="@Data.GroupColumn~" rdAgGroupName="@Data.Name~" rdAgGroupDateGroupByOperator ="@Data.DateGroupByOperator~" dtAnalysisGrid-PageNr="1"/>
 												</Action>
@@ -1093,17 +1102,6 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 									<Label Caption="Detail Rows:" ID="lblDetailRows" Class="rdAgContentHeading"/>
 									<LineBreak LineCount="1" ID="nlExcludeDetailRows"/>
 									<Spaces Size="1"/>
-									<Label Caption="&#8226; " ID="lblBulletGroup" Format="HTML"/>
-									<Label Caption="Exclude Detail Rows" ID="lblExcludeDetailRows" For="rdAgExcludeDetailRowsCheckbox" />
-									<Spaces Size="8"/>
-									<InputCheckbox ID="rdAgExcludeDetailRowsCheckbox" DefaultValue="@Request.rdAgExcludeDetailRowsCheckbox~" CheckedValue="True">
-										<EventHandler DhtmlEvent="onclick" ID="rdAgExcludeDetailRowsEventHandler">
-											<Action Type="Report" ID="actExcludeDetailRows">
-												<Target Type="Report" ID="tgtExcludeDetailRows" />
-												<LinkParams rdAgCommandExcludeDetailRows="True" />
-											</Action>
-										</EventHandler>
-									</InputCheckbox>
 								</Division>
 							</Column>
 						</Row>
