@@ -1166,7 +1166,7 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 										<Row ID="rowAddAggr">
 											<Column />
 											<Column>
-												<Label Caption="Add" ID="lblAggrOk" Class="rdAgCommand">
+												<Label Caption="Add" ID="lblAggrOk" Class="rdAgCommand btn btn-primary btn-apply-filter">
 													<Action Type="Report" ID="actAddAggr">
 														<Target Type="Report" ID="tgtAddAggr"/>
 														<LinkParams rdAgCommand="AggrAdd" rdAgCommandID="@Function.GUID~"/>
@@ -1193,21 +1193,19 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 									<DataTable ID="dtAggrs" >
 										<DataLayer Type="Static" ID="dlAggrs"/>
 										<DataTableColumn ID="colAggrName" Width="50" WidthScale="%">
-											<Label Caption="&#8226; " ID="lblBulletAggr" Format="HTML">
-											</Label>
 											<Label Caption="@Data.Name~" ID="lblAggrName">
 											</Label>
 											<Spaces Size="3"/>
 										</DataTableColumn>
 										<DataTableColumn ID="colAggrRemove">
-											<Label Caption="Replace" ID="lblAggrReplace" Class="rdAgCommand">
+											<Label Caption="Replace" ID="lblAggrReplace" Class="rdAgCommand hidden">
 												<Action Type="Report" ConfirmMessage="Replace?  Are you sure?" ID="actAggrReplace">
 													<Target Type="Report" ID="tgtAggrReplace"/>
 													<LinkParams rdAgCommand="AggrReplace" rdAgCommandID="@Function.GUID~" rdAgAggrRemoveColumn="@Data.AggrColumnID~"/>
 												</Action>
 											</Label>
 											<Label Caption="Remove" ID="lblAggrRemove" Class="rdAgCommand">
-												<Action Type="Report" ConfirmMessage="Remove?  Are you sure?" ID="actAddrRemove">
+												<Action Type="Report" ConfirmMessage="Remove?  Are you sure?" ID="actAddrRemove" Class="actAddrRemove">
 													<Target Type="Report" ID="tgtAggrRemove"/>
 													<LinkParams rdAgCommand="AggrRemove" rdAgCommandID="@Function.GUID~" rdAgAggrRemoveColumn="@Data.AggrColumnID~"/>
 												</Action>
