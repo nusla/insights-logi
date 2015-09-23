@@ -485,7 +485,7 @@ document.rdForm.rdAgCalcFormats.value=&quot;@Data.Format~&quot;;
 								</DataMultiColumnList>
 								<Row ID="RowLayoutControls">
 									<Column ID="colLayoutControls" >
-										<Label Caption="OK" ID="lblLayoutOk" Class="rdAgCommand">
+										<Label Caption="OK" ID="lblLayoutOk" Class="rdAgCommand btn btn-primary">
 											<Action Type="Report" ID="actSetLayout">
 												<Target Type="Report" ID="tgtSetLayout"/>
 												<LinkParams rdAgCommand="LayoutSet" rdAgCommandID="@Function.GUID~"/>
@@ -494,12 +494,12 @@ document.rdForm.rdAgCalcFormats.value=&quot;@Data.Format~&quot;;
 									</Column>
 									<Column Class="rdAgAlignRight" ID="colLayoutControlsAllNone" >
 										<Label Caption="Select: " ID="lblLayoutSelect"/>
-										<Label Caption="All" ID="lblLayoutSelectAll" Class="rdAgCommand">
+										<Label Caption="All" ID="lblLayoutSelectAll" Class="rdAgCommand btn btn-primary">
 											<Action Type="Link">
 												<Target Type="Link" Link="javascript: LogiXML.AnalysisGrid.rdAgLayoutSelect('All')" />
 											</Action>
 										</Label>
-										<Label Caption="None" ID="lblLayoutSelectNone" Class="rdAgCommand">
+										<Label Caption="None" ID="lblLayoutSelectNone" Class="rdAgCommand btn btn-primary">
 											<Action Type="Link">
 												<Target Type="Link" Link="javascript: LogiXML.AnalysisGrid.rdAgLayoutSelect('None')" />
 											</Action>
@@ -1040,7 +1040,7 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 										</Row>
 										<Row ID="rowAddGroup">
 											<Column>
-												<Label Caption="Add" ID="lblGroupOk" Class="rdAgCommand btn btn-primary btn-apply-filter">
+												<Label Caption="Add" ID="lblGroupOk" Class="rdAgCommand btn btn-primary btn-xs">
 													<Action Type="Report" ID="actAddGroup">
 														<Target Type="Report" ID="tgtAddGroup"/>
 														<LinkParams rdAgCommand="GroupAdd" rdAgCommandID="@Function.GUID~" dtAnalysisGrid-PageNr="1"/>
@@ -1076,6 +1076,9 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 									<Label Caption="Groups:" ID="lblGroups" Class="rdAgContentHeading"/>
 									<DataTable ID="dtGroups">
 										<DataLayer Type="Static" ID="dlGroups"/>
+										<DataTableColumn ID="colGroupColumnComa" Class="colGroupColumnComa">
+                                            <Label Caption="," Class="remove-coma" />
+										</DataTableColumn>
 										<DataTableColumn ID="colGroupColumnName" Width="50" WidthScale="%">
 											<Label Caption="@Data.Indent~" ID="lblGroupIndent">
 											</Label>
@@ -1084,6 +1087,7 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 											<Spaces Size="3"/>
 										</DataTableColumn>
 										<DataTableColumn ID="colGroupRemove" Class="colGroupRemove">
+										    
 											<Label Caption="Replace" ID="lblGroupReplace" Class="rdAgCommand">
 												<Action Type="Report" ConfirmMessage="Replace?  Are you sure?" ID="actGroupReplace" Class="hidden">
 													<Target Type="Report" ID="tgtAddGroup"/>
@@ -1166,7 +1170,7 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 										<Row ID="rowAddAggr">
 											<Column />
 											<Column>
-												<Label Caption="Add" ID="lblAggrOk" Class="rdAgCommand btn btn-primary btn-apply-filter">
+												<Label Caption="Add" ID="lblAggrOk" Class="rdAgCommand btn btn-primary">
 													<Action Type="Report" ID="actAddAggr">
 														<Target Type="Report" ID="tgtAddAggr"/>
 														<LinkParams rdAgCommand="AggrAdd" rdAgCommandID="@Function.GUID~"/>
@@ -1634,7 +1638,7 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 										<Row ID="rowAddChart">
 											<Column />
 											<Column>
-												<Label Caption="Add" ID="lblChartOk" Class="rdAgCommand">
+												<Label Caption="Add" ID="lblChartOk" Class="rdAgCommand btn btn-primary">
 													<Action Type="Report" ID="actAddChart" Validate="True">
 														<Target Type="Report" ID="tgtAddChart"/>
 														<LinkParams rdAgCommand="ChartAdd" rdAgCommandID="@Function.GUID~"/>
@@ -1864,7 +1868,7 @@ LogiXML.AnalysisGrid.rdAgManipulateFilterInputTextBoxValuesForDateColumns(&quot;
 										<Row ID="rowAddCrosstab">
 											<Column />
 											<Column ColSpan="2">
-												<Label Caption="Add" ID="lblCrosstabOk" Class="rdAgCommand">
+												<Label Caption="Add" ID="lblCrosstabOk" Class="rdAgCommand btn btn-primary">
 													<Action Type="Report" ID="actAddCrosstab">
 														<Target Type="Report" ID="tgtAddCrosstab"/>
 														<LinkParams rdAgCommand="CrosstabAdd" rdAgCommandID="@Function.GUID~"/>
