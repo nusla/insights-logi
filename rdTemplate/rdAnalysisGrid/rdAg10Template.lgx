@@ -478,7 +478,8 @@ document.rdForm.rdAgCalcFormats.value=&quot;@Data.Format~&quot;;
 								</Rows>
 								<Label Caption="Search column" ID="rdColSrchLabel"/>
                                 <InputText ID="rdColSrch" DefaultValue="" />
-								<DataMultiColumnList ID="dtLayout" MultiListColumns="4" MultiListDirection="Down">
+                                
+								<DataMultiColumnList ID="dtLayout" MultiListColumns="1" MultiListDirection="Across">
 									<DataLayer Type="Static" ID="dlLayout" />
 									<InputCheckbox ID="rdAgColVisible" DefaultValue="@Data.ColumnVisible~" CheckedValue="True" Class="rdAgColVisible"/>
 									<Label Caption="@Data.Header~" ID="lblColHeader" For="rdAgColVisible_Row@Data.Row~"/>
