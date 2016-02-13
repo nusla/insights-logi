@@ -62,6 +62,18 @@
        <url-pattern>/*</url-pattern>
     </filter-mapping>
 -->
+  <filter>
+    <filter-name>UrlRewriteFilter</filter-name>
+    <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>UrlRewriteFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
   <servlet>
     <servlet-name>VmwDynamicServlet</servlet-name>
     <servlet-class>GhDynamicHttpServlet</servlet-class>
@@ -213,7 +225,6 @@
     <welcome-file>Default.aspx</welcome-file>
   </welcome-file-list>
 
-<!--
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Reports</web-resource-name>
@@ -224,11 +235,9 @@
     </auth-constraint>
   </security-constraint>
 
--->
-  <!-- Define the Login Configuration for this Application 
+  <!-- Define the Login Configuration for this Application -->
   <login-config>
     <auth-method>DRUPAL</auth-method>
     <realm-name>Actuos Insights</realm-name>
   </login-config>
--->
 </web-app>
