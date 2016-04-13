@@ -9,7 +9,7 @@
 						<Rows>
 							<Row>
 								<Column>
-									<Label ID="lblMetadataCaption" Caption="Select Source " />
+									<Label ID="lblMetadataCaption" Caption="Select Source " For="rdMetadata" />
 									<LineBreak ID="lbMetadata"/>
 									<InputSelectList ID="rdMetadata" OptionCaptionColumn="MetadataName" OptionValueColumn="MetadataID" OptionTooltipColumn="MetadataDescription" IncludeBlank="True">
 										<DataLayer Type="Static" ID="dlMetadatas">
@@ -34,9 +34,9 @@
 						<Rows>
 							<Row>
 								<Column>
-									<Label ID="lblStartTableCaption" Caption="Select Data " />
+									<Label ID="lblStartTableCaption" Caption="Select Data " For="rdStartTable" />
 									<LineBreak ID="lbStartTable" />
-									<InputSelectList ID="rdStartTable" OptionCaptionColumn="TableFriendlyName" OptionValueColumn="TableID" OptionTooltipColumn="ColumnFriendlyNames" IncludeBlank="True">
+									<InputSelectList ID="rdStartTable" OptionCaptionColumn="TableFriendlyName" OptionValueColumn="TableID" OptionTooltipColumn="ColumnFriendlyNames" IncludeBlank="True" IncludeBlankCaptionTemplate="No Data for this Source">
 										<DataLayer Type="Static" ID="dlTables">
 											<SortFilter SortColumn="TableFriendlyName" />
 										</DataLayer>
@@ -89,7 +89,7 @@
 									<Column>
 										<Label ID="lblJoinTableCaption" Caption="Select Data " />
 										<LineBreak ID="lbJoinTable"/>
-										<InputSelectList ID="rdJoin" OptionCaptionColumn="JoinFriendlyName" OptionValueColumn="JoinID" IncludeBlank="True">
+										<InputSelectList ID="rdJoin" OptionCaptionColumn="JoinFriendlyName" OptionValueColumn="JoinID" IncludeBlank="True" >
 											<DataLayer Type="Static" ID="dlJoins">
 												<SortFilter SortColumn="JoinFriendlyName" />
 											</DataLayer>
@@ -112,7 +112,7 @@
 					<DataMultiColumnList ID="mclQbColumns" MultiListColumns="4" MultiListDirection="Down">
 						<DataLayer Type="Static" ID="dlQbColumns" />
 						<InputCheckbox ID="chkQbColumn" DefaultValue="@Data.ColumnChecked~" CheckedValue="True" Class="rdAgColSelect"/>
-						<Label Caption="@Data.ColumnFriendlyName~" ID="lblColFriendlyName"/>
+						<Label Caption="@Data.ColumnFriendlyName~" ID="lblColFriendlyName" For="chkQbColumn_0_Row@Function.RowNumber~"/>
 						<InputHidden ID="hidQbColumn" DefaultValue="@Data.ColumnName~" />
 					</DataMultiColumnList>
 				

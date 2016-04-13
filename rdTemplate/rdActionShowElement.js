@@ -49,25 +49,44 @@ function ShowElement(sParentId,sElementId,sAction,sEffect) {
                         }
                     }
                 }
-            }
-            if(c){
-                if(!sElementId.match('PPDatePickerForInputDate') && !sElementId.match('PPTimePickerForInputTime')){
-                    if(c.getAttribute('rdPopupPanel') == 'True') 
-                        rdParentPopupPanel = c;    //#11760.
                 }
-                else{   // Fix to make the new Calendar PopUp from a PopUpPanel, #11924.
-                    if(rdParentPopupPanel){
-                        var rdCurrPopupPanelObj = c.parentNode;
-                        if(rdCurrPopupPanelObj){
-                            while(rdCurrPopupPanelObj){
-                                if(rdCurrPopupPanelObj != rdParentPopupPanel){
-                                    rdCurrPopupPanelObj = rdCurrPopupPanelObj.parentNode;
+                if(c){
+                    if (sElementId.indexOf('ppAddToDashboardPrompt_')==0) {
+                        //Get the suggested dashboard panel's caption from the AG or AC panel's heading.
+                        if (sAction.toLowerCase() != 'hide') {
+                            var eleAction = document.getElementById(sElementId.replace('ppAddToDashboardPrompt_', ''));
+                            var eleActionParent = eleAction.parentNode;
+                            var sHeadingID = eleActionParent.id;
+                            sHeadingID = sHeadingID.replace('colAnalChartAddDashboard_', 'lblHeadingAnalChart_');  //AG Chart
+                            sHeadingID = sHeadingID.replace('colAnalCrosstabAddDashboard_', 'lblHeadingAnalCrosstab_');  //AG Crosstab
+                            sHeadingID = sHeadingID.replace('colTableAddDashboard', 'lblHeadingTable');  //AG Table
+                            sHeadingID = sHeadingID.replace('divAddToDashboardPanel_', 'lblHeadingAnalChart_');  //AC Chart
+                            if (sHeadingID.indexOf("lblHeading") != -1) {  //Test for AG.
+                                var eleHeading = document.getElementById(sHeadingID);
+                                if (eleHeading) {
+                                    var sTitle = eleHeading.innerHTML;
+                                    var sInputTitleID = sElementId.replace('ppAddToDashboardPrompt_', 'rdPanelTitle_');
+                                    var eleInputTitle = document.getElementById(sInputTitleID);
+                                    eleInputTitle.value = sTitle;
                                 }
-                                else{
-                                    if(rdCurrPopupPanelObj.firstChild.id.match('rdPopupPanelTable')){
-                                        if(rdCurrPopupPanelObj.parentNode)  
-                                            rdCurrPopupPanelObj.parentNode.appendChild(c);  // Add the new sibling as a child to the parent of the already popped out Div.                              
+                            }
+                        }
+                    }else if(!sElementId.match('PPDatePickerForInputDate') && !sElementId.match('PPTimePickerForInputTime')){
+                        if(c.getAttribute('rdPopupPanel') == 'True') 
+                            rdParentPopupPanel = c;    //#11760.
+                    }else{   // Fix to make the new Calendar PopUp from a PopUpPanel, #11924.
+                        if(rdParentPopupPanel){
+                            var rdCurrPopupPanelObj = c.parentNode;
+                            if(rdCurrPopupPanelObj){
+                                while(rdCurrPopupPanelObj){
+                                    if(rdCurrPopupPanelObj != rdParentPopupPanel){
+                                        rdCurrPopupPanelObj = rdCurrPopupPanelObj.parentNode;
                                     }
+                                    else{
+                                        if(rdCurrPopupPanelObj.firstChild.id.match('rdPopupPanelTable')){
+                                            if(rdCurrPopupPanelObj.parentNode)  
+                                                rdCurrPopupPanelObj.parentNode.appendChild(c);  // Add the new sibling as a child to the parent of the already popped out Div.                              
+                                        }
                                     break;
                                 }
                             }                
@@ -75,17 +94,17 @@ function ShowElement(sParentId,sElementId,sAction,sEffect) {
                     }
                     if(sAction.toLowerCase() != 'hide'){    //#14844.
                         var eleHiddenParent = c.parentNode;
-                        while(eleHiddenParent != null){                        
-                            if(eleHiddenParent.style){
-                                if(eleHiddenParent.style.display == 'none'){
-                                    eleHiddenParent.parentNode.appendChild(c);
-                                    break;
-                                }
+                    while(eleHiddenParent != null){                        
+                        if(eleHiddenParent.style){
+                            if(eleHiddenParent.style.display == 'none'){
+                                eleHiddenParent.parentNode.appendChild(c);
+                                break;
                             }
-                            eleHiddenParent = eleHiddenParent.parentNode;
                         }
+                        eleHiddenParent = eleHiddenParent.parentNode;
                     }
                 }
+            }
             }
 		    
             if (c != null ) {

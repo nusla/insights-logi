@@ -75,8 +75,10 @@
   td.visible-lg {
     display: table-cell !important;
   }
-
- .hidden-lg {
+  .hidden-md {
+    display: none !important;
+  }
+ .hidden-sm {
     display: none !important;
   }
 

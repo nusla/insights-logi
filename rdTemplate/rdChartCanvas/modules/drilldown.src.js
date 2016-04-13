@@ -10,7 +10,7 @@
 /*global HighchartsAdapter*/
 (function (H) {
 
-	"use strict";
+	//"use strict";
 
 	var noop = function () {},
 		defaultOptions = H.getOptions(),

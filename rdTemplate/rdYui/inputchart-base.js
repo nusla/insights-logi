@@ -3,7 +3,7 @@
 /*global LogiXML, YUI, document, window */
 
 YUI.add('inputchart-base', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var Lang = Y.Lang,
 		ImageUtils = Y.LogiXML.Image,

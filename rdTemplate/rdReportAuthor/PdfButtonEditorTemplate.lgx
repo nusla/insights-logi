@@ -20,7 +20,7 @@
               <Division Class="separator-horizontal" />
               <Image ID="imgDelete_rdElementID" Caption="../rdTemplate/rdReportAuthor/close.png">
                 <Action Type="RefreshElement" ElementID="rdReportAuthorID, rdParentID" ID="actDeleteElement_rdElementID" ConfirmMessage="Remove? Are you sure?">
-                  <LinkParams rdReportAuthorAction="delete" rdReportAuthorElementID="rdElementID" rdElementType="PdfButton" />
+                  <LinkParams rdReportAuthorAction="delete" rdReportAuthorElementID="rdElementID" rdElementType="PdfButton" rdReportAuthorRefreshElementID="rdParentID"/>
                   <WaitPage />
                 </Action>
               </Image>
@@ -65,105 +65,7 @@
                       <Label Caption="Font Color:" />
                     </Column>
                     <Column>
-                      <Division ID="ColorPickerWraper_rdElementID" Class="rd-color-picker-popup">
-                        <InputHidden ID="slctLabelFontColor_rdElementID" DefaultValue="" />
-                        <Rows>
-                          <Row>
-                            <Column>
-                              <Rectangle ID="rectColor_rdElementID" Height="10" Width="10" BorderThickness="1" BackgroundColor="#6AA84F" Color="#ABACAC" />
-                            </Column>
-                            <Column>
-                              <PopupPanel ID="ppLabelFontColors_rdElementID" PopupPanelLocation="Mouse">
-                                <Rows>
-                                  <Row>
-                                    <Column Class="rdAgKPIColor1" ID="colColor1">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor1" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClickColor" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor2" ID="colColor2">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor2" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor3" ID="colColor3">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor3" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor10" ID="colColor10">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor10" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                  </Row>
-                                  <Row>
-                                    <Column Class="rdAgKPIColor4" ID="colColor4">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor4" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClickColor" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor5" ID="colColor5">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor5" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor6" ID="colColor6">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor6" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor11" ID="colColor11">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor11" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                  </Row>
-                                  <Row>
-                                    <Column Class="rdAgKPIColor7" ID="colColor7">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor7" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClickColor" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor8" ID="colColor8">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor8" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor9" ID="colColor9">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor9" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                    <Column Class="rdAgKPIColor12" ID="colColor12">
-                                      <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor12" BorderThickness="0" />
-                                      <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                        <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this);" />
-                                      </EventHandler>
-                                    </Column>
-                                  </Row>
-                                </Rows>
-                              </PopupPanel>
-                              <Image Caption="rdTemplate/rdAnalysisGrid/ColorPicker.png" ID="colorPicker_rdElementID" Tooltip="Pick Color." IdeDisplayStatus="Collapsed" Class="rd-colorpicker-image">
-                                <EventHandler DhtmlEvent="onclick">
-                                  <Action Type="Javascript" ID="actClickColor" Javascript="ShowElement(this.id,'ppLabelFontColors_rdElementID','Toggle'); GetColorPicker('colorPickerValue_rdElementID', this);" />
-                                </EventHandler>
-                              </Image>
-                            </Column>
-                          </Row>
-                        </Rows>
-                      </Division>
+                      <InputColorPicker ID="slctLabelFontColor_rdElementID" Tooltip="ColorPickerTooltip"/>                    
                     </Column>
                   </Row>
                   <Row>
@@ -227,105 +129,7 @@
                         <Label Caption="Color:" />
                       </Column>
                       <Column>
-                        <Division ID="BorderColorPickerWraper_rdElementID" Class="rd-color-picker-popup">
-                          <InputHidden ID="slctBorderColor_rdElementID" DefaultValue="" />
-                          <Rows>
-                            <Row>
-                              <Column>
-                                <Rectangle ID="rectBorderColor_rdElementID" Height="10" Width="10" BorderThickness="1" BackgroundColor="#6AA84F" Color="#ABACAC"/>
-                              </Column>
-                              <Column>
-                                <PopupPanel ID="ppLabelBorderColors_rdElementID" PopupPanelLocation="Mouse">
-                                  <Rows>
-                                    <Row>
-                                      <Column Class="rdAgKPIColor1" ID="colColor1">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor1" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClickColor" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor2" ID="colColor2">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor2" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor3" ID="colColor3">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor3" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor10" ID="colColor10">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor10" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                    </Row>
-                                    <Row>
-                                      <Column Class="rdAgKPIColor4" ID="colColor4">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor4" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClickColor" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor5" ID="colColor5">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor5" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor6" ID="colColor6">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor6" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor11" ID="colColor11">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor11" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                    </Row>
-                                    <Row>
-                                      <Column Class="rdAgKPIColor7" ID="colColor7">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor7" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClickColor" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor8" ID="colColor8">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor8" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor9" ID="colColor9">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor9" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                      <Column Class="rdAgKPIColor12" ID="colColor12">
-                                        <Rectangle ID="rectColor" Height="10" Width="10" Class="rdAgKPIColor12" BorderThickness="0" />
-                                        <EventHandler DhtmlEvent="onclick" ID="evtColor">
-                                          <Action Type="Javascript" ID="actClick" Javascript="Y.LogiXML.ReportAuthor.pg(this,true);" />
-                                        </EventHandler>
-                                      </Column>
-                                    </Row>
-                                  </Rows>
-                                </PopupPanel>
-                                <Image Caption="rdTemplate/rdAnalysisGrid/ColorPicker.png" ID="colorBorderPicker_rdElementID" Tooltip="Pick Color." IdeDisplayStatus="Collapsed" Class="rd-colorpicker-image">
-                                  <EventHandler DhtmlEvent="onclick">
-                                    <Action Type="Javascript" ID="actClickColor" Javascript="ShowElement(this.id,'ppLabelBorderColors_rdElementID','Toggle'); GetColorPicker('BorderColorPicker_rdElementID', this);" />
-                                  </EventHandler>
-                                </Image>
-                              </Column>
-                            </Row>
-                          </Rows>
-                        </Division>
+                        <InputColorPicker ID="slctBorderColor_rdElementID" Tooltip="ColorPickerTooltip"/>                      
                       </Column>
                     </Row>
                   </Rows>

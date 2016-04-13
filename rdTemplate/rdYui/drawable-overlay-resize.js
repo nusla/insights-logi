@@ -2,7 +2,7 @@
 /*global LogiXML, YUI, document, window */
 
 YUI.add('drawable-overlay-resize', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var EV_DRAW_END = 'draw:end',
 		BOUNDING_BOX = 'boundingBox';

@@ -28,7 +28,9 @@ YUI.add('popupmenu', function(Y) {
 		    if (Y.Lang.isValue(this._menu)) {
 				this._menu.hide(this._menu);
 				YAHOO.widget.MenuManager.removeMenu(this._menu);    //#12703.
-			}
+		    }
+
+
 
 			var sPopupId  //Add rdPopup to the ID. For tables, it goes befor _Row#, For crosstabs, it needs to go before _Ct# 
 			if (sMenuId.indexOf("_CtCol") !=-1) { 
@@ -40,6 +42,25 @@ YUI.add('popupmenu', function(Y) {
 			 else { 
 				sPopupId = sMenuId + "_rdPopup" ;
 			} 
+
+		    //Special case for conditioned menu options. 24118
+			var popup = Y.one('#' + sPopupId);
+			if (popup) {
+			    var ul = popup.all("UL");
+			    if (ul) {
+			        var li = ul.get('childNodes');
+			        if (li && li[0]) {
+			            li = li[0];
+			            for (var i = 0; i < li._nodes.length; i++) {
+			                var item = li._nodes[i];
+                            if(item && item.nodeName && item.nodeName.toLowerCase().indexOf("rdcondelement") >= 0) {
+                                ul.insertBefore(item.firstChild, item);
+                                item.parentNode.removeChild(item);
+			                }
+			            }
+			        }
+			    }
+			}
 
 			if (sMenuId.indexOf('ppPanelMenu') > -1) {
 			    var eleDivDashboardPanels = document.getElementById("rdDivDashboardPanelTable");

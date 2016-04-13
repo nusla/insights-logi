@@ -1,13 +1,17 @@
 
 (function () {
-    "use strict";
+    //"use strict";
     var fs = require('fs');
 
     var config = {
         libs: {
             /* define locations of mandatory javascript files */
             JQUERY: 'jquery.min.js',
-            HIGHCHARTS: 'highcharts.src.js',
+            YUI: '..' + fs.separator + 'rdYui.min.js',
+            GLOBAL_JS: '..' + fs.separator + 'rdYui' + fs.separator + 'global.js',
+            CHARTCANVAS: '..' + fs.separator + 'rdChartCanvas.min.js',
+            RDAJAX: '..' + fs.separator + 'rdAjax' + fs.separator + 'rdAjax2.js'
+            /*HIGHCHARTS: 'highcharts.src.js',
             HIGHCHARTS_MORE: 'highcharts-more.js',
             YUI: '..' + fs.separator + 'rdYui' + fs.separator + 'yui-preload-min.js',
             GLOBAL_JS: '..' + fs.separator + 'rdYui' + fs.separator + 'global.js',
@@ -20,7 +24,10 @@
             H_NODATA: 'rdNoDataForHighcharts.js',
             H_VIEWSTATE: 'rdViewState.js',
             H_3D: 'highcharts-3d.js',
-            H_3D_EXTENSIONS: 'rd3Dcharts.js'
+            H_3D_EXTENSIONS: 'rd3Dcharts.js',
+            H_SEGMENTED: 'segmented_series.js',
+            H_GAUGES: fs.separator + 'modules' + fs.separator + 'rdHighchartsGauges.js'
+            */
         },
             TIMEOUT: 2000 /* 2 seconds timout for loading images */
         },
@@ -208,9 +215,10 @@
 			try {
 				if (outType.toLowerCase() === 'svg') {
 					// output svg
-					svg = svg.html.replace(/<svg /, '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ').replace(/ href=/g, ' xlink:href=').replace(/<\/svg>.*?$/, '</svg>');
+					//svg = svg.html.replace(/<svg /, '<svg xmlns:xlink="http://www.w3.org/1999/xlink" ').replace(/ href=/g, ' xlink:href=').replace(/<\/svg>.*?$/, '</svg>');
 					// add xml doc type
-					svg = SVG_DOCTYPE + svg;
+				    //svg = SVG_DOCTYPE + svg;
+				    svg = svg.html;
 
 					if (output !== undefined) {
 						// write the file
@@ -459,7 +467,7 @@
 			
 			return {
 				//html: $container[0].firstChild.innerHTML,
-				html: $('div.highcharts-container')[0].innerHTML,
+				html: $('div.highcharts-container')[0].outerHTML,
 				width: chart.chartWidth,
 				height: chart.chartHeight
 			};

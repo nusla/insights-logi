@@ -96,7 +96,7 @@ div.container-fluid + div {
     height: 26px;
 }
 .rdReportAuthor_BackgroundMenu{
-    background: #86CAC3;
+    background: lightgray;
     min-height: 22px;
 }
 .rdReportAuthor_HeaderMenu{
@@ -655,4 +655,79 @@ text-decoration: none!important;
 .backgroundButtons td span{
     display: inline-block;
     padding-top: 1px;
+}
+
+.rdPageHFHint {
+    font-size: 12px;
+    font-style: italic;
+    padding-left: 50px;
+}
+
+#divReportAuthorWorkContainer.rdDroppableContainer {
+    margin-top: 10px;
+}
+#divReportAuthorFooterContainer.rdDroppableContainer,
+#divReportAuthorHeaderContainer.rdDroppableContainer,
+#divReportAuthorWorkContainer.rdDroppableContainer {
+    border: 1px dashed #C0C0C0;
+	margin-right: 10px;
+}
+#divReportAuthorFooterContainer,
+#divReportAuthorHeaderContainer {
+    min-height: 32px;
+}
+    
+
+#divReportAuthorFooterContainer.yui3-dd-drop-active-invalid, 
+#divReportAuthorHeaderContainer.yui3-dd-drop-active-invalid,
+#divReportAuthorWorkContainer.yui3-dd-drop-active-invalid {
+    border: 1px dashed red;
+}
+
+#divReportAuthorFooterContainer.yui3-dd-drop-active-valid, 
+#divReportAuthorHeaderContainer.yui3-dd-drop-active-valid,
+#divReportAuthorWorkContainer.yui3-dd-drop-active-valid {
+    border: 1px dashed green;
+}
+
+.rd-toolbox-element-text.rd-text-element.rd-pdf-headerfooter-item {
+    width: auto;
+    margin-left: auto;
+    padding-bottom: 8px;
+}
+
+.rd-pdf-headerfooter-item input {
+    vertical-align: middle;
+}
+
+.rd-pdf-align-right {
+text-align: right;
+padding-right: 8px;
+}
+
+.rd-toolbox-container{
+   position: fixed;
+  z-index: 1;
+  left: 5px;
+  background-color: #ffffff;
+  margin-left:-5px;
+  margin-top:3px;
+  padding-left: 5px;
+  }
+  
+ #yui_3_1_1433439973255_693 {
+ margin-left: 10px;
+ 
+ }
+ 
+ #rowReportAuthorHeader{
+ margin-left:-5px;
+ }
+  
+ #colReportAuthorHeader{
+ padding-left:8px;
+ }
+ 
+.rdColorPanelHolder {
+width: 0px !important;
 }

@@ -142,7 +142,9 @@ function rdLogiWidget() {
     rdAllWidgets[rdAllWidgets.length] = this;
 }
 
-rdLogiWidget.prototype.load = function() {
+rdLogiWidget.yuiLoaded = false;
+
+rdLogiWidget.prototype.load = function () {
 	//does the page have a 'head' tag? - if not add it.
 	if (document.getElementsByTagName("head").length < 1) {
 		var eleHead = document.createElement('head');
@@ -155,6 +157,12 @@ rdLogiWidget.prototype.load = function() {
     sScriptSrc += "&rdReport=" + encodeURIComponent(this.definition);
     sScriptSrc += "&rdServerUrl=" + encodeURIComponent(this.serverUrl);
     sScriptSrc += "&rdRnd=" + Math.floor(Math.random() * 100000);
+    if (!rdLogiWidget.yuiLoaded) {
+        rdLogiWidget.yuiLoaded = true;
+    }
+    else {
+        sScriptSrc += "&skipYUI=True";
+    }
     for (i=0; i < this.parameters.length; i++) {
         sScriptSrc += this.parameters[i];
     }

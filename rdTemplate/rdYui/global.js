@@ -3,11 +3,11 @@
 /*global LogiXML: true, YUI: false, Y: false, document: false, Node: false, window: false */
 
 /*
- * JSlint doesn't like "use strict"; at the top of JS files unless you scope.  Reason being
+ * JSlint doesn't like //"use strict"; at the top of JS files unless you scope.  Reason being
  * this file might be concatenated with others therefore force the concatenated file to run in
  * strict mode.  global.js is always loaded independently so we're fine. */
 
-"use strict";
+//"use strict";
 /* 
  * Create namespace for LogiXML javascript code to live under.
  * Help prevent collisions with customer code and remove functions
@@ -15,6 +15,29 @@
  */
 if (window.LogiXML === undefined) {
     window.LogiXML = {};
+}
+if (LogiXML.decodeHtml === undefined) {
+    LogiXML.decodeHtml = function(htmlString, decodeTags) {
+        var result = htmlString.toString();
+        if (result && result.indexOf("&") != -1) {
+            if (!LogiXML.decodeHtmlTextArea) {
+                LogiXML.decodeHtmlTextArea = document.createElement("textarea");
+            }
+            LogiXML.decodeHtmlTextArea.innerHTML = result;
+            if (LogiXML.isIE() && LogiXML.isIE() <= 9) {
+                result = LogiXML.decodeHtmlTextArea.innerHTML;
+
+            } else {
+                result = LogiXML.decodeHtmlTextArea.value;
+            }
+        }
+        if (!decodeTags && result)
+        {
+            result = result.replace(/</g, "&lt;");
+        }
+
+        return result;
+    }
 }
 LogiXML.rd = {};
 LogiXML.guids = {};
@@ -36,7 +59,7 @@ String.prototype.endsWith = function(str) {
 
 if (!Array.prototype.some) {
     Array.prototype.some = function (fun /*, thisArg */) {
-        'use strict';
+        //'use strict;
         if (this === void 0 || this === null)
             throw new TypeError();
 
@@ -59,9 +82,9 @@ LogiXML.layout = {};
 LogiXML.layout.getTextDimensions = function(text, style, className) {
     var div = document.createElement("lDiv");
     document.body.appendChild(div);
-    if (style) {
+    if (style && style.toString().length != 0) {
         div.style.fontFamily = style.fontFamily;
-        div.style.fontSize = style.fontSize;
+        div.style.fontSize = style.fontSize || '';
         div.style.fontWeight = style.fontWeight || 'normal';
         if (style.width) {
             div.style.width = style.width;
@@ -83,49 +106,6 @@ LogiXML.layout.getTextDimensions = function(text, style, className) {
     div = null;
     return result;
 };
-
-(function () {
-	// Based on tests from Modernizer -- http://www.modernizr.com
-	// At some point just switch over to Modernizer, for now this is lighter
-	LogiXML.features = {};
-	
-	var tests = {},
-		features = LogiXML.features,
-		junk = 'junk',
-		feature;
-	
-	tests['localstorage'] = function() {
-        try {
-            localStorage.setItem(junk, junk);
-            localStorage.removeItem(junk);
-            return true;
-        } catch(e) {
-            return false;
-        }
-    };
-	
-	tests['canvas'] = function() {
-        var elem = document.createElement('canvas');
-        return !!(elem.getContext && elem.getContext('2d'));
-    };
-	
-	tests['touch'] = function() {
-		// Modernizer Test in case this one has problems
-		// return ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch;
-		try {
-		    //document.createEvent('TouchEvent');   //Chrome returns true in latest versions.
-		    return 'ontouchstart' in window;
-		} catch (e) {
-			return false;
-		}		
-	};
-	
-	for( feature in tests ) {
-		if ( tests.hasOwnProperty(feature) ) {
-			features[feature.toLowerCase()] = tests[feature]();
-		}
-	}
-}());
 
 // Utilities
 LogiXML.inspect = function( inspectMe ) {
@@ -599,3 +579,105 @@ LogiXML.getRandomElements = function (array, count) {
     } while (indexes.length <= count)
     return indexes;
 };
+LogiXML.attr = function (elem, prop, value) {
+    var key,
+		ret;
+    if (Y.Lang.isString(prop)) {
+        if (defined(value)) {
+            elem.setAttribute(prop, value);
+        } else if (elem && elem.getAttribute) {
+            ret = elem.getAttribute(prop);
+        }
+    } else if (Y.Lang.isValue(prop) && Y.Lang.isObject(prop)) {
+        for (key in prop) {
+            elem.setAttribute(key, prop[key]);
+        }
+    }
+    return ret;
+}
+String.prototype.format = String.prototype.format || function () {
+    var args = arguments;
+    return this.replace(/{(\d+)}/g, function (match, number) {
+        return typeof args[number] != 'undefined'
+          ? args[number]
+          : match
+        ;
+    });
+};
+LogiXML.TemplateEngine = function (tpl, data) {
+    var re = /<%([^%>]+)?%>/gm;
+    if (LogiXML.isIE()) {
+        ieReplaceByRegex();
+    }
+    else {
+        while (tpl.match(re)) {
+            var match = re.exec(tpl.toString())
+            tpl = tpl.toString().replace(match[0], data[match[1]])
+        }
+    }
+    return tpl;
+    function ieReplaceByRegex() {
+        while (match = re.exec(tpl.toString())) {
+            tpl = tpl.replace(match[0], data[match[1]])
+        }
+        if (match = re.exec(tpl.toString()))
+        {
+            tpl = tpl.replace(match[0], data[match[1]])
+            ieReplaceByRegex();
+        }
+    }
+}
+LogiXML.isIE=function () {
+    var myNav = navigator.userAgent.toLowerCase();
+    var ieNumber = parseInt(myNav.split('msie')[1] || myNav.split('rv:')[1]);
+    return ieNumber <= 11 ? ieNumber : false;
+}
+
+LogiXML.getUtcDateStringWithoutClientOffset = function (dt) {
+    var tzo = -dt.getTimezoneOffset(),
+        dif = tzo >= 0 ? '+' : '-',
+        pad = function (num) {
+            var norm = Math.abs(Math.floor(num));
+            return (norm < 10 ? '0' : '') + norm;
+        };
+    return dt.getFullYear()
+        + '-' + pad(dt.getMonth() + 1)
+        + '-' + pad(dt.getDate())
+        + 'T' + pad(dt.getHours())
+        + ':' + pad(dt.getMinutes())
+        + ':' + pad(dt.getSeconds())
+        + dif + pad(tzo / 60)
+        + ':' + pad(tzo % 60);
+}
+
+LogiXML.getTimestampWithoutClientOffset = function (dt) {
+    return Date.UTC(dt.getFullYear(), dt.getMonth(), dt.getDate(), dt.getHours(), dt.getMinutes(), dt.getSeconds());
+}
+
+YUI().use('resize-base', 'rdResizer', function (Y) {
+        //it is a stub for loading resizer and necessary .css, see yui-config.js
+});
+
+YUI().use('node', 'event', function (Y) {
+    LogiXML.EventBus = LogiXML.EventBus || {};
+    LogiXML.EventBus.ChartCanvasEvents = function () {
+        if (LogiXML.EventBus._ChartCanvasEvents === undefined) {
+            LogiXML.EventBus._ChartCanvasEvents = new Y.EventTarget();
+        }
+        return LogiXML.EventBus._ChartCanvasEvents;
+    };
+
+});
+
+LogiXML.getGuid = function () {
+    var S4 = function () {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+};
+LogiXML.getObjectX = function(eleObject) { 
+    return (eleObject.offsetParent ? (LogiXML.getObjectX(eleObject.offsetParent) + eleObject.offsetLeft) : eleObject.offsetLeft);
+}, 
+LogiXML.getObjectY = function (eleObject) {
+    return (eleObject.offsetParent ? (LogiXML.getObjectY(eleObject.offsetParent) + eleObject.offsetTop) : eleObject.offsetTop);
+}

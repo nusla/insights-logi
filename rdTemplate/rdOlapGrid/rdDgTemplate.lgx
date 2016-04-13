@@ -454,19 +454,38 @@
                         <LineBreak/>
                       </Division>
                       <OlapChart>
-						  <Chart Type="XY" XYChartType="Bar" ChartHeight="400" ChartWidth="600" LineWidth="2" ID="ogChart" BarShape="Square" BarShading="BottomLight" D3="3" Color="red, yellow, blue" OuterBorderColor="#7A7A7A" RoundedBorder="4" Transparency="2" ChartBackgroundColor="#D1D1D1" ChartBackgroundGradientColor="#FFFFFF" MaxLabelLength="20" OlapGrid="True">
-							  <FontChartTitle FontSize="10" FontFilename="arialbd.ttf"/>
-							  <FontLabel FontSize="8"/>
-							  <FontData FontSize="8"/>
-							  <DataScale Format="mp" ZeroAffinity="1"/>							  
-							  <Action Type="Report" ID="actChartDrilldown">
-								  <Target Type="Report" KeepScrollPosition="True" KeepShowElements="True"/>
-								  <LinkParams rdOgCommand="DrillChart" rdOgCommandID="@Function.FUID~" rdOlapTableID="sOlapTableId" rdDrilldownDimension="" rdDrilldownPosition="" rdDrilledDown=""/>
-							  </Action>
-							  <Resizer ID="rdChartResizerTemplate" MinWidth="250" MinHeight="250" />
-							  <HoverHighlight />
-							  <Quicktip ID="rdDgGaugeQuicktip"/>
-						  </Chart>
+                        <!--<Chart rdTranslateToChartCanvas="True"  Type="XY" XYChartType="Bar" ChartHeight="400" ChartWidth="600" LineWidth="2" ID="ogChart" BarShape="Square" BarShading="BottomLight" D3="3" Color="red, yellow, blue" OuterBorderColor="#7A7A7A" RoundedBorder="4" Transparency="2" ChartBackgroundColor="#D1D1D1" ChartBackgroundGradientColor="#FFFFFF" MaxLabelLength="20" OlapGrid="True">
+                          <FontChartTitle FontSize="10" FontFilename="arialbd.ttf"/>
+                          <FontLabel FontSize="8"/>
+                          <FontData FontSize="8"/>
+                          <DataScale Format="mp" ZeroAffinity="1"/>
+                          <Action Type="Report" ID="actChartDrilldown">
+                            <Target Type="Report" KeepScrollPosition="True" KeepShowElements="True"/>
+                            <LinkParams rdOgCommand="DrillChart" rdOgCommandID="@Function.FUID~" rdOlapTableID="sOlapTableId" rdDrilldownDimension="" rdDrilldownPosition="" rdDrilledDown=""/>
+                          </Action>
+                          <Resizer ID="rdChartResizerTemplate" MinWidth="250" MinHeight="250" />
+                          <HoverHighlight />
+                          <Quicktip ID="rdDgGaugeQuicktip"/>
+                        </Chart>-->
+                        <ChartCanvas ID="ogChart-dgNWSales2" ChartWidth="600" ChartHeight="400" BorderColor="Transparent" BorderRadius="0" BackgroundColor="#ffffff" SpacingTop="20" SpacingRight="20">
+                          <Series Type="Bar"  ID="templateSeries">
+                            <Action Type="Report" ID="actChartDrilldown">
+                              <Target Type="Report" KeepScrollPosition="True" KeepShowElements="True" />
+                              <LinkParams rdOgCommand="DrillChart" rdOgCommandID="@Function.FUID~" rdOlapTableID="sOlapTableId" rdDrilldownDimension="" rdDrilldownPosition="" rdDrilledDown="" />
+                            </Action>
+                            <Quicktip ID="rdDgGaugeQuicktip" />
+                          </Series>
+                          <ChartXAxis>
+                            <AxisLabelStyle FontColor="#424242" FontFamily="Segoe UI" FontSize="8pt" />
+                            <AxisCaptionStyle FontColor="#3B4247" FontFamily="Segoe UI" FontSize="11pt" />
+                          </ChartXAxis>
+                          <ChartYAxis>
+                            <AxisLabelStyle FontColor="#3B4247" FontFamily="Segoe UI" FontSize="8pt" />
+                            <AxisCaptionStyle FontColor="#3B4247" FontFamily="Segoe UI" FontSize="11pt" />
+                          </ChartYAxis>
+                          <Resizer ID="rdChartResizerTemplate" MinWidth="250" MinHeight="250" />
+                          <ChartCaptionStyle FontColor="#424242" FontFamily="Segoe UI" FontSize="18pt" AlignmentHorizontal="Center" />
+                        </ChartCanvas>
                       </OlapChart>
                     </Column>
                   </Row>
@@ -509,7 +528,7 @@
                         <Label Caption="Click here to drill up." ID="lblHeatmapDrillup">
                           <Action Type="Report" ID="actHeatmapDrillup">
                             <Target Type="Report" KeepScrollPosition="True" KeepShowElements="True"/>
-                            <LinkParams rdOgCommand="DrillHeatmap" rdOgCommandID="@Function.FUID~" rdOlapTableID="otOlapGrid" rdDrilldownDimension="@Session.rdOgHeatmapDrillupDimension~" rdDrilldownPosition="@Session.rdOgHeatmapDrillupPosition~"/>
+                            <LinkParams rdOgCommand="DrillHeatmap" rdOgCommandID="@Function.FUID~" rdOlapTableID="otOlapGrid" rdDrilledDown="True" rdDrilldownDimension="@Session.rdOgHeatmapDrillupDimension~" rdDrilldownPosition="@Session.rdOgHeatmapDrillupPosition~"/>
                           </Action>
                         </Label>
                       </Division>
@@ -525,6 +544,25 @@
                 <OlapHeatmap>
 				  <AnalysisChart ID="heatmapGrid" ChartHeight="500" ChartWidth="800" ControlPanelLocation="Top" AnalysisChartTypes="Heatmap" TemplateModifierFile="@Function.AppPhysicalPath~/rdTemplate/rdOlapGrid/rdAnalysisChartModifier.xml" OlapGrid="True">
 			      </AnalysisChart>
+                  <!--<ChartCanvas ID="heatmapGrid" ChartWidth="800" ChartHeight="500"  OlapGrid="True" BorderColor="Transparent" BorderRadius="0" BackgroundColor="#ffffff" SpacingTop="20" SpacingRight="20">
+                    <Series Type="Heatmap" ID="templateSeries">
+                      <Action Type="Report" ID="actChartDrilldown">
+                        <Target Type="Report" KeepScrollPosition="True" KeepShowElements="True" />
+                        <LinkParams rdOgCommand="DrillChart" rdOgCommandID="@Function.FUID~" rdOlapTableID="sOlapTableId" rdDrilldownDimension="" rdDrilldownPosition="" rdDrilledDown="" />
+                      </Action>
+                      <Quicktip ID="rdDgGaugeQuicktip" />
+                    </Series>
+                    <ChartXAxis>
+                      <AxisLabelStyle FontColor="#424242" FontFamily="Segoe UI" FontSize="8pt" />
+                      <AxisCaptionStyle FontColor="#3B4247" FontFamily="Segoe UI" FontSize="11pt" />
+                    </ChartXAxis>
+                    <ChartYAxis>
+                      <AxisLabelStyle FontColor="#3B4247" FontFamily="Segoe UI" FontSize="8pt" />
+                      <AxisCaptionStyle FontColor="#3B4247" FontFamily="Segoe UI" FontSize="11pt" />
+                    </ChartYAxis>
+                    <Resizer ID="rdChartResizerTemplate" MinWidth="250" MinHeight="250" />
+                    <ChartCaptionStyle FontColor="#424242" FontFamily="Segoe UI" FontSize="18pt" AlignmentHorizontal="Center" />
+                  </ChartCanvas>-->
                 </OlapHeatmap>
               </Column>
             </Row>

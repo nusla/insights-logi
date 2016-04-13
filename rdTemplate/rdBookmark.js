@@ -25,6 +25,28 @@ function rdAddBookmark(sActionId, sReport, sBookmarkReqIds, sBookmarkSessionIds,
     sReqParams += "&rdBookmarkCustomColumn2=" + encodeURIComponent(sCust2)
     sReqParams += "&rdBookmarkDescription=" + encodeURIComponent(sDesc)
     sReqParams += "&rdBookmarkID=" + encodeURIComponent(Y.Lang.isValue(sBookmarkId) ? sBookmarkId : '')
+	
+	
+	// This is added specifically for radio buttons. #23741
+	var frm = document.rdForm
+	if (sPrevRadioId) sPrevRadioId = "";
+	for (var i=0; i < frm.elements.length; i++) {
+		var ele = frm.elements[i]
+	    
+	    if (!ele.type) {
+            continue;  //Not an input element.
+	    }
+		
+		if (ele.type == "radio") {
+			
+			if (sReqParams.indexOf("&" + ele.name + "=") != -1) continue;
+			
+			var sInputValue =  rdGetInputValues(ele);
+			if (sReqParams.indexOf(sInputValue) == -1)
+	            sReqParams += sInputValue;	
+		}
+	}
+	
     var aIds = sBookmarkReqIds.split(",")
     for (var i=0; i < aIds.length; i++) {
         var sId = aIds[i]
@@ -34,11 +56,12 @@ function rdAddBookmark(sActionId, sReport, sBookmarkReqIds, sBookmarkSessionIds,
                 //Changed to rdGetInputValues (defined in rdAjax2.js)
                 sReqParams += rdGetInputValues(ele);
             }
-            else if (document.getElementById("rdBookmarkReqId_" + sId)) {   //20099
-                sReqParams += "&" + sId + "=" + document.getElementById("rdBookmarkReqId_" + sId).innerHTML;
-            }
+            else if ((sReqParams.indexOf("&" + sId + "=") == -1) && document.getElementById("rdBookmarkReqId_" + sId)) {   //20099
+				sReqParams += "&" + sId + "=" + document.getElementById("rdBookmarkReqId_" + sId).innerHTML;
+            }				
         }
-    }
+    }	
+	
     bSubmitFormAfterAjax = true
     rdValidationRowNrFilter = nRowNr  
     rdAjaxRequest("rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddBookmark" + sReqParams)
@@ -169,18 +192,23 @@ function rdShareBookmarkOrFolder(sActionId, sReport, BookmarkCollection, Bookmar
 
 	} else {
 
-	    sReqParams += "&rdSharedCollection=";
+        var sSharedWith = "&rdSharedCollection=";
 	    var sharedNode = Y.one("#" + sharedWith);
 	    if (!Y.Lang.isNull(sharedNode)) {
-	        sReqParams += sharedNode.get('value');
+	        sSharedWith  += sharedNode.get('value');
 	        if (sharedNode._node.tagName == 'SPAN') {
-	            sReqParams += sharedNode._node.innerHTML;
+	            sSharedWith += sharedNode._node.innerHTML;
 	            isSpanNode = true;
 	            var n = sharedWith.lastIndexOf("_");
 	            sRowId = "actShareBookmarkFromDataLayer_" + sharedWith.substring(n + 1);
 	        }
 	    }
 
+	    //exit if sharedWith is undefined or an empty string. 24839
+	    if (sSharedWith == "&rdSharedCollection=")
+	        return;
+        else
+	        sReqParams += sSharedWith;
 	}
 	sReqParams += "&rdSharedFromInput=" + bFromInput;
 	

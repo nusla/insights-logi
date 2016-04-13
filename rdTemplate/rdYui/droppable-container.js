@@ -1,5 +1,5 @@
 ﻿YUI.add('droppableContainer', function (Y) {
-    "use strict";
+    //"use strict";
 
     var Lang = Y.Lang,
         TRIGGER = 'rdDroppableContainer';
@@ -40,7 +40,8 @@
             }
 
             this.dropObject = new Y.DD.Drop(dropPrms);
-            this._handlers.onDropHit = this.dropObject.on('drop:hit', this.onDropHit, this);
+            //it is buggy, we will call onDropHit from draggable element
+            //this._handlers.onDropHit = this.dropObject.on('drop:hit', this.onDropHit, this);
             this._handlers.onDropEnter = this.dropObject.on('drop:enter', this.onDropEnter, this);
             this._handlers.onDropExit = this.dropObject.on('drop:exit', this.onDropExit, this);
             //this._handlers.onDropOver = this._handlers.drop.on('drop:over', this.onDropOver, this);
@@ -65,7 +66,6 @@
                 } else {
                     editorId = editorNode.getAttribute('id');
                 }
-                    
             }
 
             if (!obj.preventCloneNode) {
@@ -97,6 +97,9 @@
                 act = act.replace(/rdSiblingID/g, prevSibling ? prevSibling.getAttribute('id') : '');
                 act = act.replace(/rdReturnElementID/g, editorId);
                 eval(act);
+            }
+            if (node) {
+                node.removeClass('yui3-dd-dragging');
             }
             this.checkPlaceholder();
 
@@ -137,7 +140,7 @@
             }
             if (!showPlaceholder && childNodes.size() == 3 &&
                 !this.configNode.one("> .rdDropGhost")
-                && this.configNode.get('nodeName').toLowerCase() == 'td' 
+                //&& this.configNode.get('nodeName').toLowerCase() == 'td' 
                 && this.configNode.one('> .yui3-dd-dragging')
                 && this.configNode.one('> .rdDragProxy')) {
                     showPlaceholder = true;

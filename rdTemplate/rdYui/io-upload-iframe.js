@@ -188,15 +188,18 @@ Y.mix(Y.IO.prototype, {
         }
 
 		try {
-			if (b) {
-				// When a response Content-Type of "text/plain" is used, Firefox and Safari
-				// will wrap the response string with <pre></pre>.
-				p = b.one('pre:first-child');
-				o.c.responseText = p ? p.get('text') : b.get('text');
-			}
-			else {
-				o.c.responseXML = d._node;
-			}
+                //if (b) {
+                    // When a response Content-Type of "text/plain" is used, Firefox and Safari
+                    // will wrap the response string with <pre></pre>.
+                    //p = b.one('pre:first-child');
+                    //o.c.responseText = p ? p.get('text') : b.get('text');
+                    //Y.log('The responseText value for transaction ' + o.id + ' is: ' + o.c.responseText + '.', 'info', 'io');
+                //}
+                //else {
+                    o.c.responseText = new XMLSerializer().serializeToString(d._node);
+                    o.c.responseXML = d._node;
+                    Y.log('The response for transaction ' + o.id + ' is an XML document.', 'info', 'io');
+                //}
 		}
 		catch (e) {
 			o.e = "upload failure";

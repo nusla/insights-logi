@@ -59,7 +59,7 @@ TD.rdPopupPanelControl
 
 .popupPanelContainer {
 	position: absolute;
-	z-index: 202; /* Resize Handles have z-index of 100 and 200, need to be one higher */
+	z-index: 9002; /* Resize Handles have z-index of 100 and 200, need to be higher */
 }
 
 .popupPanelModal
@@ -67,7 +67,7 @@ TD.rdPopupPanelControl
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 201;
+	z-index: 9001;
 	background-color: black;
 	filter: alpha(opacity=50);
 	opacity: 0.5;

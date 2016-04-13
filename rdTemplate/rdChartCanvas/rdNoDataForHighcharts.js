@@ -85,6 +85,33 @@
 				.add();
             chart.noDataLabel.align(extend(chart.noDataLabel.getBBox(), noDataOptions.position), false, 'plotBox');
             
+            if (chart.xAxis && chart.xAxis.length > 0) {
+                var axis = chart.xAxis[0];
+                if (axis.labelGroup) {
+                    axis.labelGroup.css({ display: 'none' });
+                }
+                if (axis.gridGroup) {
+                    axis.gridGroup.css({ display: 'none' });
+                }
+                if (axis.axisGroup) {
+                    axis.axisGroup.css({ display: 'none' });
+                }
+                
+            }
+
+            if (chart.yAxis && chart.yAxis.length > 0) {
+                var axis = chart.yAxis[0];
+                if (axis.labelGroup) {
+                    axis.labelGroup.css({ display: 'none' });
+                }
+                if (axis.gridGroup) {
+                    axis.gridGroup.css({ display: 'none' });
+                }
+                if (axis.axisGroup) {
+                    axis.axisGroup.css({ display: 'none' });
+                }
+            }
+
         }
     };
 
@@ -137,7 +164,7 @@
 	 */
     function handleNoData() {
         var chart = this;
-        if (!chart.options.noData || !chart.options.noData.enabled) {
+        if (!chart.options.noData || !chart.options.noData.enabled || chart.resetZoomButton) {
             return;
         }
         var msg = chart.options.noData.text;

@@ -10,7 +10,7 @@
  * 
  */
 YUI.add('chartfx-mouse-tracker', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var Lang = Y.Lang,
 		ImageUtils = Y.LogiXML.Image,

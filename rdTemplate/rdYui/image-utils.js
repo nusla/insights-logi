@@ -2,7 +2,7 @@
 /*global LogiXML: true, YUI: false, document: false, window: false, console: false, Image: false */
 
 YUI.add('image-utils', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var WRAPPER_CLASS = 'chartfx-wrapper',
 		AttributeHelpers = Y.LogiXML.Attribute,

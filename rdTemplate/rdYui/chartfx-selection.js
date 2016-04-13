@@ -2,7 +2,7 @@
 /*global LogiXML: true, YUI: false, document: false, window: false, console: false */
 
 YUI.add('chartfx-selection', function(Y) {
-	"use strict";
+	//"use strict";
 
 	var ChartFX = Y.namespace('LogiXML.ChartFX'),
 		AttributeHelpers = Y.LogiXML.Attribute,
@@ -94,15 +94,14 @@ YUI.add('chartfx-selection', function(Y) {
 		return useNotSelector;
 	},
 	
-	UseNativeNotSelector = testForNotSelector(),
-	
+
 	/*
 	 * Keep track of which areas in the map have been selected or deselected.
 	 */
 	StateTracker = Y.Base.create('StateTracker', Y.Base, [], {
 		initializer : function(config) {
 			var chartNode = this.get('chart');
-			
+			UseNativeNotSelector = testForNotSelector();
 			this._mapNode = ImageUtils.getMapfromImage( chartNode );
 			this._markValidAreas();
 			

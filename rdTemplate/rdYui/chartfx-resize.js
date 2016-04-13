@@ -2,7 +2,7 @@
 /*global LogiXML, YUI, document, window */
 
 YUI.add('chartfx-resize', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var NODE = 'node',
 		ABSOLUTE = 'absolute',

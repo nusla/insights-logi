@@ -8,10 +8,16 @@ YUI.add('analysis-grid', function(Y) {
 	
 		initializer : function() {
 		
-			//Show the selected tab (if the menu is not hidden)
-			if ( !Y.Lang.isValue(Y.one('hideAgMenu'))
+			//Show the selected tab (if the menu is not hidden) -- Dont show menu if we just added a crosstab or chart 24511
+		    if (!(location.href.indexOf("AcChartAdd") > -1 || location.href.indexOf("AxAdd") > -1)
+                && !Y.Lang.isValue(Y.one('hideAgMenu'))
 			&& Y.Lang.isValue(document.getElementById('rdAgCurrentOpenPanel')))
-				this.rdAgShowMenuTab(document.getElementById('rdAgCurrentOpenPanel').value,true);
+			    this.rdAgShowMenuTab(document.getElementById('rdAgCurrentOpenPanel').value, true);
+
+		    //Show the selected tab (if the menu is not hidden)
+			if (!Y.Lang.isValue(Y.one('hideAgMenu'))
+			&& Y.Lang.isValue(document.getElementById('rdAgCurrentOpenTablePanel')))
+			    this.rdAgShowTableMenuTab(document.getElementById('rdAgCurrentOpenTablePanel').value, true);
 			
 			//Open the correct chart panel if there is an error
 			var chartError = Y.one('#rdChartError');
@@ -20,32 +26,40 @@ YUI.add('analysis-grid', function(Y) {
 		
 			//Initialize draggable panels if not disabled
 			if (Y.Lang.isValue(Y.one('#rdAgDraggablePanels')))
-				this.rdInitDraggableAgPanels();
+			    this.rdInitDraggableAgPanels();
+
+			if (document.getElementById('rdAgCurrentOpenTablePanel') && document.getElementById('rdAgCurrentOpenTablePanel').value == "")
+			    this.rdAgShowTableMenuTab("Layout");
+
+			if (document.getElementById('rdAllowCrosstabBasedOnCurrentColumns') && document.getElementById('rdAllowCrosstabBasedOnCurrentColumns').value == "False")
+			    this.rdSetPanelDisabledClass('Crosstab');
 		},
 		
 		/* -----Analysis Grid Methods----- */
-		
-		rdAgShowMenuTab: function (sTabName, bCheckForReset) {
 
-		    var bNoData = false
-		    //if (sTabName.length == 0) {
-		        var eleStartTableDropdown = document.getElementById('rdStartTable')
-		        if (eleStartTableDropdown != null) {
-		            if (eleStartTableDropdown.selectedIndex == 0) {
+		rdAgShowMenuTab: function (sTabName, bCheckForReset, sSelectedColumn, bKeepOpen) {
+
+		    var bNoData = false;
+		    var eleStartTableDropdown = document.getElementById('rdStartTable');
+
+		    if (eleStartTableDropdown != null) {
+		        if (eleStartTableDropdown.selectedIndex == 0) {
 		                //No table selected in QB. Show the QB.
-		                sTabName = "QueryBuilder"
-		                bNoData = true
-		            }
+		            sTabName = "QueryBuilder"
+		            bNoData = true
 		        }
-		    //}
+		    }
 
-			var bOpen = true;
+		    var bOpen = true;
+
 			if (sTabName.length==0){
 				bOpen=false;
 			}else{
 				var eleSelectedTab = document.getElementById('col' + sTabName);
 				var eleSelectedRow = document.getElementById('row' + sTabName);
-				if (eleSelectedTab.className.indexOf('rdAgSelectedTab')!=-1) {
+
+                //24368
+				if (eleSelectedTab && eleSelectedTab.className.indexOf('rdAgSelectedTab')!=-1) {
 					bOpen = false;
 				}
 				if (bCheckForReset){
@@ -58,61 +72,53 @@ YUI.add('analysis-grid', function(Y) {
 			    bOpen = true;  //When no data, that tab must always remain open.
 			}
 
-			document.getElementById('rdAgCurrentOpenPanel').value = '';
-			this.rdSetClassNameById('colQueryBuilder', 'rdAgUnselectedTab');
-			this.rdSetClassNameById('colLayout', 'rdAgUnselectedTab');
-			this.rdSetClassNameById('colCalc', 'rdAgUnselectedTab');
-			this.rdSetClassNameById('colSortOrder','rdAgUnselectedTab');
-			this.rdSetClassNameById('colFilter','rdAgUnselectedTab');
-			this.rdSetClassNameById('colGroup','rdAgUnselectedTab');
-			this.rdSetClassNameById('colAggr','rdAgUnselectedTab');
-			this.rdSetClassNameById('colChart','rdAgUnselectedTab');
-			this.rdSetClassNameById('colCrosstab','rdAgUnselectedTab');
-			this.rdSetClassNameById('colPaging','rdAgUnselectedTab');
-			
-			this.rdSetDisplayById('rowQueryBuilder', 'none');
-			this.rdSetDisplayById('rowLayout', 'none');
-			this.rdSetDisplayById('rowCalc', 'none');
-			this.rdSetDisplayById('rowSortOrder','none');
-			this.rdSetDisplayById('rowFilter','none');
-			this.rdSetDisplayById('rowGroup','none');
-			this.rdSetDisplayById('rowAggr','none');
-			this.rdSetDisplayById('rowChart','none');
-			this.rdSetDisplayById('rowCrosstab','none');
-			this.rdSetDisplayById('rowPaging','none');
-			
-			if (bOpen) {
-				document.getElementById('rdAgCurrentOpenPanel').value = sTabName;
-				eleSelectedTab.className = 'rdAgSelectedTab';
-		//        ShowElement(this.id,'row' + sTabName,'Show');
+			if (bKeepOpen && bKeepOpen == true) {
+			    bOpen = true;  //Coming from the ag column menu so we dont want to toggle
+			}
 
-				eleSelectedRow.style.display = '';
-				if(!bCheckForReset)   // Avoid flicker/fading effect when Paged/Sorted/Postbacks.
-					rdFadeElementIn(eleSelectedRow.firstChild,400);    //#11723, #17294 tr does not handle transition well.
+			var bAlreadyOpen = false;
+			if (document.getElementById('rdAgCurrentOpenPanel').value == sTabName)
+			    bAlreadyOpen = true;
+
+			document.getElementById('rdAgCurrentOpenPanel').value = '';
+
+			this.rdSetClassNameById('colQueryBuilder', 'rdAgUnselectedTab');
+			this.rdSetClassNameById('colCalc', 'rdAgUnselectedTab');
+			this.rdSetClassNameById('colFilter', 'rdAgUnselectedTab');
+			this.rdSetClassNameById('colTableEdit', 'rdAgUnselectedTab');
+
+			this.rdSetDisplayById('rowQueryBuilder', 'none');
+			this.rdSetDisplayById('rowCalc', 'none');
+			this.rdSetDisplayById('rowFilter', 'none');
+			this.rdSetDisplayById('rowEdit', 'none');
+		
+			if (bOpen) {
+			    
+			    document.getElementById('rdAgCurrentOpenPanel').value = sTabName;
+                if(eleSelectedTab)
+			        eleSelectedTab.className = 'rdAgSelectedTab';
+
+                if(eleSelectedRow)
+                    eleSelectedRow.style.display = '';
+
+			    //Dont fade the tab if it is already open
+                if (!bCheckForReset && eleSelectedRow && eleSelectedRow.firstChild && !bAlreadyOpen)   // Avoid flicker/fading effect when Paged/Sorted/Postbacks.
+                {             
+                    rdFadeElementIn(eleSelectedRow.firstChild, 400);    //#11723, #17294 tr does not handle transition well.
+                }
 			}
 			
 			this.rdSetPanelModifiedClass('QueryBuilder');
-			this.rdSetPanelModifiedClass('Layout');
 			this.rdSetPanelModifiedClass('Calc');
-			this.rdSetPanelModifiedClass('SortOrder');
 			this.rdSetPanelModifiedClass('Filter');
-			this.rdSetPanelModifiedClass('Group');
-			this.rdSetPanelModifiedClass('Aggr');
-			this.rdSetPanelModifiedClass('Chart');
-			this.rdSetPanelModifiedClass('Crosstab');
-			this.rdSetPanelModifiedClass('Paging');
-
+			this.rdSetPanelModifiedClass('TableEdit');
 
 			if (bNoData) {
-			    this.rdSetPanelDisabledClass('Layout')
 			    this.rdSetPanelDisabledClass('Calc');
-			    this.rdSetPanelDisabledClass('SortOrder');
 			    this.rdSetPanelDisabledClass('Filter');
-			    this.rdSetPanelDisabledClass('Group');
-			    this.rdSetPanelDisabledClass('Aggr');
+			    this.rdSetPanelDisabledClass('TableEdit');
 			    this.rdSetPanelDisabledClass('Chart');
 			    this.rdSetPanelDisabledClass('Crosstab');
-			    this.rdSetPanelDisabledClass('Paging');
             }
 
 			if (typeof window.rdRepositionSliders != 'undefined') {
@@ -120,20 +126,534 @@ YUI.add('analysis-grid', function(Y) {
 				rdRepositionSliders();
 			}
 
-			if (sTabName=="Filter") {
+            //Set column and scroll into view if this came from the table menu
+			if (sTabName == "Filter") {
+			    if (sSelectedColumn && sSelectedColumn != "") {
+                    //Select the right column
+			        Y.one("#rdAgFilterColumn").get("options").each(function () {
+			            var value = this.get('value');
+			            if (value == sSelectedColumn)
+			                this.set('selected', true);
+			        });
+			        Y.one('#rowsAnalysisGrid').scrollIntoView();
+			    }
 				this.rdAgShowPickDistinctButton();
 			}
 			
-			if (sTabName=="Group") {
-				this.rdAgGetGroupByDateOperatorDiv();
-			}
-			if (sTabName=="Chart") {
-				this.rdAgGetChartsGroupByDateOperatorDiv();
-			}
-			if (sTabName=="Crosstab") {
-				this.rdAgGetCrosstabHeaderGroupByDateOperatorDiv();
-				this.rdAgGetCrosstabLabelGroupByDateOperatorDiv();
-			}
+		},
+
+		rdGetCookie: function (varName) {
+		    var name = varName + "=";
+		    var cookieString = document.cookie.split(';');
+		    for (var i = 0; i < cookieString.length; i++) {
+		        var cookie = cookieString[i].trim();
+		        if (cookie.indexOf(name) == 0) return cookie.substring(name.length, cookie.length);
+		    }
+		    return "";
+		},
+
+		rdSetCookie: function (name, value) {
+		    document.cookie = name + "=" + value + "; ";
+		},
+
+		rdAgToggleTablePanel: function (initializing) {
+
+		    var expandedState = this.rdGetCookie('rdPanelExpanded_Table');
+		    //We do not want to toggle if we are intializing the AG
+		    if (!initializing) {
+		        if (expandedState != "True") {
+		            expandedState = "True";
+		            this.rdSetCookie('rdPanelExpanded_Table', "True");
+		        }
+		        else {
+		            expandedState = "False";
+		            this.rdSetCookie('rdPanelExpanded_Table', "False");
+		        }
+		    }
+		    
+		    if (expandedState != "False") {
+		        var divClosed = document.getElementById('divPanelClosed_Table');
+		        if (divClosed)
+		            divClosed.style.display = 'none';
+		        var divOpen = document.getElementById('divPanelOpen_Table');
+		        if (divOpen)
+		            divOpen.style.display = '';
+		        var rowContent = document.getElementById('rowContentTable');
+		        if (rowContent)
+		            rowContent.style.display = '';
+		        var rowMenuOptions = document.getElementById('rowsTableMenuOptions');
+		        if (rowMenuOptions)
+		            rowMenuOptions.style.display = '';
+		        var rowControls = document.getElementById('rowTableControls');
+		        if (rowControls)
+		            rowControls.style.display = '';
+		        var colAddToDashboard = document.getElementById('colTableAddDashboard');
+		        if (colAddToDashboard)
+		            colAddToDashboard.style.display = '';
+		        var rowTableMenu = document.getElementById('colTableMenu');
+		        if (rowTableMenu)
+		            rowTableMenu.style.display = '';
+		        var colTableExport = document.getElementById('colTableExportControls');
+		        if (colTableExport)
+		            colTableExport.style.display = '';
+
+		    }
+		    else {
+		        var divClosed = document.getElementById('divPanelClosed_Table');
+		        if (divClosed)
+		            divClosed.style.display = '';
+		        var divOpen = document.getElementById('divPanelOpen_Table');
+		        if (divOpen)
+		            divOpen.style.display = 'none';
+		        var rowContent = document.getElementById('rowContentTable');
+		        if (rowContent)
+		            rowContent.style.display = 'none';
+		        var rowMenuOptions = document.getElementById('rowsTableMenuOptions');
+		        if (rowMenuOptions)
+		            rowMenuOptions.style.display = 'none';
+		        var rowControls = document.getElementById('rowTableControls');
+		        if (rowControls)
+		            rowControls.style.display = 'none';
+		        var colAddToDashboard = document.getElementById('colTableAddDashboard');
+		        if (colAddToDashboard)
+		            colAddToDashboard.style.display = 'none';
+		        var colTableMenu = document.getElementById('colTableMenu');
+		        if (colTableMenu)
+		            colTableMenu.style.display = 'none';
+		        var colTableExport = document.getElementById('colTableExportControls');
+		        if (colTableExport)
+		            colTableExport.style.display = 'none';
+		    }
+
+		    if (typeof window.rdRepositionSliders != 'undefined') {
+		        //Move CellColorSliders, if there are any.
+		        rdRepositionSliders();
+		    }
+
+		},
+
+		rdAgToggleCrosstabPanel: function (sID, initializing) {
+
+		    var expandedState = this.rdGetCookie('rdPanelExpanded_' + sID);
+		    //We do not want to toggle if we are intializing the AG
+		    if (!initializing) {
+		        if (expandedState != "True") {
+		            expandedState = "True";
+		            this.rdSetCookie('rdPanelExpanded_' + sID, "True");
+		        }
+		        else {
+		            expandedState = "False";
+		            this.rdSetCookie('rdPanelExpanded_' + sID, "False");
+		        }
+		    }
+
+		    if (expandedState == "True") {
+		        var divClosed = document.getElementById('divPanelClosed_' + sID);
+		        if (divClosed)
+		            divClosed.style.display = 'none';
+		        var divOpen = document.getElementById('divPanelOpen_' + sID);
+		        if (divOpen)
+		            divOpen.style.display = '';
+		        var rowContent = document.getElementById('rowContentAnalCrosstab_' + sID);
+		        if (rowContent)
+		            rowContent.style.display = '';
+		        var colAddToDashboard = document.getElementById('colAnalCrosstabAddDashboard_' + sID);
+		        if (colAddToDashboard)
+		            colAddToDashboard.style.display = '';
+		        var colEdit = document.getElementById('colAxEdit_' + sID);
+		        if (colEdit)
+		            colEdit.style.display = '';
+		        var colExport = document.getElementById('divCrosstabExportControls_' + sID);
+		        if (colExport)
+		            colExport.style.display = '';
+            }
+		    else {
+		        var divClosed = document.getElementById('divPanelClosed_' + sID);
+		        if (divClosed)
+		            divClosed.style.display = '';
+		        var divOpen = document.getElementById('divPanelOpen_' + sID);
+		        if (divOpen)
+		            divOpen.style.display = 'none';
+		        var rowContent = document.getElementById('rowContentAnalCrosstab_' + sID);
+		        if (rowContent)
+		            rowContent.style.display = 'none';
+		        var colAddToDashboard = document.getElementById('colAnalCrosstabAddDashboard_' + sID);
+		        if (colAddToDashboard)
+		            colAddToDashboard.style.display = 'none';
+		        var colEdit = document.getElementById('colAxEdit_' + sID);
+		        if (colEdit)
+		            colEdit.style.display = 'none';
+		        var colExport = document.getElementById('divCrosstabExportControls_' + sID);
+		        if (colExport)
+		            colExport.style.display = 'none';
+            }
+		    if (typeof window.rdRepositionSliders != 'undefined') {
+		        //Move CellColorSliders, if there are any.
+		        rdRepositionSliders();
+		    }
+
+		},
+
+
+	    /* ---This function gets a list of AG columns for the datatype specified --- */
+		rdAgGetColumnList: function (array, arrayLabel, sDataType, aAggrGroupLabel, aAggrGroupLabelClass, includeGroupAggr) {
+		    var eleAgDataColumnDetails = document.getElementById('rdAgDataColumnDetails');
+		    if (eleAgDataColumnDetails.value != '') {
+		        var sDataColumnDetails = eleAgDataColumnDetails.value;
+		        var aDataColumnDetails = sDataColumnDetails.split(',')
+		        if (aDataColumnDetails.length > 0) {
+		            var i; var j = 0;
+		            var sColumnVal = '';
+		            for (i = 0; i < aDataColumnDetails.length; i++) {
+		                var sDataColumnDetail = aDataColumnDetails[i];
+		                if (includeGroupAggr == false && sDataColumnDetail.indexOf('^') > -1) {
+		                    sDataColumnDetail = '';
+		                }
+		                if (sDataColumnDetail.length > 1 && sDataColumnDetail.indexOf(':') > -1) {
+		                    var sDataColumnType = sDataColumnDetail.split(':')[1].split("|")[0];
+		                    if (sDataType == '') {
+		                        sColumnVal = sDataColumnDetail.split(':')[0];
+		                        array[i] = sColumnVal.split(';')[0];
+		                        arrayLabel[i] = sColumnVal.split(';')[1];
+		                        /* 21211 - Non IE browsers need a blank value defined for empty array entries */
+		                        if (i == 1) {
+		                            array[0] = '';
+		                            arrayLabel[0] = '';
+		                        }
+		                        if (sDataColumnDetail.indexOf("|") > -1) {
+		                            aAggrGroupLabel[i] = sDataColumnDetail.split('|')[1].split('-')[0];
+		                            if (sDataColumnDetail.indexOf("^") > -1) {
+		                                aAggrGroupLabelClass[i] = sDataColumnDetail.split('-')[1].split('^')[0];
+		                            }
+		                            else {
+		                                aAggrGroupLabelClass[i] = sDataColumnDetail.split('|')[1].split('-')[1];
+		                            }
+		                        }
+		                        else {
+		                            aAggrGroupLabel[i] = '';
+		                            aAggrGroupLabelClass[i] = '';
+		                        }
+		                    }
+		                    else if (sDataType == 'number' && sDataColumnType == 'Number') {
+		                        sColumnVal = sDataColumnDetail.split(':')[0];
+		                        array[j] = sColumnVal.split(';')[0];
+		                        arrayLabel[j] = sColumnVal.split(';')[1];
+		                        j++;
+		                        if (sDataColumnDetail.indexOf("|") > -1) {
+		                            aAggrGroupLabel[j] = sDataColumnDetail.split('|')[1].split('-')[0];
+		                            aAggrGroupLabelClass[j] = sDataColumnDetail.split('|')[1].split('-')[1];
+		                        }
+		                        else {
+		                            aAggrGroupLabel[j] = '';
+		                            aAggrGroupLabelClass[j] = '';
+		                        }
+		                    }
+		                }
+		            }
+		            if (sDataType == 'number') {
+		                array.unshift('');
+		                arrayLabel.unshift('');
+		            }
+		        }
+		    }
+		},
+
+		rdAgGetColumnDataType: function (sColumn) {
+		    var eleAgDataColumnDetails = document.getElementById('rdAgDataColumnDetails');
+		    if (eleAgDataColumnDetails.value != '') {
+		        var sDataColumnDetails = eleAgDataColumnDetails.value;
+		        var aDataColumnDetails = sDataColumnDetails.split(',')
+		        if (aDataColumnDetails.length > 0) {
+		            var i;
+		            for (i = 0; i < aDataColumnDetails.length; i++) {
+		                var sDataColumnDetail = aDataColumnDetails[i];
+		                if (sDataColumnDetail.length > 1 && sDataColumnDetail.indexOf(':') > -1) {
+		                    var sDataColumn = sDataColumnDetail.split(':')[0];
+		                    sDataColumn = sDataColumn.split(';')[1];
+		                    if (sDataColumn == sColumn) {
+		                        //22397
+		                        return sDataColumnDetail.split(':')[1].split("|")[0];
+		                    }
+		                }
+		            }
+		        }
+		    }
+		},
+
+
+		rdAgToggleChartPanel: function (sID, initializing) {
+
+		    var expandedState = this.rdGetCookie('rdPanelExpanded_' + sID);
+		    //We do not want to toggle if we are intializing the AG
+		    if (!initializing) {
+		        if (expandedState != "True") {
+		            expandedState = "True";
+		            this.rdSetCookie('rdPanelExpanded_' + sID, "True");
+		        }
+		        else {
+		            expandedState = "False";
+		            this.rdSetCookie('rdPanelExpanded_' + sID, "False");
+		        }
+		    }
+
+		    if (expandedState == "True") {
+		        var divClosed = document.getElementById('divPanelClosed_' + sID);
+		        if (divClosed)
+		            divClosed.style.display = 'none';
+		        var divOpen = document.getElementById('divPanelOpen_' + sID);
+		        if(divOpen)
+		            divOpen.style.display = '';
+		        var rowContent = document.getElementById('rowContentAnalChart_' + sID);
+		        if (rowContent)
+		            rowContent.style.display = '';
+		        var colAddToDashboard = document.getElementById('colAnalChartAddDashboard_' + sID);
+		        if (colAddToDashboard)
+		            colAddToDashboard.style.display = '';
+		        var colEdit = document.getElementById('colAcEdit_' + sID);
+		        if (colEdit)
+		            colEdit.style.display = '';
+		    }
+		    else {
+		        var divClosed = document.getElementById('divPanelClosed_' + sID);
+		        if (divClosed)
+		            divClosed.style.display = '';
+		        var divOpen = document.getElementById('divPanelOpen_' + sID);
+		        if (divOpen)
+		            divOpen.style.display = 'none';
+		        var rowContent = document.getElementById('rowContentAnalChart_' + sID);
+		        if (rowContent)
+		            rowContent.style.display = 'none';
+		        var colAddToDashboard = document.getElementById('colAnalChartAddDashboard_' + sID);
+		        if (colAddToDashboard)
+		            colAddToDashboard.style.display = 'none';
+		        var colEdit = document.getElementById('colAcEdit_' + sID);
+		        if (colEdit)
+		            colEdit.style.display = 'none';
+		    }
+		    if (typeof window.rdRepositionSliders != 'undefined') {
+		        //Move CellColorSliders, if there are any.
+		        rdRepositionSliders();
+		    }
+
+		},
+
+		rdChangeAggregateOptions: function(){
+		    var aAggrList = []; var aAggrListLabel = []; var aAggrGroupLabel = []; var aAggrGroupLabelClass = [];
+
+		    this.rdAgGetColumnList(aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass, false);
+	
+		    var rdColList = document.getElementById('rdAgAggrColumn');
+		    var sVal = rdColList.options[rdColList.selectedIndex].value;
+
+		    var dataType = this.rdAgGetColumnDataType(sVal);
+		    rdchangeList('rdAgAggrFunction', aAggrList, aAggrListLabel, dataType, '', '');
+		},
+
+		rdAgTableTogglePanelMenu: function (initializing) {
+
+		    var expandedState = this.rdGetCookie('rdTablePanelMenuExpanded');
+		    //We do not want to toggle if we are intializing the AG
+		    if (!initializing) {
+		        if (expandedState != "True") {
+		            expandedState = "True";
+		            this.rdSetCookie('rdTablePanelMenuExpanded', "True");
+		        }
+		        else {
+		            expandedState = "False";
+		            this.rdSetCookie('rdTablePanelMenuExpanded', "False");
+		        }
+		    }
+
+		    if (expandedState == "False") {
+		        var menu = document.getElementById('rowTableMenu');
+		        if (menu)
+		            menu.style.display = 'none';
+		        var selected = document.getElementById('divTableEditSelected');
+		        if (selected)
+		            selected.style.display = 'none';
+		        var unselected = document.getElementById('divTableEditUnselected');
+		        if (unselected)
+		            unselected.style.display = '';
+		    }
+		    else {
+		        var menu = document.getElementById('rowTableMenu');
+		        if (menu)
+		            menu.style.display = '';
+		        var selected = document.getElementById('divTableEditSelected');
+		        if (selected)
+		            selected.style.display = '';
+		        var unselected = document.getElementById('divTableEditUnselected');
+		        if (unselected)
+		            unselected.style.display = 'none';
+		    }
+		    if (typeof window.rdRepositionSliders != 'undefined') {
+		        //Move CellColorSliders, if there are any.
+		        rdRepositionSliders();
+		    }
+
+		},
+
+		rdAgChartTogglePanelMenu: function (sID, initializing) {
+  
+		    var expandedState = this.rdGetCookie('rdChartPanelMenuExpanded_' + sID);
+		    //We do not want to toggle if we are intializing the AG
+		    if (!initializing) {
+		        if (expandedState != "True") {
+		            expandedState = "True";
+		            this.rdSetCookie('rdChartPanelMenuExpanded_' + sID, "True");
+		        }
+		        else {
+		            expandedState = "False";
+		            this.rdSetCookie('rdChartPanelMenuExpanded_' + sID, "False");
+		        }
+		    }
+		    if (expandedState == "False") {
+		        var types = document.getElementById('divAcChartTypes_' + sID);
+		        if (types)
+		            types.style.display = 'none';
+		        var lists = document.getElementById('divChartLists_' + sID);
+		        if (lists)
+		            lists.style.display = 'none';
+		        var controls = document.getElementById('divAcControls_' + sID);
+		        if (controls)
+		            controls.style.display = 'none';
+		        var selected = document.getElementById('divAcEditSelected_' + sID);
+		        if (selected)
+		            selected.style.display = 'none';
+		        var unselected = document.getElementById('divAcEditUnselected_' + sID);
+		        if (unselected)
+		            unselected.style.display = '';
+		    }
+		    else {
+		        var types = document.getElementById('divAcChartTypes_' + sID);
+		        if (types)
+		            types.style.display = '';
+		        var lists = document.getElementById('divChartLists_' + sID);
+		        if (lists)
+		            lists.style.display = '';
+		        var controls = document.getElementById('divAcControls_' + sID);
+		        if (controls)
+		            controls.style.display = '';
+		        var selected = document.getElementById('divAcEditSelected_' + sID);
+		        if (selected)
+		            selected.style.display = '';
+		        var unselected = document.getElementById('divAcEditUnselected_' + sID);
+		        if (unselected)
+		            unselected.style.display = 'none';
+		    }
+		    if (typeof window.rdRepositionSliders != 'undefined') {
+		        //Move CellColorSliders, if there are any.
+		        rdRepositionSliders();
+		    }
+
+		},
+    
+		rdAgCrosstabTogglePanelMenu: function (sID, initializing) {
+
+		    var expandedState = this.rdGetCookie('rdCrosstabPanelMenuExpanded_' + sID);
+            //We do not want to toggle if we are intializing the AG
+		    if (!initializing) {
+		        if (expandedState != "True") {
+		            expandedState = "True";
+		            this.rdSetCookie('rdCrosstabPanelMenuExpanded_' + sID, "True");
+		        }
+		        else {
+		            expandedState = "False";
+		            this.rdSetCookie('rdCrosstabPanelMenuExpanded_' + sID, "False");
+		        }
+		    }
+
+		    if (expandedState == "False") {
+		        var controls = document.getElementById('divAxControls_' + sID);
+		        if(controls)
+		            controls.style.display = 'none';
+		        var selected = document.getElementById('divAxEditSelected_' + sID);
+		        if(selected)
+		            selected.style.display = 'none';
+		        var unselected = document.getElementById('divAxEditUnselected_' + sID);
+		        if(unselected)
+		            unselected.style.display = '';
+		    }
+		    else {
+		        var controls = document.getElementById('divAxControls_' + sID);
+		        if (controls)
+		            controls.style.display = '';
+		        var selected = document.getElementById('divAxEditSelected_' + sID);
+		        if (selected)
+		            selected.style.display = '';
+		        var unselected = document.getElementById('divAxEditUnselected_' + sID);
+		        if (unselected)
+		            unselected.style.display = 'none';
+		    }
+		    if (typeof window.rdRepositionSliders != 'undefined') {
+		        //Move CellColorSliders, if there are any.
+		        rdRepositionSliders();
+		    }
+
+		},
+
+		rdAgShowTableMenuTab: function (sTabName, bCheckForReset, sSelectedColumn) {
+
+		    var bNoData = false;
+		    var bOpen = true;
+
+		    //sTabName may have a ,
+		    sTabName = sTabName.replace(/,/g, "")
+
+		    if (sTabName.length == 0) {
+		        bOpen = false;
+		    } else {
+		        var eleSelectedTab = document.getElementById('lblHeading' + sTabName);
+		        var eleSelectedRow = document.getElementById('row' + sTabName);
+
+		        //24368
+                if (eleSelectedTab && eleSelectedTab.className.indexOf('rdAgCommandHighlight') != -1) {
+		            bOpen = false;
+		        }
+		        if (bCheckForReset) {
+		            if (location.href.indexOf("rdAgLoadSaved") != -1) {
+		                bOpen = false;
+		            }
+		        }
+		    }
+		    if (bNoData) {
+		        bOpen = true;  //When no data, that tab must always remain open.
+		    }
+
+		    document.getElementById('rdAgCurrentOpenTablePanel').value = '';
+
+		    this.rdSetClassNameById('lblHeadingGroup', 'rdAgCommandIdle');
+		    this.rdSetClassNameById('lblHeadingAggr', 'rdAgCommandIdle');
+		    this.rdSetClassNameById('lblHeadingPaging', 'rdAgCommandIdle');
+		    this.rdSetClassNameById('lblHeadingSortOrder', 'rdAgCommandIdle');
+		    this.rdSetClassNameById('lblHeadingLayout', 'rdAgCommandIdle');
+
+		    this.rdSetDisplayById('rowLayout', 'none');
+		    this.rdSetDisplayById('rowSortOrder', 'none');
+		    this.rdSetDisplayById('rowGroup', 'none');
+		    this.rdSetDisplayById('rowAggr', 'none');
+		    this.rdSetDisplayById('rowPaging', 'none');
+
+
+		    if (bOpen && eleSelectedTab) {
+		        document.getElementById('rdAgCurrentOpenTablePanel').value = sTabName;
+		        eleSelectedTab.className = 'rdAgCommandHighlight';
+
+		        if (eleSelectedRow)
+		            eleSelectedRow.style.display = '';
+		        if (!bCheckForReset && eleSelectedRow && eleSelectedRow.firstChild)   // Avoid flicker/fading effect when Paged/Sorted/Postbacks.
+		            rdFadeElementIn(eleSelectedRow.firstChild, 400);    //#11723, #17294 tr does not handle transition well.
+		    }
+
+		    this.rdSetPanelModifiedClass('Layout');
+		    this.rdSetPanelModifiedClass('SortOrder');
+		    this.rdSetPanelModifiedClass('Group');
+		    this.rdSetPanelModifiedClass('Aggr');
+		    this.rdSetPanelModifiedClass('Paging');
+
+		    if (sTabName == "Group") {
+		        this.rdAgGetGroupByDateOperatorDiv();
+		    }
 		},
 
 		rdAgLayoutSelect: function (sAllNone) {
@@ -187,8 +707,8 @@ YUI.add('analysis-grid', function(Y) {
 							rdFilterNewComparisonOptionsArray.push(document.rdForm.rdAgFilterOperator.lastChild);    // remove the new Comparison option 'Date Range'.
 							document.rdForm.rdAgFilterOperator.removeChild(document.rdForm.rdAgFilterOperator.lastChild); 
 						}  
-						if (document.rdForm.rdAgFilterOperator.lastChild.value == 'Not Contains') {    //remove 'Not Contains' and 3 options before that.
-							for (i=0;i<=3;i++){
+						if (document.rdForm.rdAgFilterOperator.lastChild.value == 'Not Contains') {    //remove 'Not Contains' and 4 options before that.
+							for (i=0;i<=5;i++){
 								rdFilterOldComparisonOptionsArray.push(document.rdForm.rdAgFilterOperator.lastChild);
 								document.rdForm.rdAgFilterOperator.removeChild(document.rdForm.rdAgFilterOperator.lastChild); 
 							}
@@ -198,8 +718,8 @@ YUI.add('analysis-grid', function(Y) {
 						}  
 					}
 					else{   // condition specific for an already manipulated dropdown.
-					    if (document.rdForm.rdAgFilterOperator.lastChild.value == 'Not Contains') {    //remove 'Not Contains' and 3 options before that.
-							for (i=0;i<=3;i++){
+					    if (document.rdForm.rdAgFilterOperator.lastChild.value == 'Not Contains') {    //remove 'Not Contains' and 4 options before that.
+							for (i=0;i<=5;i++){
 								rdFilterOldComparisonOptionsArray.push(document.rdForm.rdAgFilterOperator.lastChild);
 								document.rdForm.rdAgFilterOperator.removeChild(document.rdForm.rdAgFilterOperator.lastChild); 
 							}
@@ -219,17 +739,52 @@ YUI.add('analysis-grid', function(Y) {
 							document.rdForm.rdAgFilterOperator.removeChild(document.rdForm.rdAgFilterOperator.lastChild); 
 						}  
 						if(document.rdForm.rdAgFilterOperator.lastChild.value != 'Not Contains'){    // condition specific for an already manipulated dropdown.
-						    for (i = 0; i <= 3; i++) {
+						    for (i = 0; i <= 5; i++) {
 						        document.rdForm.rdAgFilterOperator.appendChild(rdFilterOldComparisonOptionsArray.pop());
 							}
 						}
 					}
 					var elePopupIFrame = document.getElementById('subPickDistinct')
 					var sSrc = Y.one(elePopupIFrame).getData("hiddensource");
+
 					//Put the picked column name into the URL.
 					var nStart = sSrc.indexOf("&rdAgDataColumn=")
 					var nEnd = sSrc.indexOf("&", nStart + 1)
-					sSrc = sSrc.substr(0,nStart) + "&rdAgDataColumn=" + encodeURI(document.rdForm.rdAgFilterColumn.value) + sSrc.substr(nEnd)
+					sSrc = sSrc.substr(0, nStart) + "&rdAgDataColumn=" + encodeURIComponent(document.rdForm.rdAgFilterColumn.value) + sSrc.substr(nEnd)
+					var nStart = sSrc.indexOf("&rdAgFilterOperator=")
+					var nEnd = sSrc.indexOf("&", nStart + 1)
+					sSrc = sSrc.substr(0, nStart) + "&rdAgFilterOperator=" + encodeURIComponent(document.rdForm.rdAgFilterOperator.value) + sSrc.substr(nEnd)
+
+                    //Get format of column for subreport and put it into the URL
+					var columnFormat = "";
+					var columnFormats = document.getElementById("rdAgColumnFormats").value;
+					columnFormats = columnFormats.split("|");
+					for (var i = 0; i < columnFormats.length - 1; i++) {
+					    var colId = columnFormats[i].split(":")[0];
+					    if (colId == document.rdForm.rdAgFilterColumn.value) {
+					        columnFormat = columnFormats[i].split(":")[1];
+					        break;
+					    }
+					}
+					var nStart = sSrc.indexOf("&rdAgColumnFormat=")
+					var nEnd = sSrc.indexOf("&", nStart + 1)
+					sSrc = sSrc.substr(0, nStart) + "&rdAgColumnFormat=" + encodeURIComponent(columnFormat) + sSrc.substr(nEnd)
+
+				    //Get data type of column for subreport and put it into the URL
+					var columnDataType = "";
+					var columnDataTypes = document.getElementById("rdAgColumnDataTypes").value;
+					columnDataTypes = columnDataTypes.split("|");
+					for (var i = 0; i < columnDataTypes.length - 1; i++) {
+					    var colId = columnDataTypes[i].split(":")[0];
+					    if (colId == document.rdForm.rdAgFilterColumn.value) {
+					        columnDataType = columnDataTypes[i].split(":")[1];
+					        break;
+					    }
+					}
+					var nStart = sSrc.indexOf("&rdAgColumnDataType=")
+					var nEnd = sSrc.indexOf("&", nStart + 1)
+					sSrc = sSrc.substr(0, nStart) + "&rdAgColumnDataType=" + encodeURIComponent(columnDataType) + sSrc.substr(nEnd)
+
 					Y.one(elePopupIFrame).setData("hiddensource", sSrc);
 					//elePopupIFrame.setAttribute("HiddenSource", elePopupIFrame.getAttribute("HiddenSource").replace("rdPickDataColumn",encodeURI(document.rdForm.rdAgFilterColumn.value)))
 					this.rdAgHideAllFilterDivs();
@@ -250,8 +805,8 @@ YUI.add('analysis-grid', function(Y) {
 							document.rdForm.rdAgFilterOperator.removeChild(document.rdForm.rdAgFilterOperator.lastChild); 
 							} 
 						}
-						if(rdFilterOldComparisonOptionsArray[0]){                    
-							for(i=0;i<=3;i++){
+						if (rdFilterOldComparisonOptionsArray[0] && rdFilterOldComparisonOptionsArray[0] != '') {
+							for(i=0;i<=5;i++){
 								document.rdForm.rdAgFilterOperator.appendChild(rdFilterOldComparisonOptionsArray.pop());
 							}
 						}
@@ -277,63 +832,7 @@ YUI.add('analysis-grid', function(Y) {
 				}
 			}
 		},
-		rdAgGetChartsGroupByDateOperatorDiv : function(){
-			// Function used by the Charts division for hiding/unhiding the GroupByOperator Div for the Charts except for Pie and Scatter.
-			var sChartType = document.rdForm.rdAgChartType.value;
-			if(sChartType == 'Pie' || sChartType == 'Bar'){
-				if((document.rdForm.rdAgPickDateColumnsInChartForGrouping.value.indexOf(document.rdForm.rdAgChartXLabelColumn.value + ",")!=-1) && (document.rdForm.rdAgChartXLabelColumn.value.length != 0)){
-					ShowElement(this.id,'divChartsGroupByDateOperator','Show');
-				}else{
-					ShowElement(this.id,'divChartsGroupByDateOperator','Hide');
-					document.rdForm.rdAgChartsDateGroupBy.value='';
-				}
-			}else if(sChartType == 'Line' || sChartType == 'Spline'){
-				if((document.rdForm.rdAgPickDateColumnsInChartForGrouping.value.indexOf(document.rdForm.rdAgChartXDataColumn.value + ",")!=-1) && (document.rdForm.rdAgChartXDataColumn.value.length != 0)){
-				    ShowElement(this.id,'divChartsGroupByDateOperator','Show');
-				    // change the y-axis drop down when a date column is selected in line charts...(show all)
-				    var aAggrList = []; var aAggrListLabel = []; var aAggrGroupLabel = []; var aAggrGroupLabelClass = [];
-				    this.rdAgGetColumnList(aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass, false);
-				    rdchangeList('rdAgChartYColumn', aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass);
-				}else{
-					ShowElement(this.id,'divChartsGroupByDateOperator','Hide');
-					document.rdForm.rdAgChartsDateGroupBy.value = '';
-				    // change y-axis dropdown back to show only numeric data columns...
-					var aAggrList = []; var aAggrListLabel = []; var aAggrGroupLabel = []; var aAggrGroupLabelClass = [];
-					this.rdAgGetColumnList(aAggrList, aAggrListLabel, 'number', aAggrGroupLabel, aAggrGroupLabelClass, false);
-					rdchangeList('rdAgChartYColumn', aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass);
-				}
-			}else{
-				ShowElement(this.id,'divChartsGroupByDateOperator','Hide');
-				document.rdForm.rdAgChartsDateGroupBy.value='';
-			}    
-		},
-		rdAgGetCrosstabHeaderGroupByDateOperatorDiv : function(){
-			// Function used by the Crosstabs division for hiding/unhiding the GroupByOperator Div for the header Column dropdown.
-			if((document.rdForm.rdAgPickDateColumnsInCrossTabForGrouping.value.indexOf(document.rdForm.rdAgCrosstabHeaderColumn.value + ",")!=-1) && (document.rdForm.rdAgCrosstabHeaderColumn.value.length != 0)){
-				if(Y.Lang.isValue(Y.one('#divCrosstabHeaderGroupByDateOperator')))
-					ShowElement(this.id,'divCrosstabHeaderGroupByDateOperator','Show');
-			}
-			else{
-				if(Y.Lang.isValue(Y.one('#divCrosstabHeaderGroupByDateOperator'))){
-					ShowElement(this.id,'divCrosstabHeaderGroupByDateOperator','Hide');
-					document.rdForm.rdAgCrosstabHeaderDateGroupBy.value='';
-				}
-			}
-		},
-		rdAgGetCrosstabLabelGroupByDateOperatorDiv : function(){
-		 // Function used by the Crosstabs division for hiding/unhiding the GroupByOperator Div for the Label Column dropdown.
-			if((document.rdForm.rdAgPickDateColumnsInCrossTabForGrouping.value.indexOf(document.rdForm.rdAgCrosstabLabelColumn.value + ",")!=-1) && (document.rdForm.rdAgCrosstabLabelColumn.value.length != 0)){
-				if(Y.Lang.isValue(Y.one('#divCrosstabLabelGroupByDateOperator')))
-					ShowElement(this.id,'divCrosstabLabelGroupByDateOperator','Show');
-			}
-			else{
-				if(Y.Lang.isValue(Y.one('#divCrosstabLabelGroupByDateOperator'))){
-					ShowElement(this.id,'divCrosstabLabelGroupByDateOperator','Hide');
-					document.rdForm.rdAgCrosstabLabelDateGroupBy.value='';
-				}
-			}
-		},
-		
+	
 		rdAgRemoveAllWhiteSpaceNodesFromFilterOperatorDropdown : function(){
 			// Function removes all the unnecessary text/WhiteSpace nodes from the dropdown which cause issues with different browsers.
 			var elerdAgFilterOperator = document.rdForm.rdAgFilterOperator;
@@ -508,208 +1007,6 @@ YUI.add('analysis-grid', function(Y) {
 		
 		/* -----Action.Javascript Methods----- */
 		
-		rdAgShowChartAdd : function(sChartType) {
-			document.rdForm.rdAgChartType.value=sChartType;
-			ShowElement(this.id,'divChartAdd','Show');
-			var bForecast = false;
-			if(document.getElementById('IslAgForecastType') != null) bForecast = true;
-			switch (sChartType) {
-					case 'Pie':
-			        case 'Bar':
-			            ShowElement(this.id, 'lblChartXLabelColumn', 'Show');
-			            ShowElement(this.id, 'lblChartXAxisColumn', 'Hide');
-			            ShowElement(this.id, 'lblChartYDataColumn', 'Show');
-			            ShowElement(this.id, 'lblChartYAxisColumn', 'Hide');
-			            ShowElement(this.id, 'lblChartSizeColumn', 'Hide');
-			            ShowElement(this.id, 'rdAgChartXLabelColumn', 'Show');
-			            ShowElement(this.id, 'rdAgChartXDataColumn', 'Hide');
-			            ShowElement(this.id, 'rdAgChartXNumberColumn', 'Hide');
-			            ShowElement(this.id, 'rdAgChartYAggrLabel', 'Show');
-			            ShowElement(this.id, 'rdAgChartSizeColumnAggrLabel', 'Hide');
-			            ShowElement(this.id, 'rdAgChartYAggrList', 'Show');
-			            ShowElement(this.id, 'rdAgChartXLabelTextColumn', 'Hide');
-			            ShowElement(this.id, 'rowChartExtraDataColumn', 'Hide');
-			            ShowElement(this.id, 'rowChartExtraAggr', 'Hide');
-			            ShowElement(this.id, 'lblChartYDataAggregation', 'Hide');
-			            ShowElement(this.id, 'rdAgGaugeMin', 'Hide');
-			            ShowElement(this.id, 'rdAgGaugeGoal1', 'Hide');
-			            ShowElement(this.id, 'rdAgGaugeGoal2', 'Hide');
-			            ShowElement(this.id, 'rdAgGaugeMax', 'Hide');
-			            ShowElement(this.id, 'divGaugeError-BlankData', 'Hide');
-			            ShowElement(this.id, 'divHeatmapError-BlankSizeColumn', 'Hide');
-			            ShowElement(this.id, 'divHeatmapError-BlankColorColumn', 'Hide');
-			            ShowElement(this.id, 'divChartError-BlankXAxis', 'Hide');
-			            ShowElement(this.id, 'divChartError-BlankYAxis', 'Hide');
-			            this.rdAgGetChartsGroupByDateOperatorDiv();
-			            if (bForecast) {
-    			            if (sChartType == "Bar") {
-			                    document.getElementById('rowChartForecast').style.display = '';
-			                    document.getElementById('IslAgForecastType').style.display = '';
-			                    document.getElementById('rdAgChartForecastLabel').style.display = ''
-			                    this.rdAgModifyTimeSeriesCycleLengthOptions(document.getElementById('rdAgChartsDateGroupBy'));
-			                    this.rdAgModifyForecastOptions(document.getElementById('rdAgChartXLabelColumn').value);
-			                    this.rdAgShowForecastOptions();
-			                } else {
-    			                this.rdAgHideForecast();
-			                }
-			            }
-			            var aAggrList = []; var aAggrListLabel = []; var aAggrGroupLabel = []; var aAggrGroupLabelClass = [];
-			            this.rdAgGetColumnList(aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass, false);
-			            rdchangeList('rdAgChartYColumn', aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass);
-			            break;			        
-					case 'Heatmap':
-						ShowElement(this.id,'lblChartXLabelColumn','Show');
-						ShowElement(this.id,'lblChartXAxisColumn','Hide');
-						ShowElement(this.id,'lblChartYDataColumn','Hide');
-						ShowElement(this.id,'lblChartYAxisColumn','Hide');
-						ShowElement(this.id,'lblChartSizeColumn','Show');
-						ShowElement(this.id,'rdAgChartXLabelTextColumn','Show');
-						ShowElement(this.id,'rdAgChartXLabelColumn','Hide');
-						ShowElement(this.id,'rdAgChartXDataColumn','Hide');
-						ShowElement(this.id,'rdAgChartXNumberColumn','Hide');
-						ShowElement(this.id,'rdAgChartYAggrLabel','Hide');
-						ShowElement(this.id,'rdAgChartSizeColumnAggrLabel','Show');
-						ShowElement(this.id,'rdAgChartYAggrList','Show');
-						ShowElement(this.id,'rowChartExtraDataColumn','Show');
-						ShowElement(this.id,'rowChartExtraAggr','Show');
-						ShowElement(this.id,'divChartsGroupByDateOperator','Hide');
-						ShowElement(this.id,'lblChartYDataAggregation','Hide');
-						ShowElement(this.id,'rdAgGaugeMin','Hide');
-						ShowElement(this.id,'rdAgGaugeGoal1','Hide');
-						ShowElement(this.id,'rdAgGaugeGoal2','Hide');
-						ShowElement(this.id, 'rdAgGaugeMax', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankData', 'Hide');
-						ShowElement(this.id, 'divGaugeError-BlankData', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankXAxis', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankYAxis', 'Hide');
-						document.rdForm.rdAgChartsDateGroupBy.value='';
-						this.rdAgHideForecast();
-						break;
-					case 'Scatter':
-						ShowElement(this.id,'lblChartXLabelColumn','Hide');
-						ShowElement(this.id,'lblChartXAxisColumn','Show');
-						ShowElement(this.id,'lblChartYDataColumn','Hide');
-						ShowElement(this.id,'lblChartYAxisColumn','Show');
-						ShowElement(this.id,'lblChartSizeColumn','Hide');
-						ShowElement(this.id,'rdAgChartXLabelColumn','Hide');
-						ShowElement(this.id,'rdAgChartXDataColumn','Show');
-						ShowElement(this.id,'rdAgChartXNumberColumn','Hide');
-						ShowElement(this.id,'rdAgChartYAggrLabel','Hide');
-						ShowElement(this.id,'rdAgChartSizeColumnAggrLabel','Hide');
-						ShowElement(this.id,'rdAgChartYAggrList','Hide');
-						ShowElement(this.id,'divChartsGroupByDateOperator','Hide');
-						ShowElement(this.id,'rdAgChartXLabelTextColumn','Hide');
-						ShowElement(this.id,'rowChartExtraDataColumn','Hide');
-						ShowElement(this.id,'rowChartExtraAggr','Hide');
-						ShowElement(this.id,'lblChartYDataAggregation','Hide');
-						ShowElement(this.id,'rdAgGaugeMin','Hide');
-						ShowElement(this.id,'rdAgGaugeGoal1','Hide');
-						ShowElement(this.id,'rdAgGaugeGoal2','Hide');
-						ShowElement(this.id,'rdAgGaugeMax','Hide');
-						ShowElement(this.id, 'divGaugeError-BlankData', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankData', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankLabel', 'Hide');
-						ShowElement(this.id, 'divHeatmapError-BlankSizeColumn', 'Hide');
-						ShowElement(this.id, 'divHeatmapError-BlankColorColumn', 'Hide');
-						document.rdForm.rdAgChartsDateGroupBy.value='';
-						this.rdAgHideForecast();
-						var aAggrList = []; var aAggrListLabel = []; var aAggrGroupLabel = []; var aAggrGroupLabelClass = [];
-						this.rdAgGetColumnList(aAggrList, aAggrListLabel, 'number', aAggrGroupLabel, aAggrGroupLabelClass, false);
-						rdchangeList('rdAgChartYColumn', aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass);
-						break;
-					case 'Gauge':
-					   ShowElement(this.id,'lblChartXLabelColumn','Hide');
-						ShowElement(this.id,'lblChartXAxisColumn','Hide');
-						ShowElement(this.id,'lblChartYDataColumn','Show');
-						ShowElement(this.id,'lblChartYAxisColumn','Hide');
-						ShowElement(this.id,'lblChartSizeColumn','Hide');
-						ShowElement(this.id,'rdAgChartXLabelColumn','Hide');
-						ShowElement(this.id,'rdAgChartXDataColumn','Hide');
-						ShowElement(this.id,'rdAgChartXNumberColumn','Hide');
-						ShowElement(this.id,'rdAgChartYAggrLabel','Show');
-						ShowElement(this.id,'rdAgChartSizeColumnAggrLabel','Hide');
-						ShowElement(this.id,'rdAgChartYAggrList','Show');
-						ShowElement(this.id,'rdAgChartXLabelTextColumn','Hide');
-						ShowElement(this.id,'rowChartExtraDataColumn','Hide');
-						ShowElement(this.id,'rowChartExtraAggr','Hide');
-						ShowElement(this.id,'lblChartYDataAggregation','Hide');
-						ShowElement(this.id,'rdAgGaugeMin','Show');
-						ShowElement(this.id,'rdAgGaugeGoal1','Show');
-						ShowElement(this.id,'rdAgGaugeGoal2','Show');
-						ShowElement(this.id,'rdAgGaugeMax','Show');
-						ShowElement(this.id,'divChartError-BlankData','Hide');
-						ShowElement(this.id, 'divChartError-BlankLabel', 'Hide');
-						ShowElement(this.id, 'divHeatmapError-BlankSizeColumn', 'Hide');
-						ShowElement(this.id, 'divHeatmapError-BlankColorColumn', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankXAxis', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankYAxis', 'Hide');
-						if((document.getElementById('rdAgGaugeAggregationValue').value == '' || Y.DOM.getText(Y.one('#lblChartYDataAggregation')) == '') && document.getElementById('rdAgChartYColumn').value != ''){
-							this.rdGetAgGaugeAggregation();
-						}
-						ShowElement(this.id,'divChartsGroupByDateOperator','Hide');
-						document.rdForm.rdAgChartsDateGroupBy.value='';
-						this.rdAgHideForecast();
-						var aAggrList = []; var aAggrListLabel = []; var aAggrGroupLabel = []; var aAggrGroupLabelClass = [];
-						this.rdAgGetColumnList(aAggrList, aAggrListLabel, 'number', aAggrGroupLabel, aAggrGroupLabelClass, false);
-						rdchangeList('rdAgChartYColumn', aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass);
-						break;
-					default:  //Line,Spline
-						ShowElement(this.id,'lblChartXLabelColumn','Hide');
-						ShowElement(this.id,'lblChartXAxisColumn','Show');
-						ShowElement(this.id,'lblChartYDataColumn','Hide');
-						ShowElement(this.id,'lblChartYAxisColumn','Show');
-						ShowElement(this.id,'lblChartSizeColumn','Hide');
-						ShowElement(this.id,'rdAgChartXLabelColumn','Hide');
-						ShowElement(this.id,'rdAgChartXDataColumn','Show');
-						ShowElement(this.id,'rdAgChartXNumberColumn','Hide');
-						ShowElement(this.id,'rdAgChartYAggrLabel','Show');
-						ShowElement(this.id,'rdAgChartSizeColumnAggrLabel','Hide');
-						ShowElement(this.id,'rdAgChartYAggrList','Show');
-						ShowElement(this.id,'rdAgChartXLabelTextColumn','Hide');
-						ShowElement(this.id,'rowChartExtraDataColumn','Hide');
-						ShowElement(this.id,'rowChartExtraAggr','Hide');
-						ShowElement(this.id,'lblChartYDataAggregation','Hide');
-						ShowElement(this.id,'rdAgGaugeInput','Hide');
-						ShowElement(this.id,'rdAgGaugeMin','Hide');
-						ShowElement(this.id,'rdAgGaugeGoal1','Hide');
-						ShowElement(this.id,'rdAgGaugeGoal2','Hide');
-						ShowElement(this.id,'rdAgGaugeMax','Hide');
-						ShowElement(this.id, 'divGaugeError-BlankData', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankData', 'Hide');
-						ShowElement(this.id, 'divChartError-BlankLabel', 'Hide');
-						ShowElement(this.id, 'divHeatmapError-BlankSizeColumn', 'Hide');
-						ShowElement(this.id, 'divHeatmapError-BlankColorColumn', 'Hide');
-						this.rdAgGetChartsGroupByDateOperatorDiv();
-						if(bForecast){
-							document.getElementById('rowChartForecast').style.display = '';
-							document.getElementById('IslAgForecastType').style.display = '';
-							document.getElementById('rdAgChartForecastLabel').style.display = '';
-							this.rdAgModifyTimeSeriesCycleLengthOptions(document.getElementById('rdAgChartsDateGroupBy'));    
-							this.rdAgModifyForecastOptions(document.getElementById('rdAgChartXDataColumn').value);
-							this.rdAgShowForecastOptions();
-						}
-						var aAggrList = []; var aAggrListLabel = []; var aAggrGroupLabel = []; var aAggrGroupLabelClass = [];
-						this.rdAgGetColumnList(aAggrList, aAggrListLabel, 'number', aAggrGroupLabel, aAggrGroupLabelClass, false);
-						rdchangeList('rdAgChartYColumn', aAggrList, aAggrListLabel, '', aAggrGroupLabel, aAggrGroupLabelClass);
-						break;
-			}
-			this.rdAgModifyAggregationAvailability(document.getElementById('rdAgChartXDataColumn').value);   //#18599.
-			//Highlight the selected chart.
-			document.getElementById('lblChartAddPie').className = "rdAgCommand";
-			document.getElementById('lblChartAddBar').className = "rdAgCommand";
-			document.getElementById('lblChartAddLine').className = "rdAgCommand";
-			document.getElementById('lblChartAddSpline').className = "rdAgCommand";
-			document.getElementById('lblChartAddScatter').className = "rdAgCommand";
-            //22351
-			document.getElementById('lblChartAddGauge').className = "rdAgCommand";
-			if(document.getElementById('lblChartAddHeatmap') != null){
-				document.getElementById('lblChartAddHeatmap').className = "rdAgCommand";
-			}
-			var eleSelectedCommand = document.getElementById('lblChartAdd' + sChartType);
-			eleSelectedCommand.className = "rdAgCommand rdAgCommandHightlight";
-			
-		},
-
 		rdAgManipulateFilterOptionsDropdownForDateColumns : function(sFilterColumn, sFilterOperator, sFilterValue){
 			// Function gets called when the filter link (with the filter info displayed above the data table) displayed is clicked to set the drop down values.  
 			this.rdAgRemoveAllWhiteSpaceNodesFromFilterOperatorDropdown();      
@@ -764,426 +1061,30 @@ YUI.add('analysis-grid', function(Y) {
 			}   
 		},
 		
-		rdAgSetPickedFilterValue : function(nPickListRowNr) {
-			var fraPopup = document.getElementById("subPickDistinct");
-			var eleValue = fraPopup.contentWindow.document.getElementById("lblFilter_Row" + nPickListRowNr);
-			var sValue;
-			if (eleValue.textContent) {
-				sValue = eleValue.textContent; //Mozilla
-			}else{
-				 sValue = eleValue.innerText;  //IE
-			}
-			document.rdForm.rdAgFilterValue.value = sValue;
+		rdAgSetPickedFilterValueByRow: function (nPickListRowNr) {
+		    var fraPopup = document.getElementById("subPickDistinct");
+		    var eleValue = fraPopup.contentWindow.document.getElementById("lblFilter_Row" + nPickListRowNr);
+		    var sValue;
+		    if (eleValue.textContent) {
+		        sValue = eleValue.textContent; //Mozilla
+		    } else {
+		        sValue = eleValue.innerText;  //IE
+		    }
+		    document.rdForm.rdAgFilterValue.value = sValue;
 		},
-		
-		rdAgModifyAggregationAvailability : function(sColumn) {
-			// Function shows/Hides the Aggregation dropdown based on the X-axis column picked.
-			if (document.rdForm.rdAgChartType.value == "Line" || document.rdForm.rdAgChartType.value == "Spline") {   //#16559.
-				if (sColumn == '') {
-					document.getElementById('rowChartAggr').style.display = 'none';
-					return;
-				}
-				var sDataColumnType = this.rdAgGetColumnDataType(sColumn);
-				if (sDataColumnType.toLowerCase() == "number") {
-					document.getElementById('rowChartAggr').style.display = 'none';
-				} else {
-					document.getElementById('rowChartAggr').style.display = '';
-				}
-			} else {
-				document.getElementById('rowChartAggr').style.display = '';
-			}
+
+		rdAgSetPickedFilterValues: function (sValues) {
+		    var fraPopup = document.getElementById("subPickDistinct");
+		    document.rdForm.rdAgFilterValue.value = sValues;
 		},
-		
-		rdAgPickProperElementDiv : function(){
+
+		rdAgPickProperElementDiv: function () {
 			// Function used to regulate the hiding/unhiding of the Divs containing the InputDate elements, called on the onchange event of the filter operator(values like <, <= etc) dropdown.
 			if(document.rdForm.rdAgFilterColumn.value){
 				this.rdAgShowProperElementDiv(document.rdForm.rdAgFilterColumn.value, document.rdForm.rdAgFilterOperator.value);
 			} 
 		},
 
-		rdAgModifyAggregateOptions : function(sColumn){
-            // This function modifies the aggregate drilldown based on the y-axis column datatype...    
-            var sDataColumnType = this.rdAgGetColumnDataType(sColumn);
-            if (Y.Lang.isValue(sDataColumnType)) {
-                rdchangeList('rdAgChartYAggrList', '', '',sDataColumnType, '');
-            }            
-		},
-
-		/* ----Analysis Grid Forecasting----- */
-
-		rdAgShowForecastOptions : function() {
-			if(document.getElementById('IslAgForecastType') == null) return;
-			var eleForecastType = document.getElementById('IslAgForecastType');
-			if(eleForecastType.value == 'TimeSeriesDecomposition'){
-				if(document.getElementById('rdAgChartsDateGroupBy').value == "FirstDayOfYear"){
-					document.getElementById('IslAgTimeSeriesCycleLength').style.display = 'none';
-					document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = 'none';
-				}else{
-					document.getElementById('IslAgTimeSeriesCycleLength').style.display = '';
-					document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = '';
-				}
-				document.getElementById('IslAgRegressionType').style.display = 'none';
-				document.getElementById('IslAgRegressionType'+ '-Caption').style.display = 'none';      
-				return;
-			}
-			else if(eleForecastType.value == 'Regression'){
-				var eleRegression = document.getElementById('IslAgRegressionType');
-				document.getElementById('IslAgRegressionType').style.display = '';
-				document.getElementById('IslAgRegressionType' + '-Caption').style.display = '';
-				document.getElementById('IslAgTimeSeriesCycleLength').style.display = 'none';
-				document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = 'none';
-				return;
-			}
-			else{
-				document.getElementById('IslAgTimeSeriesCycleLength').style.display = 'none';
-				document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = 'none';
-				document.getElementById('IslAgRegressionType').style.display = 'none';
-				document.getElementById('IslAgRegressionType' + '-Caption').style.display = 'none';
-			}   
-		},
-
-        /* ---This function gets a list of AG columns for the datatype specified --- */
-		rdAgGetColumnList : function(array, arrayLabel, sDataType, aAggrGroupLabel, aAggrGroupLabelClass, includeGroupAggr) {
-		    var eleAgDataColumnDetails = document.getElementById('rdAgDataColumnDetails');		    
-		    if (eleAgDataColumnDetails.value != '') {
-		        var sDataColumnDetails = eleAgDataColumnDetails.value;
-		        var aDataColumnDetails = sDataColumnDetails.split(',')
-		        if (aDataColumnDetails.length > 0) {
-		            var i; var j = 0;
-		            var sColumnVal = '';
-		            for (i = 0; i < aDataColumnDetails.length; i++) {
-		                var sDataColumnDetail = aDataColumnDetails[i];
-		                if (includeGroupAggr == false && sDataColumnDetail.indexOf('^') > -1) {
-		                    sDataColumnDetail = '';
-		                }
-		                if (sDataColumnDetail.length > 1 && sDataColumnDetail.indexOf(':') > -1) {
-		                    var sDataColumnType = sDataColumnDetail.split(':')[1].split("|")[0];
-		                    if (sDataType == '') {		                       
-		                        sColumnVal = sDataColumnDetail.split(':')[0];
-		                        array[i] = sColumnVal.split(';')[0];
-		                        arrayLabel[i] = sColumnVal.split(';')[1];
-                                /* 21211 - Non IE browsers need a blank value defined for empty array entries */
-		                        if (i == 1) {  
-		                            array[0] = '';
-		                            arrayLabel[0] = '';
-		                        }
-		                        if (sDataColumnDetail.indexOf("|") > -1) {
-		                            aAggrGroupLabel[i] = sDataColumnDetail.split('|')[1].split('-')[0];
-		                            if (sDataColumnDetail.indexOf("^") > -1) {
-		                                aAggrGroupLabelClass[i] = sDataColumnDetail.split('-')[1].split('^')[0];
-		                            }
-		                            else {
-		                                aAggrGroupLabelClass[i] = sDataColumnDetail.split('|')[1].split('-')[1];
-		                            }
-		                        }
-		                        else {
-		                            aAggrGroupLabel[i] = '';
-		                            aAggrGroupLabelClass[i] = '';
-		                        }
-		                    } 
-		                    else if (sDataType == 'number' && sDataColumnType == 'Number') {		                        
-		                        sColumnVal = sDataColumnDetail.split(':')[0];
-		                        array[j] = sColumnVal.split(';')[0];
-		                        arrayLabel[j] = sColumnVal.split(';')[1];
-		                        j++;
-		                        if (sDataColumnDetail.indexOf("|") > -1) {
-		                            aAggrGroupLabel[j] = sDataColumnDetail.split('|')[1].split('-')[0];
-		                            aAggrGroupLabelClass[j] = sDataColumnDetail.split('|')[1].split('-')[1];
-		                        }
-		                        else {
-		                            aAggrGroupLabel[j] = '';
-		                            aAggrGroupLabelClass[j] = '';
-		                        }
-		                    }
-		                }
-		            }
-		            if ( sDataType == 'number' ) {
-		                array.unshift('');
-		                arrayLabel.unshift('');
-		            }		            
-		        }
-		    }		    
-	    },
-        	
-		rdAgGetColumnDataType : function(sColumn){
-			var eleAgDataColumnDetails = document.getElementById('rdAgDataColumnDetails'); 
-			if(eleAgDataColumnDetails.value != ''){
-				var sDataColumnDetails = eleAgDataColumnDetails.value;
-				var aDataColumnDetails = sDataColumnDetails.split(',')
-				if(aDataColumnDetails.length > 0){
-					var i;
-					for(i=0;i<aDataColumnDetails.length;i++){
-						var sDataColumnDetail = aDataColumnDetails[i];
-						if(sDataColumnDetail.length > 1 && sDataColumnDetail.indexOf(':') > -1){
-						    var sDataColumn = sDataColumnDetail.split(':')[0];
-						    sDataColumn = sDataColumnDetail.split(';')[0];
-						    if (sDataColumn == sColumn) {
-                                //22397
-								return sDataColumnDetail.split(':')[1].split("|")[0];
-							}
-						}
-					}
-				}
-			}
-		},		
-
-		rdAgModifyForecastOptions : function(sColumn){
-			// Function modifies the forecast type dropdown based on the X-Axis column value.
-			if(document.rdForm.rdAgChartType.value == "Pie" || document.rdForm.rdAgChartType.value == "Scatter" || document.rdForm.rdAgChartType.value == "Heatmap"){this.rdAgHideForecast(); return;}   //#16559.
-			if(document.getElementById('IslAgForecastType') == null) return;
-			if(sColumn == ''){this.rdAgResetForecastValues(); return;}
-			var eleAgDataColumnDetails = document.getElementById('rdAgDataColumnDetails');
-			var eleDataForecastDropdown = document.getElementById('IslAgForecastType');
-			var sForecastValue = eleDataForecastDropdown.value;
-			var eleDateGroupByDropdown = document.getElementById('rdAgChartsDateGroupBy');
-			var aForecastValues = ['None', 'TimeSeriesDecomposition', 'Regression']; 
-			var aForecastOptions = ['', 'Time Series', 'Regression']; 
-			var sDataColumnType = this.rdAgGetColumnDataType(sColumn);
-			if(Y.Lang.isValue(sDataColumnType)){
-				if(sDataColumnType.toLowerCase() == "text"){
-					this.rdAgHideForecast();
-					return;
-				}
-				if(sDataColumnType.toLowerCase() != "date" && sDataColumnType.toLowerCase() != "datetime"){
-					if(eleDataForecastDropdown.options[1].value == 'TimeSeriesDecomposition'){
-						eleDataForecastDropdown.remove(1);
-					}
-					document.getElementById('rowChartForecast').style.display = '';                                    
-					document.getElementById('IslAgForecastType').style.display = '';
-					document.getElementById('rdAgChartForecastLabel').style.display = '';
-					document.getElementById('IslAgTimeSeriesCycleLength').style.display = 'none';
-					document.getElementById('IslAgTimeSeriesCycleLength'+ '-Caption').style.display = 'none';
-				}else{
-					if(eleDataForecastDropdown.options.length < 3){ 
-						var j;
-						for(j=0;j<4;j++){
-							if(eleDataForecastDropdown.options.length > 0){
-								eleDataForecastDropdown.remove(0);
-							}
-						}
-						var k;
-						for(k=0;k<aForecastOptions.length;k++){
-							var eleForecastOption = document.createElement('option');
-							eleForecastOption.text = aForecastOptions[k];
-							eleForecastOption.value = aForecastValues[k];
-							eleDataForecastDropdown.add(eleForecastOption);
-						}
-						if(sForecastValue.length > 0){
-							eleDataForecastDropdown.value = sForecastValue;
-						}                                   
-					}
-					document.getElementById('rowChartForecast').style.display = '';
-					document.getElementById('IslAgForecastType').style.display = '';
-					document.getElementById('rdAgChartForecastLabel').style.display = ''
-				}
-			}
-		},
-		rdAgResetForecastValues : function(){
-			// Function resets all forecast related element values.
-			if(document.getElementById('IslAgForecastType') == null) return;
-			document.getElementById('IslAgForecastType').value = '';
-			document.getElementById('IslAgTimeSeriesCycleLength').value = '';
-			document.getElementById('IslAgRegressionType').value = 'Linear';
-		},
-
-		rdAgModifyTimeSeriesCycleLengthOptions : function(eleColumnGroupByDropdown){
-
-			// Function modifies the forecast cycle length options based on the Groupby dropdown value.
-			if(document.getElementById('IslAgForecastType') == null) return;
-			if(document.rdForm.rdAgChartType.value == "Pie" || document.rdForm.rdAgChartType.value == "Scatter" || document.rdForm.rdAgChartType.value == "Heatmap") return;
-			var eleTimeSeriesCycleLengthDropdown = document.getElementById('IslAgTimeSeriesCycleLength');
-			var sTimeSeriesCycleLength = eleTimeSeriesCycleLengthDropdown.value;
-			var sColumnGroupByValue = eleColumnGroupByDropdown.value
-			var i; var j = 0; var aColumnGroupByOptions = ['Year', 'Quarter', 'Month', 'Week', 'Day', 'Hour']; 
-			this.rdResetTimeSeriesCycleLenthDropdown();
-			switch(sColumnGroupByValue){
-				case 'FirstDayOfYear':
-				 for(i=0;i<7;i++){
-						var eleTimeSeriesCycleLengthOption = eleTimeSeriesCycleLengthDropdown.options[j]
-						if(eleTimeSeriesCycleLengthOption != null){
-							if(eleTimeSeriesCycleLengthOption.value != ''){
-								eleTimeSeriesCycleLengthDropdown.remove(j);
-							}else{
-								if(eleTimeSeriesCycleLengthOption.value == sTimeSeriesCycleLength){
-									eleTimeSeriesCycleLengthDropdown.value = sTimeSeriesCycleLength;
-								}
-								j += 1;
-							}
-						}
-					}
-					document.getElementById('IslAgTimeSeriesCycleLength').style.display = 'none';
-					document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = 'none';
-					break;
-				case 'FirstDayOfQuarter':
-				for(i=0;i<7;i++){
-						var eleTimeSeriesCycleLengthOption = eleTimeSeriesCycleLengthDropdown.options[j]
-						if(eleTimeSeriesCycleLengthOption != null){
-							if(eleTimeSeriesCycleLengthOption.value != '' && eleTimeSeriesCycleLengthOption.value != 'Year'){
-								eleTimeSeriesCycleLengthDropdown.remove(j);
-							}else{
-								if(eleTimeSeriesCycleLengthOption.value == sTimeSeriesCycleLength){
-									eleTimeSeriesCycleLengthDropdown.value = sTimeSeriesCycleLength;
-								}
-								j += 1;
-							}
-						}
-					}
-					if(document.getElementById('IslAgForecastType').value == 'TimeSeriesDecomposition'){
-						document.getElementById('IslAgTimeSeriesCycleLength').style.display = '';
-						document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = '';
-					}
-					break;
-				case 'FirstDayOfMonth':
-					for(i=0;i<7;i++){
-						var eleTimeSeriesCycleLengthOption = eleTimeSeriesCycleLengthDropdown.options[j]
-						if(eleTimeSeriesCycleLengthOption != null){
-							if(eleTimeSeriesCycleLengthOption.value != '' && eleTimeSeriesCycleLengthOption.value != 'Year' && eleTimeSeriesCycleLengthOption.value != 'Quarter'){
-								eleTimeSeriesCycleLengthDropdown.remove(j);
-							}else{
-								if(eleTimeSeriesCycleLengthOption.value == sTimeSeriesCycleLength){
-									eleTimeSeriesCycleLengthDropdown.value = sTimeSeriesCycleLength;
-								}
-								j += 1;
-							}
-						}
-					}
-					if(document.getElementById('IslAgForecastType').value == 'TimeSeriesDecomposition'){
-						document.getElementById('IslAgTimeSeriesCycleLength').style.display = '';
-						document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = '';
-					}
-					break;
-				case 'Date':
-					for(i=0;i<7;i++){
-						var eleTimeSeriesCycleLengthOption = eleTimeSeriesCycleLengthDropdown.options[j]
-						if(eleTimeSeriesCycleLengthOption != null){
-							if(eleTimeSeriesCycleLengthOption.value != '' && eleTimeSeriesCycleLengthOption.value != 'Year' && eleTimeSeriesCycleLengthOption.value != 'Quarter' && eleTimeSeriesCycleLengthOption.value != 'Month' && eleTimeSeriesCycleLengthOption.value != 'Week'){
-								eleTimeSeriesCycleLengthDropdown.remove(j);
-							}else{
-								if(eleTimeSeriesCycleLengthOption.value == sTimeSeriesCycleLength){
-									eleTimeSeriesCycleLengthDropdown.value = sTimeSeriesCycleLength;
-								}
-								j += 1;
-							}
-						}
-					}
-					if(document.getElementById('IslAgForecastType').value == 'TimeSeriesDecomposition'){
-						document.getElementById('IslAgTimeSeriesCycleLength').style.display = '';
-						document.getElementById('IslAgTimeSeriesCycleLength' + '-Caption').style.display = '';
-					}
-					break;
-			}
-			if(eleTimeSeriesCycleLengthDropdown.value == ''){
-				eleTimeSeriesCycleLengthDropdown.value = eleTimeSeriesCycleLengthDropdown.options[eleTimeSeriesCycleLengthDropdown.options.length -1].value;
-				if(eleTimeSeriesCycleLengthDropdown.options[eleTimeSeriesCycleLengthDropdown.options.length -1].value == "Day"){
-					eleTimeSeriesCycleLengthDropdown.value = '';
-				}        
-			}
-		},
-
-		rdResetTimeSeriesCycleLenthDropdown : function() {
-			// Function resets the forecast cycle length dropdown.
-			if(document.getElementById('IslAgForecastType') == null) return;
-			var eleTimeSeriesCycleLengthDropdown = document.getElementById('IslAgTimeSeriesCycleLength');
-			var i; var aColumnGroupByOptions = ['', 'Year', 'Quarter', 'Month', 'Week', 'Day']; 
-			if(eleTimeSeriesCycleLengthDropdown.options.length >5) return;
-			for(i=0;i<7;i++){
-				if(eleTimeSeriesCycleLengthDropdown.options.length > 0){
-					eleTimeSeriesCycleLengthDropdown.remove(0);
-				}else{
-					break;
-				}
-			}
-			for(i=0;i<aColumnGroupByOptions.length;i++){
-				var eleTimeSeriesOption = document.createElement('option');
-				eleTimeSeriesOption.text = aColumnGroupByOptions[i];
-				eleTimeSeriesOption.value = aColumnGroupByOptions[i];
-				eleTimeSeriesCycleLengthDropdown.add(eleTimeSeriesOption);
-			}
-		},
-		
-		rdAgHideForecast : function(){
-			// Function hides all forecast related elements.
-			if(document.getElementById('IslAgForecastType') == null) return;
-			document.getElementById('rowChartForecast').style.display = 'none';
-			document.getElementById('IslAgForecastType').style.display = 'none';
-			document.getElementById('IslAgForecastType').value = '';
-			document.getElementById('rdAgChartForecastLabel').style.display = 'none'
-			document.getElementById('IslAgTimeSeriesCycleLength').style.display = 'none';
-			document.getElementById('IslAgTimeSeriesCycleLength'+ '-Caption').style.display = 'none';
-			document.getElementById('IslAgRegressionType').style.display = 'none';
-			document.getElementById('IslAgRegressionType' + '-Caption').style.display = 'none';
-		},
-		
-		/* -----KPIs------ */
-		rdGetAgGaugeAggregation : function(){
-			Y.one('#lblChartYDataAggregation').hide();
-			Y.one('#lblSuggestedMinMax').hide();
-			if(document.rdForm.rdAgChartType.value != "Gauge") return;
-			if(document.getElementById('rdAgChartYColumn').value == '' || document.getElementById('rdAgChartYAggrList').value == '') return;
-			Y.one('#lblChartYDataAggregation').hide();
-			Y.one('#lblSuggestedMinMax').hide();
-			var sRefreshIDs = document.getElementById("rdAgReportId").value + ',lblChartYDataAggregation,rdAgGaugeAggregationValue,lblSuggestedMinMax';
-			var eleMinValueBox = document.getElementById('txtMinValue')
-			var rdAgRefreshParams = "&rdReport=" + document.getElementById("rdAgReportId").value;
-			rdAgRefreshParams += "&rdAgId=" + document.getElementById('rdAgId').value;
-			rdAgRefreshParams += "&rdAgAggregateColumnValue=" + document.getElementById('rdAgChartYColumn').value;
-			rdAgRefreshParams += "&rdAgAggregation=" + document.getElementById('rdAgChartYAggrList').value;
-			rdAgRefreshParams += "&rdDataCache=" + document.getElementById('rdDataTableDiv-dtAnalysisGrid').getAttribute("rdDataCache");
-			rdAgRefreshParams += "&rdAgAggregationText=" + document.getElementById('rdAgChartYAggrList').options[document.getElementById('rdAgChartYAggrList').selectedIndex].text;
-			rdAgRefreshParams += "&rdAgGetGaugeAggregation=True";
-			rdAjaxRequestWithFormVars("rdAjaxCommand=RefreshElement&rdRefreshElementID=" + sRefreshIDs + rdAgRefreshParams, false, "", false, false, this.ShowMinMaxSuggestionLink)
-		},
-		ShowMinMaxSuggestionLink : function(){
-		    LogiXML.AnalysisGrid.rdSetClassNameById('colChart', 'rdAgUnselectedTab');   //#20970.
-		    Y.one('#divSuggestedMinMax').show();
-		    if (Y.one('#rdChartError')) {
-		        Y.one('#rdChartError').remove();
-		    }
-		    ShowElement(this.id, 'divGaugeError-BlankData', 'Hide');
-		},
-		
-		AutoPopulateMinMaxValues : function(){
-			var nMin = document.getElementById('txtMinValue').value;
-			var nMax = document.getElementById('txtMaxValue').value;
-			var nGoal1 = document.getElementById('txtGoal1').value; 
-			var nGoal2 = document.getElementById('txtGoal2').value;
-			if(document.getElementById('rdAgGaugeAggregationValue').value == '') return;
-			var nAggregationLength = parseInt(document.getElementById('rdAgGaugeAggregationValue').value).toString().length
-			var fAggregation = parseFloat(document.getElementById('rdAgGaugeAggregationValue').value);
-			var sBuiltValue;
-			if(fAggregation<0){
-				sBuiltValue = '-1';
-				if(fAggregation<-1){   
-					for(i=0;i<nAggregationLength-1;i++){
-						sBuiltValue += '0';
-					}
-				}
-				document.getElementById('txtMinValue').value = sBuiltValue;
-				document.getElementById('txtMaxValue').value = 0;
-				if(parseFloat(nGoal1) > 0){ //#17769.
-					document.getElementById('txtGoal1').value = '';
-				}
-				if(parseFloat(nGoal2) > 0){
-					 document.getElementById('txtGoal2').value = '';
-				}
-			}else{
-				document.getElementById('txtMinValue').value = 0;
-				sBuiltValue = '1';
-				if(fAggregation>1){        
-					for(i=0;i<nAggregationLength;i++){
-						sBuiltValue += '0';
-					}
-				}
-				document.getElementById('txtMaxValue').value = sBuiltValue;      
-				if(parseFloat(nGoal1) > parseFloat(sBuiltValue)){   //#17769.
-					document.getElementById('txtGoal1').value = '';
-				}
-				if(parseFloat(nGoal2) > parseFloat(sBuiltValue)){
-					 document.getElementById('txtGoal2').value = '';
-				}
-			}    
-		},
-	
 		/* -----Draggable Panels----- */
 		rdInitDraggableAgPanels : function(){
 			var bDraggableAgPanels = false;
@@ -1203,8 +1104,6 @@ YUI.add('analysis-grid', function(Y) {
 			            var pnlNode = Y.one('#' + eleAgPanel.id);
 			            var pnlDD = new Y.DD.Drag({
 			                node: pnlNode
-			            }).plug(Y.Plugin.DDConstrained, {
-			                stickY: true
 			            });
 			            var pnlDrop = pnlNode.plug(Y.Plugin.Drop);
 
@@ -1375,15 +1274,16 @@ YUI.add('analysis-grid', function(Y) {
 			rdPanelParams += "&rdAgPanelOrder="; 
 			var aDraggableAgPanels = this.rdGetDraggableAgPanels();
 			for (var i=0; i < aDraggableAgPanels.length; i++){
-				var eleAgPnl = aDraggableAgPanels[i];
-				rdPanelParams += eleAgPnl.id.replace('rdDivAgPanelWrap_', '') + ',';
+			    var eleAgPnl = aDraggableAgPanels[i];
+			    if(rdPanelParams.indexOf(eleAgPnl.id.replace('rdDivAgPanelWrap_', '') + ',') < 0)
+				    rdPanelParams += eleAgPnl.id.replace('rdDivAgPanelWrap_', '') + ',';
 			}
 			rdPanelParams += "&rdAgId=" + document.getElementById('rdAgId').value;
 
 			window.status = "Saving dashboard panel positions.";
 			rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=UpdateAgPanelOrder' + rdPanelParams);
 		},
-		
+
 		rdGetDraggableAgPanels : function(){
 				var aDraggableAgPanels = new Array();
 				var eleDivAgPanels = document.getElementById('rdDivAgPanels');
@@ -1391,10 +1291,8 @@ YUI.add('analysis-grid', function(Y) {
 				var aDraggableAgDivs = eleDivAgPanels.getElementsByTagName("div")
 				for(i=0;i<aDraggableAgDivs.length;i++){
 					var eleDraggableAgDiv = aDraggableAgDivs[i];
-					if(eleDraggableAgDiv.id){
-						if((eleDraggableAgDiv.id.indexOf('rdDivAgPanelWrap_rowTable') > -1) || 
-						   (eleDraggableAgDiv.id.indexOf('rdDivAgPanelWrap_rowChart') > -1) ||
-						   (eleDraggableAgDiv.id.indexOf('rdDivAgPanelWrap_rowCrosstab_') > -1)) {
+					if (eleDraggableAgDiv.id && eleDraggableAgDiv.id.indexOf('rowMenu') < 0 && eleDraggableAgDiv.id.indexOf('rowTitle') < 0) {
+						if((eleDraggableAgDiv.id.indexOf('rdDivAgPanelWrap_row') > -1)) {
 						    if(Y.Lang.isValue(eleDraggableAgDiv.firstChild.firstChild)){
 						        if(eleDraggableAgDiv.firstChild.firstChild.firstChild.style.display != 'none'){
 						            aDraggableAgPanels.push(eleDraggableAgDiv);
@@ -1525,8 +1423,8 @@ function rdemptyList(rdEleId) {
 
 function rdfillList(rdEleId, arr, aLabel, sDataColumnType, sSelectedValue, arrGroupLabel, arrGroupLabelClass) {
     var rdAggrList = document.getElementById(rdEleId);    
-    if ( sDataColumnType != '' ) {
-        if (sDataColumnType.toLowerCase() == "text" || sDataColumnType.toLowerCase() == "datetime") {
+    if ( sDataColumnType && sDataColumnType != '' ) {
+        if (sDataColumnType.toLowerCase() == "text" || sDataColumnType.toLowerCase() == "date" || sDataColumnType.toLowerCase() == "datetime") {
             arr = ["COUNT", "DISTINCTCOUNT"];
             aLabel = ["Count", "Distinct Count"];
         }
@@ -1550,6 +1448,8 @@ function rdfillList(rdEleId, arr, aLabel, sDataColumnType, sSelectedValue, arrGr
                 rdAggrList.appendChild(group);
             }
             option = new Option(arrLabel[i], arrList[i]);
+            if (option.innerHTML == "")
+                option.innerHTML = arrLabel[i];
             group.appendChild(option);
         }
         //Non grouped

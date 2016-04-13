@@ -4,7 +4,7 @@
   <PopupPanel ID="popupSharing" PopupModal="True" Caption="" Draggable="True" rdNoElementShowHistory="True" PopupPanelLocation="Center" Class="ThemeAlignLeft" CloseButtonClass="ThemeHidden" CloseButtonCaption="">
     <IncludeFrame ID="frameShareFolder" FrameBorder="False" Scrolling="False" Width="550" WidthScale="px">
       <Target Type="IncludeFrameReport" Report="rdDownloadLink" />
-      <LinkParams rdBookmarkCollection="" rdFolderID="" rdBookmarkID="" rdPopupID="" rdSharingCollectionColumn="" />
+      <LinkParams rdBookmarkCollection="" rdFolderID="" rdBookmarkID="" rdPopupID="" rdSharingCollectionColumn="" rdGroupIdentifierColumn="" />
     </IncludeFrame>
 
     <LineBreak LineCount="2" />

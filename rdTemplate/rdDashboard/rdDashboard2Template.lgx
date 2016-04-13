@@ -172,7 +172,7 @@
 																		<Label ID="rdDashboardCaptionID" Caption="Caption" Class="rdDashboardTitleCaption" For="rdDashboardPanelRenameID" />
 																	</Division>
 																	<Division ID="rdDashboardPanelRenameDivID" ShowModes="None">
-																		<InputText ID="rdDashboardPanelRenameID" Class="rdDashboardText panelTitleRename" Value="Caption" InputSize="20" >
+																		<InputText ID="rdDashboardPanelRenameID" Class="rdDashboardText panelTitleRename" Value="Caption" InputSize="60" >
 																			<EventHandler DhtmlEvent="onblur">
 																				<Action Type="Link" ID="actionRenamePanel">
 																					<Target Type="Link" Link="javascript: LogiXML.Dashboard.pageDashboard.rdSaveDashboardParams('rdDashboardPanelID', true);" />

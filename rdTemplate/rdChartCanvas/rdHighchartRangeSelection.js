@@ -1,5 +1,5 @@
 ﻿YUI.add('chartCanvasRangeSelection', function (Y) {
-    "use strict";
+    //"use strict";
     var Lang = Y.Lang,
         TRIGGER = 'rdChartCanvasRangeSelection',
         MIN_HEIGHT = 5,

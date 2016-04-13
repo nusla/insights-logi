@@ -2,7 +2,7 @@
 /*global LogiXML, YUI, document, window */
 
 YUI.add('drawable-overlay-size-constrain', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var Lang = Y.Lang,
 		BOUNDING_BOX = 'boundingBox';

@@ -1,7 +1,8 @@
 //General resize yui namespace
 YUI.add('rdResize', function(Y) {
 
-	Y.namespace('rdResize').AddYUIResizerHandles = function(sContentHolderID, eleAttrs){
+    Y.namespace('rdResize').AddYUIResizerHandles = function (sContentHolderID, eleAttrs) {
+        
 		// Function includes the common code used to instantiate a YUI object and wrap YUI handles around the Container.		
 		var freeFormLayout = false;
 		if (sContentHolderID.indexOf('rdDashboardPanel-') == 0)
@@ -117,7 +118,7 @@ YUI.add('rdResize', function(Y) {
 	}
 	
 }, '10.1.100', {
-	requires:['base', 'resize', 'stylesheet', 'event-custom', 'chartfx-resize']
+    requires: ['base', 'resize', 'stylesheet', 'event-custom', 'chartfx-resize']
 });
 
 Y.use('rdResize', function(Y) {	
@@ -146,12 +147,17 @@ Y.use('rdResize', function(Y) {
 		
 		var yuiResize = Y.rdResize.AddYUIResizerHandles(eleContent.id, eleAttrs);
 		yuiResize.on('resize:end', function(e) {
-				var src = eleContent.src
-				if (src.indexOf("rdChart2.aspx")!=-1) {
-					if (src.indexOf("&rdResizerNewWidth=")!=-1){
-						src = src.substr(0,src.indexOf("&rdResizerNewWidth="))
-					}
-					src += "&rdResizerNewWidth=" + eleContent.width  + "&rdResizerNewHeight=" + eleContent.height 
+		        eleContent = document.getElementById(eleContent.id);
+		        var src = eleContent.src
+		        if (src.indexOf("rdChart2.aspx") != -1) {
+		            if (src.indexOf("&rdResizerNewWidth=") != -1) {
+		                src = src.substr(0, src.indexOf("&rdResizerNewWidth="))
+		            }		            
+		        var nowWidth = (eleContent.style && eleContent.style['width']) ? eleContent.style['width'] : eleContent.width
+		        nowWidth = nowWidth.replace("px", "");
+		        var nowHeight = (eleContent.style && eleContent.style['height']) ? eleContent.style['height'] : eleContent.height
+		        nowHeight = nowHeight.replace("px", "");
+		        src += "&rdResizerNewWidth=" + nowWidth + "&rdResizerNewHeight=" + nowHeight
 					
 					if (document.rdForm && document.rdForm.rdAgId) {
 					    src += "&rdAgId=" + document.rdForm.rdAgId.value;
@@ -216,8 +222,12 @@ Y.use('rdResize', function(Y) {
 	        }
 	    }
 
-	    if (eleAnimatedChartContentHolder.className.indexOf('yui3-resize') == 0)
-	        return;
+	    if (eleAnimatedChartContentHolder.className.indexOf('yui3-resize') >= 0) {
+            //23170
+	        if (eleAnimatedChartContentHolder.nextSibling.className.indexOf('yui3-resize-handles-wrapper') >= 0) {
+	            eleAnimatedChartContentHolder.nextSibling.parentNode.removeChild(eleAnimatedChartContentHolder.nextSibling);
+	        }
+	    }
 
 	    //Set width and height based on parameters
 	    var yuiResize = Y.rdResize.AddYUIResizerHandles(eleAnimatedChartContentHolder.id, eleAttrs);
@@ -465,7 +475,7 @@ Y.use('rdResize', function(Y) {
 		var width = parseInt(eleAnimatedMap.offsetWidth == 0 ? eleAnimatedMap.getAttribute('Width') : eleAnimatedMap.offsetWidth) // To handle issue under DataTable.
 		var height = parseInt(eleAnimatedMap.offsetHeight == 0 ? eleAnimatedMap.getAttribute('Height') : eleAnimatedMap.offsetHeight)
 		var eleAnimatedMapContentHolder = document.getElementById('rdFusionMap'+ sAnimatedMapID);  // Div that holds the Chart.
-		if((eleAnimatedMap.tagName.match('OBJECT'))||(eleAnimatedMap.tagName.match('EMBED'))){               
+		if (eleAnimatedMap.tagName.match('OBJECT') || eleAnimatedMap.tagName.match('EMBED') || eleAnimatedMap.tagName.match('SPAN')) {
 			if(!eleAnimatedMapContentHolder){
 				var eleAnimatedMapContentHolder = document.createElement("Div");
 				eleAnimatedMapContentHolder.setAttribute("id","rdFusionMap" + sAnimatedMapOriginalID);
@@ -498,13 +508,14 @@ Y.use('rdResize', function(Y) {
 		
 		var yuiResize = Y.rdResize.AddYUIResizerHandles(eleAnimatedMapContentHolder.id, eleAttrs);
 		yuiResize.get('wrapper').setStyles({
+            margin: '0 auto',
 			padding: '10',
 			width: eleAnimatedMap.width,
 			height: eleAnimatedMap.height
 		});			
 
 		yuiResize.on('resize:end', function(e) { 
-			var eleAnimatedMapResizing = e.target.get('node').one('embed, object').getDOMNode();		
+			var eleAnimatedMapResizing = e.target.get('node').one('embed, object, span').getDOMNode();		
 			// event triggered after the resize is done.      
 			if(eleAnimatedMapResizing){
 				eleAnimatedMapContentHolder.style.backgroundColor="transparent";
@@ -518,7 +529,7 @@ Y.use('rdResize', function(Y) {
 			}       
 		});    
 		yuiResize.on('resize:start', function(e) {
-			var eleAnimatedMapResizing = e.target.get('node').one('embed, object').getDOMNode();	
+			var eleAnimatedMapResizing = e.target.get('node').one('embed, object, span').getDOMNode();	
 			// event triggered after the resize has begun.     
 			eleAnimatedMapResizing.style.visibility = 'hidden';
 		});

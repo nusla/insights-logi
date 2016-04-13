@@ -1,5 +1,5 @@
 ﻿YUI.add('rd-BookmarkOrganizer-plugin', function (Y) {
-    'use strict';
+    //'use strict;
 
     //Define querySelectorAll if it's not defined (IE7)
     if (!document.querySelectorAll) {
@@ -430,6 +430,7 @@
             var folders = document.getElementById('dtFolders');
             var sharedFolders = document.getElementById('dtSharedFolders');
             var myFolders = folders.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
             var sMyFolders = "";
             for (var i = 0; i < myFolders.length; i++) {
@@ -463,7 +464,7 @@
 
             }
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=SaveBookmarkOrganizerExpandedCollapsedStatus&rdMyFolderState=' + sMyFolders + '&rdSharedFolderState=' + sSharedFolders);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=SaveBookmarkOrganizerExpandedCollapsedStatus&rdMyFolderState=' + sMyFolders + '&rdSharedFolderState=' + sSharedFolders + '&rdReport=' + sReportID);
 
         },
         toggleChildren: function (toggleNode) {
@@ -513,11 +514,12 @@
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
             var sDataTableID = document.getElementById('rdBookmarkOrganizerDataTableID').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
             var trParentFolder = this.getTableRowByFolderID(sParentFolderID);
             this.expandSingleRow(trParentFolder);
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddBookmarkFolder&rdDataTableID=' + sDataTableID + '&rdParentFolderID=' + sParentFolderID + '&rdFolderName=' + sFolderName + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddBookmarkFolder&rdDataTableID=' + sDataTableID + '&rdParentFolderID=' + sParentFolderID + '&rdFolderName=' + sFolderName + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
 
             
         },
@@ -526,16 +528,18 @@
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
             var sDataTableID = document.getElementById('rdBookmarkOrganizerDataTableID').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddBookmarkToFolder&rdDataTableID=' + sDataTableID + '&rdFolderID=' + sFolderID + '&rdBookmarkID=' + sBookmarkID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddBookmarkToFolder&rdDataTableID=' + sDataTableID + '&rdFolderID=' + sFolderID + '&rdBookmarkID=' + sBookmarkID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
         },
         rdDragBookmarkToFolder: function (sBookmarkID, sBookmarkUserName, sBookmarkDescription, sFolderID) {
             
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
             var sDataTableID = document.getElementById('rdBookmarkOrganizerDataTableID').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddBookmarkToFolder&rdDataTableID=' + sDataTableID + '&rdFolderID=' + sFolderID + '&rdBookmarkDescription=' + sBookmarkDescription + '&rdBookmarkID=' + sBookmarkID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkUserName=' + sBookmarkUserName + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddBookmarkToFolder&rdDataTableID=' + sDataTableID + '&rdFolderID=' + sFolderID + '&rdBookmarkDescription=' + sBookmarkDescription + '&rdBookmarkID=' + sBookmarkID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkUserName=' + sBookmarkUserName + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
         },
         rdSaveCheckboxListState: function(c) {
             var inputNode = c.parentNode.parentNode.nextSibling;
@@ -564,8 +568,9 @@
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
             var sDataTableID = document.getElementById('rdBookmarkOrganizerDataTableID').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddFolderToFolder&&rdDataTableID=' + sDataTableID + '&rdMovingFolderID=' + sMovingFolderID + '&rdReceivingFolderID=' + sReceivingFolderID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddFolderToFolder&&rdDataTableID=' + sDataTableID + '&rdMovingFolderID=' + sMovingFolderID + '&rdReceivingFolderID=' + sReceivingFolderID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
         },
         rdRemoveFolder: function (sFolderID) {
 
@@ -577,8 +582,9 @@
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
             var sDataTableID = document.getElementById('rdBookmarkOrganizerDataTableID').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=RemoveBookmarkFolder&rdDataTableID=' + sDataTableID + '&rdFolderID=' + sFolderID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdResetSelectedFolder=' + sResetSelectedFolder + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=RemoveBookmarkFolder&rdDataTableID=' + sDataTableID + '&rdFolderID=' + sFolderID + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdResetSelectedFolder=' + sResetSelectedFolder + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
         },
         rdRenameFolderSetup: function (sFolderID, sFolderName) {
             document.getElementById('rdFolderRenameText').value = sFolderName;
@@ -590,22 +596,25 @@
             var sRenameFolderText = document.getElementById('rdFolderRenameText').value;
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=RenameBookmarkFolder&rdFolderID=' + sFolderID + '&rdFolderName=' + sRenameFolderText + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=RenameBookmarkFolder&rdFolderID=' + sFolderID + '&rdFolderName=' + sRenameFolderText + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
         },
         rdExcludeFolder: function (sFolderID, sFolderCollection) {
 
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=ExcludeSharedFolder&rdSharedFolderID=' + sFolderID + '&rdSharedFolderCollection=' + sFolderCollection + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=ExcludeSharedFolder&rdSharedFolderID=' + sFolderID + '&rdSharedFolderCollection=' + sFolderCollection + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
         },
         rdCreateFolderShortcut: function (sFolderID, sShortcutUserName, sShortcutCollection, sFolderName, sReceivingFolderID) {
 
             var sBookmarkOrganizerID = document.getElementById('rdBookmarkOrganizerID').value;
             var sBookmarkCollection = document.getElementById('rdBookmarkCollection').value;
+            var sReportID = document.getElementById('rdBookmarkOrganizerReport').value;
 
-            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddFolderShortcut&rdFolderID=' + sFolderID + '&rdFolderName=' + sFolderName + '&rdReceivingFolderID=' + sReceivingFolderID + '&rdShortcutCollection=' + sShortcutCollection + '&rdShortcutUserName=' + sShortcutUserName + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID);
+            rdAjaxRequestWithFormVars('rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=AddFolderShortcut&rdFolderID=' + sFolderID + '&rdFolderName=' + sFolderName + '&rdReceivingFolderID=' + sReceivingFolderID + '&rdShortcutCollection=' + sShortcutCollection + '&rdShortcutUserName=' + sShortcutUserName + '&rdBookmarkCollection=' + sBookmarkCollection + '&rdBookmarkOrganizerID=' + sBookmarkOrganizerID + '&rdReport=' + sReportID);
         },
     },
     {

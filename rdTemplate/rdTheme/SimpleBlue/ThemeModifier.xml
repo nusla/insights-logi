@@ -249,23 +249,6 @@
 		<CycleValue Color="#ffebcc" />
 	</CycleAttributeValues>
 
-	<!-- BallonBar -->
-	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BalloonBar']" FontName="Arial" BalloonLabelFontName="Arial" TickLabelFontName="Arial" FontSize="18" FontBold="True" BackgroundColor="Transparent" CaptionColor="#333333" BalloonLabelColor="#333333" TickColor="#333333" BalloonColor="#ffffff" BarBorderColor="Transparent" TickLabelFontSize="11" BalloonBorderColor="#cccccc" />
-	<CycleAttributeValues XPath=".//Gauge[@Type='BalloonBar']" CycleOnChildElement="GaugeRange">
-		<CycleValue Color="#fa7a67" />
-		<CycleValue Color="#c0c0c0" />
-		<CycleValue Color="#7fc659" />
-	</CycleAttributeValues>
-
-	<!-- BulletBar -->
-	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BulletBar']" BackgroundColor="Transparent" BulletColor="#5e5e5e" BarBorderColor="Transparent" CaptionColor="#333333" FontSize="18" FontBold="True" TickColor="#333333" MarkerBorderColor="#333333" MarkerColor="#ffffff" TickLabelFontSize="11" FontName="Arial" TickLabelFontName="Arial" />
-	<CycleAttributeValues XPath=".//Gauge[@Type='BulletBar']" CycleOnChildElement="GaugeRange">
-		<CycleValue Color="#ff9900" />
-		<CycleValue Color="#ffc164" />
-		<CycleValue Color="#ffd9a1" />
-		<CycleValue Color="#ffe8c6" />
-		<CycleValue Color="#fff1dc" />
-	</CycleAttributeValues>
 
 	<!-- Sparkline -->
 	<SetAttributeWhenEmpty XPath=".//Sparkline[@Type='Line']" Color="#4d89f9" LineWidth="1" ChartBackgroundColor="Transparent" OuterBorderColor="Transparent" BackgroundColor="Transparent" />
@@ -470,11 +453,12 @@
 
 	<!-- ChartCanvas -->
 
-	<SetAttributeWhenEmpty XPath=".//ChartCanvas" PlotBackgroundColor="Transparent" BackgroundColor="Transparent" BorderRadius="4" BorderColor="Transparent" />
+	<SetAttributeWhenEmpty XPath=".//ChartCanvas" PlotBackgroundColor="Transparent" BackgroundColor="Transparent" BorderRadius="4" BorderColor="Transparent" BorderColorTransparency="15" />
 	<SetAttributeWhenEmpty XPath=".//ChartCanvas/ChartXAxis/ChartTicksAndGrid" GridLineColor="#f0eaea" GridLineThickness="3" />
 
 	<!-- ChartCanvas series -->
-	<SetAttributeWhenEmpty XPath=".//ChartCanvas[DataLayer/CrosstabFilter]/Series | .//ChartCanvas/Series[DataLayer/CrosstabFilter]" Color="#4d89f9, #ffb444, #7fc659, #97bbfc, #fa7a67, #f7e306" />
+	<SetAttributeWhenEmpty XPath=".//ChartCanvas[DataLayer/CrosstabFilter]/Series | .//ChartCanvas/Series[DataLayer/CrosstabFilter]" Color="" />
+	<SetAttributeWhenEmpty XPath=".//ChartCanvas[.//DataLayer/CrosstabFilter or .//DataLayer/SqlCrosstab]/Series" Color="#4d89f9, #ffb444, #7fc659, #97bbfc, #fa7a67, #f7e306" />
 	<SetAttributeWhenEmpty XPath=".//ChartCanvas/Series" ChartSymbolEdgeColor="Transparent" Transparency="3" />
 	<SetAttributeWhenEmpty XPath=".//ChartCanvas/Series[@BarStacking='Overlay']" Transparency="6" />
 
@@ -488,7 +472,7 @@
 	</CycleAttributeValues>
 
 	<!-- Legend -->
-	<UpdateOrAppendChildElement XPath=".//ChartCanvas[DataLayer/CrosstabFilter] | .//ChartCanvas[Series/DataLayer/CrosstabFilter] | .//ChartCanvas[Series[@LegendLabel]]">
+  <UpdateOrAppendChildElement XPath=".//ChartCanvas[DataLayer/CrosstabFilter] | .//ChartCanvas[DataLayer/SqlCrosstab] | .//ChartCanvas[Series/DataLayer/CrosstabFilter] | .//ChartCanvas[Series/DataLayer/SqlCrosstab] | .//ChartCanvas[Series[@LegendLabel]]">
 		<NewElement>
 			<ChartCanvasLegend />
 		</NewElement>
@@ -620,7 +604,33 @@
 
 
 	<!-- Gauges -->
+	
+	<SetAttributeWhenEmpty XPath=".//Gauge" BackgroundColor="Transparent" FontName="Arial" FontSize="24" FontBold="True" FontColor="#464646" CaptionColor="#333333" AlignmentHorizontal="Center" TickColor="#333333" TickLabelFontName="Arial" TickLabelFontBold="False" TickLabelFontSize="18" TickLabelColor="#464646" LabelFontName="Arial" LabelFontSize="24" LabelFontBold="True" LabelColor="#333333" LabelFontFamily="Arial" BorderColorTransparency="15"  />
+	
+	<!-- Solid Gauge -->
+	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='Arc']" ArcBackgroundColor="#f9f9f9" ArcColor="#4d89f9" ArcBorderThickness="1" ArcBorderColor="#e1e1e1" />
+	<SetAttributeWhenEmpty XPath=".//GaugeRange" Color="#86CAC3"/>
 
+	<!-- BallonBar -->
+	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BalloonBar']" BarBackgroundColor="#4d89f9" BalloonLabelFontName="Arial" CaptionColor="#3B4247" BalloonLabelColor="#ffffff" BalloonColor="#2f2f2f" BarBorderColor="Transparent" BalloonBorderColor="#2f2f2f" />
+	<CycleAttributeValues XPath=".//Gauge[@Type='BalloonBar']" CycleOnChildElement="GaugeRange">
+		<CycleValue Color="#fa7a67" />
+		<CycleValue Color="#c0c0c0" />
+		<CycleValue Color="#7fc659" />
+	</CycleAttributeValues>
+
+	<!-- BulletBar -->
+	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BulletBar']" BarBackgroundColor="#f9f9f9" BackgroundColor="Transparent" BulletColor="#4d89f9" BarBorderColor="Transparent" CaptionColor="#333333" MarkerBorderColor="#2f2f2f" MarkerColor="#2f2f2f" />
+	<CycleAttributeValues XPath=".//Gauge[@Type='BulletBar']" CycleOnChildElement="GaugeRange">
+		<CycleValue Color="#ff9900" />
+		<CycleValue Color="#ffc164" />
+		<CycleValue Color="#ffd9a1" />
+		<CycleValue Color="#ffe8c6" />
+		<CycleValue Color="#fff1dc" />
+	</CycleAttributeValues>
+	
+	
+	
 	<!-- NeedleGauge -->
 	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='Needle']" TickLabelFontName="Arial" D3Effects="True"  NeedleGaugeEnclosure="RoundGlass" BorderColor="DimGray" BackgroundColor="#c6d9fd" NeedleColor="#ff9900" TickColor="#ff9900" TickThickness="3" NeedleThickness="2" />
 	<SetAttributeWhenEmpty XPath=".//GaugeRing" Color="#ffd088" RingThickness="2" />
@@ -666,5 +676,6 @@
 	<SetAttributeWithInsert XPath=".//InputRadioButtons" CaptionClass="rdThemeInputCaption" />
 	<!-- InputText, InputEmail, InputTelephone InputTextArea, InputFileUpload, InputPassword, InputSelectList, InputSlider -->
 	<SetAttributeWithInsert XPath=".//InputText | .//InputEmail | .//InputTelephone | .//InputTextArea | .//InputFileUpload | .//InputPassword  | .//InputSelectList" Class="rdThemeInput" CaptionClass="rdThemeInputCaption" />
+	
 
 </TemplateModifier>

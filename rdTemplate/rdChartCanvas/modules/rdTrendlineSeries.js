@@ -1,6 +1,6 @@
 ﻿(function (Highcharts) {
 
-    'use strict';
+    //'use strict;
 
     // create shortcuts
     var defaultOptions = Highcharts.getOptions(),
@@ -218,7 +218,7 @@
 **/
 
 ; (function () {
-    'use strict';
+    //'use strict;
 
     var gaussianElimination = function (a, o) {
         var i = 0, j = 0, k = 0, maxrow = 0, tmp = 0, n = a.length - 1, x = new Array(o);

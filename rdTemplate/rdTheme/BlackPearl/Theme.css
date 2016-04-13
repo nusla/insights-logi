@@ -71,6 +71,7 @@ span:active.rdCgCommand {
 span:hover.rdDashboardCommand,
 span:hover.rdPopupPanelCommand {
 	background-color: #2a2a2a;
+	cursor: pointer;
 }
 span:active.rdDashboardCommand,
 span:active.rdPopupPanelCommand {
@@ -86,6 +87,264 @@ td:hover.rdAgUnselectedTabOn {
 span:hover.rdAcCommand {
 	background-image: url(linkButtonHover.png);
 }
+
+/*User classes*/
+
+.ThemeHeaderLargest {
+	color: #fff;
+	font-weight: bold;
+	font-size: 220%;
+	padding-bottom: 1px;
+}
+
+.ThemeHeaderLarger {
+	color: #fff;
+	font-weight: bold;
+	font-size: 169%;
+	padding-bottom: 1px;
+}
+
+.ThemeHeaderLarge {
+	color: #fff;
+	font-weight: bold;
+	font-size: 130%;
+	padding-bottom: 1px;
+}
+
+.ThemeHeader {
+	color: #fff;
+	font-weight: bold;
+	padding-bottom: 1px;
+}
+
+.ThemeHeaderSmall {
+	color: #fff;
+	font-weight: bold;
+	font-size: 85%;
+	padding-bottom: 1px;
+}
+
+.ThemeHeaderSmaller {
+	color: #fff;
+	font-weight: bold;
+	font-size: 75%;
+	padding-bottom: 1px;
+}
+
+.ThemeHeaderSmallest {
+	color: #fff;
+	font-weight: bold;
+	font-size: 60%;
+	padding-bottom: 1px;
+}
+
+.ThemeTextLargest {
+	font-size: 160%;
+}
+
+.ThemeTextLarger {
+	font-size: 145%;
+}
+
+.ThemeTextLarge {
+	font-size: 130%;
+}
+
+.ThemeTextSmall {
+	font-size: 85%;
+}
+
+.ThemeTextSmaller {
+	font-size: 75%;
+}
+
+.ThemeTextSmallest {
+	font-size: 60%;
+}
+
+.ThemeMarginLargest {
+	margin: 25px;
+}
+
+.ThemeMarginLarger {
+	margin: 20px;
+}
+
+.ThemeMarginLarge {
+	margin: 15px;
+}
+
+.ThemeMargin {
+	margin: 5px;
+}
+
+.ThemePaddingLargest {
+	padding: 25px;
+}
+
+.ThemePaddingLarger {
+	padding: 20px;
+}
+
+.ThemePaddingLarge {
+	padding: 15px;
+}
+
+.ThemePadding {
+	padding: 5px;
+}
+
+.ThemeBold {
+	font-weight: bold;
+}
+
+.ThemeItalic {
+	font-style: italic;
+}
+
+.ThemeTextPositive {
+	color: #7cfc00;
+}
+
+.ThemeTextNegative {
+	color: #ff6347;
+}
+
+.ThemeTextNormal {
+	font-size: 11px;
+	color: #fff;
+}
+
+.ThemeErrorText {
+	color: #790619 !important;
+	font-family: Helvetica;
+	font-size: 100%;
+	border: 1px solid #d8000c !important;
+	background-color: #ffbaba !important;
+}
+
+.ThemeNoWrap {
+	white-space: nowrap;
+}
+
+.ThemeHidden {
+	display: none;
+}
+
+.ThemeContainerBordered {
+	border: solid 2px #978b71;
+	padding: 3px;
+}
+
+.ThemeContainerShaded {
+	background-color: #363636;
+	padding: 3px;
+}
+
+.ThemeContainerShadedAndBordered {
+	background-image: url(AgFadeContentRow.png);
+    background-repeat: repeat-x;
+	background-color: #0f0f0f;
+	color: #fff;
+	vertical-align: top;
+	border: 1px Solid #fff;
+	padding: 3px;
+}
+
+tr.ThemeAlternatingRow td.rdThemeDataTableCell {
+	background-color: #313131;
+	color: #fff;
+	padding-left: 4px;
+	padding-top: 2px;
+	padding-right: 3px;
+	padding-bottom: 2px;
+}
+
+.ThemeLinkButton {
+	background-image: url(linkButton.png);
+	color: #fff;
+	text-decoration: none;
+	border-top: 1px Solid #d6dbdf;
+	border-left: 1px Solid #c1c5c9;
+	border-bottom: 1px Solid #5d6165;
+	border-right: 1px Solid #5d6165;
+	padding-left: 11px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-right: 7px;
+	margin-bottom: 2px;
+	cursor: pointer;
+	line-height: 24px;
+	white-space: nowrap;
+}
+
+.ThemeLinkButtonSmall {
+	background-image: url(linkButton.png);
+	color: #fff;
+	text-decoration: none;
+	border-top: 1px Solid #d6dbdf;
+	border-left: 1px Solid #c1c5c9;
+	border-bottom: 1px Solid #5d6165;
+	border-right: 1px Solid #5d6165;
+	margin-left: 3px;
+	padding-right: 3px;
+	padding-left: 3px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	cursor: pointer;
+	line-height: 24px;
+	white-space: nowrap;
+}
+
+.ThemeContainer {
+	background-color: #242424;
+	color: #fff;
+	border: 1px Solid #696868;
+	margin-top: 15px;
+}
+
+.ThemeAlignCenter {
+	text-align: center;
+}
+
+.ThemeAlignLeft {
+	text-align: left;
+}
+
+.ThemeAlignRight {
+	text-align: right;
+}
+
+.ThemeAlignTop {
+	vertical-align: top;
+}
+
+.ThemeAlignTopLeft {
+	vertical-align: top;
+	text-align: left;
+}
+
+.ThemeAlignTopRight {
+	vertical-align: top;
+	text-align: right;
+}
+
+.ThemeAlignBottom {
+	vertical-align: bottom;
+}
+
+.ThemeAlignBottomLeft {
+	vertical-align: bottom;
+	text-align: left;
+}
+
+.ThemeAlignBottomRight {
+	vertical-align: bottom;
+	text-align: right;
+}
+
+/*User classes*/
 
 /*Wait page fix for BlackPearl*/
 #rdWaitMsg  {
@@ -176,7 +435,7 @@ a.rdThemeLinkLabel:visited {
 	margin-bottom: 50px;
 }
 
-.rdThemeDataTableHeader, table.rdAgDataTable th, tr.rdAgHeaderRow th  {
+.rdThemeDataTableHeader, table.rdAgDataTable th, tr.rdAgHeaderRow th, tr.rdAgHeaderRow td  {
 	background-image: url(rdThemeHeaderFade.png);
 	background-repeat: repeat-x;
 	background-color: #4b4b4b;
@@ -337,7 +596,7 @@ a.rdThemeLinkLabel:visited {
 
 .rdThemePaging {
 	color: #fff;
-	vertical-align : text-bottom;
+	vertical-align : middle;
 }
 
 .rdThemePagingCurrent {
@@ -384,12 +643,27 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
 	padding: 2px;
 }
 
+
+.rdAgContentRow input.rdThemeInput,
+#rowsAxControls input.rdThemeInput,
+#cellAcControls input.rdThemeInput{
+	min-width:150px;
+}
+
+.rdAgContentRow select.rdThemeInput,
+#rowsAxControls select.rdThemeInput,
+#cellAcControls select.rdThemeInput{
+	min-width:160px;
+	margin-left:3px;
+}
+
 /* Input checkbox list */
 .rd-checkboxlist, .rd-checkboxlist-dropdown {
 	font-family: helvetica;
 	color: #fff;
 	background-color: #4b4b4b;
 	border: 1px solid #ccc;
+
 }
 
 .rd-checkboxlist-popup {
@@ -406,6 +680,9 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
 	filter: alpha(opacity=90);
 	opacity: 0.9;
+	padding: 7px;
+    padding-top: 1px;
+
 }
 
 .rdquicktip-content .rdquicktip-table {
@@ -486,9 +763,16 @@ td.rdPopupPanelControl
     background-color: #0f0f0f;
 }
 
+/* Black pearl column headers have an image background, so we need to make sure we don't override that if we have a popup menu link on the column header. */
+a.rdThemePopupMenu 
+{
+    background-color: transparent !important;
+}
+
 .yuimenubaritemlabel, .yuimenuitemlabel, .yuimenubaritem, .yuimenuitem
 {
     color: #fff;
+    font-weight: normal;
 }
 
 .yuimenubaritemlabel-selected, .yuimenuitemlabel-selected, .yuimenubaritem-selected, .yuimenuitem-selected
@@ -513,7 +797,7 @@ td.rdPopupPanelControl
 	border: 1px Solid #fff;
 }
 
-.rdAgContentHeadingRow, .rdOgContentHeadingRow, .rdDgContentHeadingRow, .rdCgContentHeadingRow
+.rdOgContentHeadingRow, .rdDgContentHeadingRow, .rdCgContentHeadingRow
 {
 	background-color: #343434;
 }
@@ -621,30 +905,83 @@ td.rdPopupPanelControl
 	padding-top: 2px;
 	padding-bottom: 2px;
 	cursor: pointer;
+	font-size: 12px;
 }
 
-.rdAcCommandHighlight {
-	background-image: url(rdButtonIn.png);
-	color: #0f0f0f;
-	text-decoration: none;
-	border-top: 1px Solid #d6dbdf;
-	border-left: 1px Solid #c1c5c9;
-	border-bottom: 1px Solid #5d6165;
-	border-right: 1px Solid #5d6165;
-	padding-right: 3px;
-	padding-left: 3px;
-	padding-top: 2px;
-	padding-bottom: 2px;
+
+/* AG Edit Gear and new Sub menu */
+
+.rdAgEditOff {
+	background-color: none;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAgEditOff:Hover{
+	background-color: #FFF9AF;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAgEditOn {
+	background-color: #262626;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAgEditOn:Hover {
+	background-color: #474747;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAcContentRow {
+	border: 0px solid #90909c;
+	background-color: transparent;
+}
+
+.rdAcCommandIdle, .rdAcCommandLeft, .rdAcCommandMiddle, .rdAcCommandRight, .rdAgCommandIdle, .rdAgCommandLeft, .rdAgCommandMiddle, .rdAgCommandRight {
+    color: #ffffff !important;
 	cursor: pointer;
+	text-decoration: none;
+	vertical-align: baseline;
+	white-space: nowrap;
+	font-size: 16px;
+	border-bottom: 4px solid #343434;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+	padding: 3px;
+	margin: 1px;
+    border-radius: 0;
+	background: none;
 }
-.rdAcCommandMiddle
-{
-	border-left:0;
+
+.rdAcCommandHighlight, .rdAgCommandHighlight {
+	border-radius: 0;
+	color: #ffffff !important;
+	cursor: pointer;
+	text-decoration: none;
+	vertical-align: baseline;
+	white-space: nowrap;
+	font-size: 16px;
+	border-bottom: 4px solid #FFF9AF;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+	background: none;
+	padding: 3px;
+	margin: 1px;
 }
-.rdAcCommandRight
-{
-	border-left:0;
-}
+
 
 .rdAgError, .rdOgError, .rdDgError, .rdCgError {
 	color: #ffae44;
@@ -963,265 +1300,6 @@ td.rdDashboardParamsSave
 	margin-right: 15px;
 }
 
-/*User classes*/
-
-.ThemeHeaderLargest {
-	color: #fff;
-	font-weight: bold;
-	font-size: 220%;
-	padding-bottom: 1px;
-}
-
-.ThemeHeaderLarger {
-	color: #fff;
-	font-weight: bold;
-	font-size: 169%;
-	padding-bottom: 1px;
-}
-
-.ThemeHeaderLarge {
-	color: #fff;
-	font-weight: bold;
-	font-size: 130%;
-	padding-bottom: 1px;
-}
-
-.ThemeHeader {
-	color: #fff;
-	font-weight: bold;
-	padding-bottom: 1px;
-}
-
-.ThemeHeaderSmall {
-	color: #fff;
-	font-weight: bold;
-	font-size: 85%;
-	padding-bottom: 1px;
-}
-
-.ThemeHeaderSmaller {
-	color: #fff;
-	font-weight: bold;
-	font-size: 75%;
-	padding-bottom: 1px;
-}
-
-.ThemeHeaderSmallest {
-	color: #fff;
-	font-weight: bold;
-	font-size: 60%;
-	padding-bottom: 1px;
-}
-
-.ThemeTextLargest {
-	font-size: 160%;
-}
-
-.ThemeTextLarger {
-	font-size: 145%;
-}
-
-.ThemeTextLarge {
-	font-size: 130%;
-}
-
-.ThemeTextSmall {
-	font-size: 85%;
-}
-
-.ThemeTextSmaller {
-	font-size: 75%;
-}
-
-.ThemeTextSmallest {
-	font-size: 60%;
-}
-
-.ThemeMarginLargest {
-	margin: 25px;
-}
-
-.ThemeMarginLarger {
-	margin: 20px;
-}
-
-.ThemeMarginLarge {
-	margin: 15px;
-}
-
-.ThemeMargin {
-	margin: 5px;
-}
-
-.ThemePaddingLargest {
-	padding: 25px;
-}
-
-.ThemePaddingLarger {
-	padding: 20px;
-}
-
-.ThemePaddingLarge {
-	padding: 15px;
-}
-
-.ThemePadding {
-	padding: 5px;
-}
-
-.ThemeBold {
-	font-weight: bold;
-}
-
-.ThemeItalic {
-	font-style: italic;
-}
-
-.ThemeTextPositive {
-	color: #7cfc00;
-}
-
-.ThemeTextNegative {
-	color: #ff6347;
-}
-
-.ThemeTextNormal {
-	font-size: 11px;
-	color: #fff;
-}
-
-.ThemeErrorText {
-	color: #790619 !important;
-	font-family: Helvetica;
-	font-size: 100%;
-	border: 1px solid #d8000c !important;
-	background-color: #ffbaba !important;
-}
-
-.ThemeNoWrap {
-	white-space: nowrap;
-}
-
-.ThemeHidden {
-	display: none;
-}
-
-.ThemeContainerBordered {
-	border: solid 2px #978b71;
-	padding: 3px;
-}
-
-.ThemeContainerShaded {
-	background-color: #363636;
-	padding: 3px;
-}
-
-.ThemeContainerShadedAndBordered {
-	background-image: url(AgFadeContentRow.png);
-    background-repeat: repeat-x;
-	background-color: #0f0f0f;
-	color: #fff;
-	vertical-align: top;
-	border: 1px Solid #fff;
-	padding: 3px;
-}
-
-tr.ThemeAlternatingRow td.rdThemeDataTableCell {
-	background-color: #313131;
-	color: #fff;
-	padding-left: 4px;
-	padding-top: 2px;
-	padding-right: 3px;
-	padding-bottom: 2px;
-}
-
-.ThemeLinkButton {
-	background-image: url(linkButton.png);
-	color: #fff;
-	text-decoration: none;
-	border-top: 1px Solid #d6dbdf;
-	border-left: 1px Solid #c1c5c9;
-	border-bottom: 1px Solid #5d6165;
-	border-right: 1px Solid #5d6165;
-	padding-left: 11px;
-	padding-right: 10px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	margin-right: 7px;
-	margin-bottom: 2px;
-	cursor: pointer;
-	line-height: 24px;
-	white-space: nowrap;
-}
-
-.ThemeLinkButtonSmall {
-	background-image: url(linkButton.png);
-	color: #fff;
-	text-decoration: none;
-	border-top: 1px Solid #d6dbdf;
-	border-left: 1px Solid #c1c5c9;
-	border-bottom: 1px Solid #5d6165;
-	border-right: 1px Solid #5d6165;
-	margin-left: 3px;
-	padding-right: 3px;
-	padding-left: 3px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	cursor: pointer;
-	line-height: 24px;
-	white-space: nowrap;
-}
-
-.ThemeContainer {
-	background-color: #242424;
-	color: #fff;
-	border: 1px Solid #696868;
-	margin-top: 15px;
-}
-
-.ThemeAlignCenter {
-	text-align: center;
-}
-
-.ThemeAlignLeft {
-	text-align: left;
-}
-
-.ThemeAlignRight {
-	text-align: right;
-}
-
-.ThemeAlignTop {
-	vertical-align: top;
-}
-
-.ThemeAlignTopLeft {
-	vertical-align: top;
-	text-align: left;
-}
-
-.ThemeAlignTopRight {
-	vertical-align: top;
-	text-align: right;
-}
-
-.ThemeAlignBottom {
-	vertical-align: bottom;
-}
-
-.ThemeAlignBottomLeft {
-	vertical-align: bottom;
-	text-align: left;
-}
-
-.ThemeAlignBottomRight {
-	vertical-align: bottom;
-	text-align: right;
-}
-
-/*User classes*/
-
-
 /*rdElement: DataList | rdElement: ListItem*/
 
 .ThemeULNone {
@@ -1277,7 +1355,7 @@ text-decoration: none!important;
 }
 
 .reportAuthorHeightMenu{
-height: 22px!important;
+height: 30px!important;
 padding-top: 1px;
 }
 .reportAuthorbgc{
@@ -1323,7 +1401,7 @@ table #dtBookmarkSharedWith a{
   display: inline-block;
   line-height: 28px;
   padding-right: 25px;
-  background: transparent url("../../rdBookmarkOrganizer/deleteOn.png") top right no-repeat; 
+  background: transparent url("../../rdBookmarkOrganizer/rdDelete.png") top right no-repeat; 
 }
 
 table #dtBookmarkSharedWith td:first-of-type > span{
@@ -1335,6 +1413,12 @@ table #dtBookmarkSharedWith td:first-of-type > span{
 
 .iconAddUser{
   background: transparent url("../../rdBookmarkOrganizer/rdBookmarkSharingAdd.png") top left no-repeat; 
+  height: 24px;
+  display: block;
+}
+
+.iconAddGroup{
+  background: transparent url("../../rdBookmarkOrganizer/rdBookmarkGroupSharingAdd.png") top left no-repeat; 
   height: 24px;
   display: block;
 }
@@ -1357,12 +1441,57 @@ input + div .yui3-aclist-content{
 	margin-bottom: 2px;
     margin-top: 2px;
 }
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+.rdAgUnselectedTab a{
+	color: white;
+}
+div[id^=LinkSettingPopup] .rd-popup-content #rdRows-3 tr td:first-child{
+	width: 128px\9;
+}
+div[id^=LinkSettingPopup] .rd-popup-content #rdRows-4 tr td{
+	width: 100%\9;
+}
+
+.rdDgOlapTable tbody a{
+  display: inline-table;
+}
+
+fieldset legend {
+  color: #ffffff !important;
+}
+
+#divReportAuthorWorkContainer{
+margin-left:44px;
+}
+
+.rd-toolbox-container{
+background-color:#0f0f0f;
+}
+
+.rdAgControlsPosition {
+	padding-right:35px;
+}
+
+.rdAgControls {
+	padding-bottom:35px;
+}
+
+.rdAgBackground {
+	background-color: #4b4b4b;
+	width:100%;
+	white-space: nowrap;
+}
+
+#lstFilter  tr td li{
+  background-color: #0f0f0f;
+  border: none;
+}
+
+#lstFilter {
+  background-color: #0f0f0f;
+}
+
+#rdDataTableDiv-dtFilter tr td {
+background-color: #0f0f0f;
+}
+

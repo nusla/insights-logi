@@ -16,6 +16,10 @@ width:100%;
 border-collapse: separate;
 }
 
+#colDepth_Row1{
+width:5px !important;
+}
+
 .rdDraggableElement {
     cursor: move;
 }

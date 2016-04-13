@@ -1,5 +1,5 @@
 YUI.add('rd-inputCheckList-plugin', function (Y) {
-    'use strict';
+    //'use strict;
 
     //Define querySelectorAll if it's not defined (IE7)
     if (!document.querySelectorAll) {
@@ -21,91 +21,103 @@ YUI.add('rd-inputCheckList-plugin', function (Y) {
 		_leafNodes: 0,
 		_actions: [],
         //constructor
-        initializer: function () {
-			this._container = this.get("host");
-			this._id = this._container.getAttribute("id");
-			if (!Y.Lang.isValue(this._container) || !Y.Lang.isValue(this._id)) {
-				return;
-			}
-			var sIsDropdown = this._container.getAttribute("data-dropdown");
-			if (Y.Lang.isString(sIsDropdown) && sIsDropdown.toLowerCase() === "true") {
-				this._isDropdown = true;
-			}
-			var multiple = this._container.getAttribute("data-multiple");
-			this._multiple = LogiXML.String.isBlank(multiple) ? true : multiple == "False" ? false : true;
-			// is there check-all? 21775
-			this._checkAllBtn = Y.one("#" + this._id + "_check_all");
-			this._inputs = Y.all('input[type="checkbox"][id^="' + this._id + '_rdList"]');
+		initializer: function () {
+		    this._container = this.get("host");
+		    this._id = this._container.getAttribute("id");
+		    if (!Y.Lang.isValue(this._container) || !Y.Lang.isValue(this._id)) {
+		        return;
+		    }
+		    var sIsDropdown = this._container.getAttribute("data-dropdown");
+		    if (Y.Lang.isString(sIsDropdown) && sIsDropdown.toLowerCase() === "true") {
+		        this._isDropdown = true;
+		    }
+		    var multiple = this._container.getAttribute("data-multiple");
+		    this._multiple = LogiXML.String.isBlank(multiple) ? true : multiple == "False" ? false : true;
+		    // is there check-all? 21775
+		    this._checkAllBtn = Y.one("#" + this._id + "_check_all");
+		    this._inputs = Y.all('input[type="checkbox"][id^="' + this._id + '_rdList"]');
 
-			if (this._inputs.size() > 0 && this._inputs._nodes[0]) {
-			    if (this._inputs._nodes[0].getAttribute("rdLevel")) {
-			        this._isHierarchical = true;
+		    if (this._inputs.size() > 0 && this._inputs._nodes[0]) {
+		        if (this._inputs._nodes[0].getAttribute("rdLevel")) {
+		            this._isHierarchical = true;
 
-			        var leafNodes = document.querySelectorAll('[rdLeaf][id^="' + this._id + '_rdList"]');
-			        this._leafNodes = leafNodes.length;
-			    }
-			}
-			//IE7
-			if (this._inputs.size() > 0 && this._inputs.item(0).get("id").indexOf("check_all") != -1) {
-			    this._inputs = this._inputs.slice(1, this._inputs.size());
-			}	
-			if (this._checkAllBtn) {
-				if (this._multiple == false || this._inputs.size() <= 1) {
-					this._checkAllBtn.get('parentNode').hide();
-				} else {
-					this._checkAllIsVisible = true;
-				}
-			}
-			this._noneSelectedText = this._container.getAttribute("data-noneselected-caption");
-			this._selectedText = this._container.getAttribute("data-selected-caption");
-			if (this._isDropdown === true) {
-				this._dropDownHandler = Y.one("#" + this._id + "_handler");
-				this._caption = this._dropDownHandler.one("span.rd-checkboxlist-caption");
-				this._img = this._dropDownHandler.one("span.rd-checkboxlist-icon");
-				this._spacer = Y.Node.create('<img style="height:1px;" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="""" />');
-				this._container.append(this._spacer);
-				//attach events
-				this._docClickHandle = Y.one("document").on("mousedown", function (e) {this.onDocMouseDown(e); }, this);
-				this._dropDownHandle = this._dropDownHandler.on("click", function (e) {this.togglePopup(e); }, this);
-			}
-			if (this._checkAllIsVisible === true) {
-			    this._handleCheckAll = this._checkAllBtn.on("click", function (e) {this.onCheckAllClicked(e); }, this);
-			}
-			this._inputsHandle = this._inputs.on("click", function (e) {this.onCheckboxClicked(e); }, this);
-			//Subscribe for Ajax refreshing?
-			if (Y.Lang.isValue(LogiXML) && Y.Lang.isValue(LogiXML.Ajax)) {
-				var id = this._id;
-				LogiXML.Ajax.AjaxTarget().on('reinitialize', function (e) {var chkList = Y.one("#" + id); if (Y.Lang.isValue(chkList)) {chkList.plug(Y.LogiXML.rdInputCheckList);}});
-			}
+		            var leafNodes = document.querySelectorAll('[rdLeaf][id^="' + this._id + '_rdList"]');
+		            this._leafNodes = leafNodes.length;
+		        }
+		    }
+		    //IE7
+		    if (this._inputs.size() > 0 && this._inputs.item(0).get("id").indexOf("check_all") != -1) {
+		        this._inputs = this._inputs.slice(1, this._inputs.size());
+		    }	
+		    if (this._checkAllBtn) {
+		        if (this._multiple == false || this._inputs.size() <= 1) {
+		            this._checkAllBtn.get('parentNode').hide();
+		        } else {
+		            this._checkAllIsVisible = true;
+		        }
+		    }
+		    this._noneSelectedText = this._container.getAttribute("data-noneselected-caption");
+		    this._selectedText = this._container.getAttribute("data-selected-caption");
+		    if (this._isDropdown === true) {
+		        this._dropDownHandler = Y.one("#" + this._id + "_handler");
+		        this._caption = this._dropDownHandler.one("span.rd-checkboxlist-caption");
+		        this._img = this._dropDownHandler.one("span.rd-checkboxlist-icon");
+		        this._spacer = Y.Node.create('<img style="height:1px;" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="""" />');
+		        this._container.append(this._spacer);
+		        //attach events
+		        this._docClickHandle = Y.one("document").on("mousedown", function (e) {this.onDocMouseDown(e); }, this);
+		        this._dropDownHandle = this._dropDownHandler.on("click", function (e) {this.togglePopup(e); }, this);
+		    }
+		    if (this._checkAllIsVisible === true) {
+		        this._handleCheckAll = this._checkAllBtn.on("click", function (e) {this.onCheckAllClicked(e); }, this);
+		    }
+		    this._inputsHandle = this._inputs.on("click", function (e) {this.onCheckboxClicked(e); }, this);
+		    //Subscribe for Ajax refreshing?
+		    if (Y.Lang.isValue(LogiXML) && Y.Lang.isValue(LogiXML.Ajax)) {
+		        var id = this._id;
+		        LogiXML.Ajax.AjaxTarget().on('reinitialize', function (e) {var chkList = Y.one("#" + id); if (Y.Lang.isValue(chkList)) {chkList.plug(Y.LogiXML.rdInputCheckList);}});
+		    }
 			
-			var actAttributes = ["data-action-onclick","data-action-onchange"], i, length = actAttributes.length, action;
-			this._actions = [];
-			for (i = 0; i < length; i++) {
-				action = this._container.getAttribute(actAttributes[i]);
-				if (LogiXML.String.isNotBlank(action)) {
-					if (action.indexOf("javascript:") == 0) {
-						action = action.substring("javascript:".length);
-					}
-				}
-				this._actions.push(action.replace(/'/g,"\""));
-			}
+		    var actAttributes = ["data-action-onclick","data-action-onchange"], i, length = actAttributes.length, action;
+		    this._actions = [];
+		    for (i = 0; i < length; i++) {
+		        action = this._container.getAttribute(actAttributes[i]);
+		        if (LogiXML.String.isNotBlank(action)) {
+		            if (action.indexOf("javascript:") == 0) {
+		                action = action.substring("javascript:".length);
+		
+		            }
+		        }
+		        this._actions.push(action.replace(/'/g,"\""));
+		    }
 
-            //Hierarchical
-			var changeHistory = document.getElementById(this._id + "_rdExpandedCollapsedHistory").value;
-			if (changeHistory != "")
-			    this.restoreCheckboxState(changeHistory);
-            //Hierarchical
-			var parentNodes = document.querySelectorAll('[rdExpanded]');
-			if (this._isHierarchical) {
-			    for (i = 0; i < parentNodes.length; i++) {
-			        if(parentNodes[i].getAttribute("rdLevel") == "1")
-			            this.initializeExpandCollapse(parentNodes[i], false);
-			    }
-			}
+		    //Hierarchical
+		    var changeHistory = document.getElementById(this._id + "_rdExpandedCollapsedHistory").value;
+		    if (changeHistory != "")
+		        this.restoreCheckboxState(changeHistory);
+		    //Hierarchical
+		    var parentNodes = document.querySelectorAll('[rdExpanded]');
+		    if (this._isHierarchical) {
+		        for (i = 0; i < parentNodes.length; i++) {
+		            if(parentNodes[i].getAttribute("rdLevel") == "1")
+		                this.initializeExpandCollapse(parentNodes[i], false);
+		        }
+		    }
 
-			this.onCheckboxClicked(null);
-            //Element was hidden during loading, make it visible now
-			document.getElementById(this._id + "_hideWaiting").style.display = "";
+		    this.onCheckboxClicked(null);
+		    //Element was hidden during loading, make it visible now
+		    document.getElementById(this._id + "_hideWaiting").style.display = "";
+
+
+            //Special case when running under the AG, set checkboxes based on the current Filter value.
+		    if (this._id == 'lstFilter') {
+		        var eleAgFilterValue = window.parent.document.getElementById('rdAgFilterValue')
+		        if (eleAgFilterValue) {
+		            var sValue = eleAgFilterValue.value
+		            LogiXML.rd.setInputElementListValue(this._id, sValue);
+		        }
+		    }
+
         },
 
         //clean up on destruction
@@ -160,10 +172,21 @@ YUI.add('rd-inputCheckList-plugin', function (Y) {
 			}
 			var popupWidth = this._dropDownHandler.get('offsetWidth');
 			var popupPosition = this._dropDownHandler.getXY();
-			popupPosition[1]  += this._dropDownHandler.get('offsetHeight');
-			this._container.setStyles({
-				position: "absolute",
-				display: "block"
+			popupPosition[1] += this._dropDownHandler.get('offsetHeight');
+		    var positionValue = "";
+
+			var yuiPopupPanel = Y.one(this._container);
+			var dashboardPanel = yuiPopupPanel.ancestor('.rdDashboardPanel');
+            
+		    if (dashboardPanel && dashboardPanel.getDOMNode()) {
+		        dashboardPanel.getDOMNode().setAttribute('oldOpacity', dashboardPanel.getDOMNode().style['opacity']);
+		        dashboardPanel.getDOMNode().style['opacity'] = null;
+		        positionValue = "fixed";
+		    }
+
+		    this._container.setStyles({
+			    position: positionValue || "absolute",
+			    display: "block"
 			});
 			this._container.setXY(popupPosition);
 			this.setPopupWidth();
@@ -173,6 +196,13 @@ YUI.add('rd-inputCheckList-plugin', function (Y) {
 			if (this._isOpen) {
 			    this._container.hide();
 				this._isOpen = false;
+
+			    var yuiPopupPanel = Y.one(this._container);
+			    var dashboardPanel = yuiPopupPanel.ancestor('.rdDashboardPanel');
+
+			    if (dashboardPanel && dashboardPanel.getDOMNode()) {
+			        dashboardPanel.getDOMNode().style['opacity'] = dashboardPanel.getDOMNode().getAttribute('oldOpacity');
+			    }
 			}
 		},
 		togglePopup: function () {
@@ -661,12 +691,13 @@ if (this.LogiXML === undefined) {
 
 //Temporary. Should be moved somewhere else.
 LogiXML.rd.setInputElementListValue = function (elementId, sValue) {
-	'use strict';
+	//'use strict;
 	var listContainer = Y.one("#" + elementId);
 	if (!Y.Lang.isValue(listContainer)) {
 		return;
 	}
 	var sValueDelimiter = listContainer.getAttribute("rdInputValueDelimiter");
+	sValue = sValue.replace(", ",",")
 	var aValues = sValue.split(sValueDelimiter);
 	var listItems = listContainer.all('[id^=' + elementId + '_rdList]');
 	var i, listLength = listItems.size(), listItemType = "";
@@ -674,9 +705,11 @@ LogiXML.rd.setInputElementListValue = function (elementId, sValue) {
 	    listItemType = listItems.item(i).getAttribute('type');
 		switch (listItemType) {
 		case "checkbox":
-			if (Y.Array.indexOf(aValues, listItems.item(i).get('value')) != -1) {
-				listItems.item(i).set('checked', true);
-			}
+		    if (Y.Array.indexOf(aValues, listItems.item(i).get('value')) != -1) {
+		        listItems.item(i).set('checked', true);
+		    } else {
+		        listItems.item(i).set('checked', false);
+		    }
 			break;
 		}
 	}

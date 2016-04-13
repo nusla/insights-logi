@@ -138,8 +138,9 @@
 
             //Set table style to fixed so that table will leave viewport if necessary
             if (typeof tableWidth === 'number' && !isNaN(tableWidth)) { //21231
-               // tableDOM.style.width = tableWidth + 'px';
-                tableDOM.style.maxWidth = tableWidth + 'px';
+                tableDOM.style.width = tableWidth + 'px';
+                //23183 24337
+                //tableDOM.style.maxWidth = tableWidth + 'px';
                 tableDOM.style.tableLayout = "fixed";
             }
         }

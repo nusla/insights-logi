@@ -1,5 +1,5 @@
 YUI.add('reportAuthor', function (Y) {
-    "use strict";
+    //"use strict";
 
     var Lang = Y.Lang,
         TRIGGER = 'rdReportAuthor';
@@ -274,6 +274,22 @@ YUI.add('reportAuthor', function (Y) {
                 }
 
                 href = href.substr(0, idxStart) + ',' + newParentId + href.substr(idxEnd) + ';return false;';
+
+                idxStart = href.indexOf('&rdReportAuthorRefreshElementID=');
+                if (idxStart == -1) {
+                    return;
+                }
+                idxStart = href.indexOf('=', idxStart + 1);
+                if (idxStart == -1) {
+                    return;
+                }
+                idxEnd = href.indexOf('&', idxStart + 1);
+                if (idxEnd == -1) {
+                    return;
+                }
+
+                href = href.substr(0, idxStart+1) + newParentId + href.substr(idxEnd)
+
                 if (href.indexOf('javascript:') == 0) {
                     href = href.substr(11);
                 }
@@ -290,6 +306,8 @@ function GetColorPicker(sColorPickerValue) {
 };
 
 function toggleInlineEdit(element) {
+    if (!element.previousSibling)
+        return;
     element.previousSibling.style.display = 'none';
     element.parentNode.style.background = 'none';
     element = element.firstChild.firstChild; //fix for moving action to template
@@ -365,24 +383,12 @@ function onClickwrapper(event) {
 function exitInlineEdit(element) {
     if (element.outerHTML.indexOf("<textarea") > -1) {
         var newText = element.value;
-        //23197
-        if (newText.indexOf('<') > -1 && newText.indexOf('>') > -1) {
-            var startIndex = newText.indexOf('<');
-            var endIndex = newText.indexOf('>', startIndex);
-            do {
-                newText = newText.replace(newText.substr(startIndex, endIndex - startIndex + 1), '');
-                startIndex = newText.indexOf('<');
-                endIndex = newText.indexOf('>', startIndex);
-
-            } while (startIndex>-1 && endIndex>-1)
-        }
-        newText = newText.replace('<', '').replace('>', '').replace('&', '');
         element.innerHTML = newText;
         element.className = "rd-editable";
         var elemId = element.id.substring(element.id.lastIndexOf("_") + 1, element.id.length);
         var editor = document.getElementById("txtLabelText_" + elemId);
         if (editor) {
-            editor.value = element.value;
+            editor.value = HtmlEncode(element.value);
         }
         element.outerHTML = element.outerHTML.replace("<textarea", "<span").replace("</textarea>", "</span>");
         element = document.getElementById(element.id);
@@ -393,4 +399,10 @@ function exitInlineEdit(element) {
             saveBtn.onclick();
         }
     }
+}
+function HtmlEncode(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;').replace('/', '%5C');
+}
+function HtmlDecode(str) {
+    return str.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, '\'').replace('%5C', '/');
 }

@@ -12,13 +12,6 @@
 		</NewElement>
     </PrependChildElement>
 
-    <!-- IE 8 and under stylesheet -->
-    <PrependChildElement XPath="/Report | /MobileReport | /Widget" >
-		<NewElement>
-		    <IncludeHtml Html="&lt;!--[if lte IE 8]&gt;&#xD;&#xA;	&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;rdTemplate/rdTheme/Signal/IE8-down.css&quot; /&gt;&#xD;&#xA;&lt;![endif]--&gt;" ID="IE8-down.css" />
-		</NewElement>
-    </PrependChildElement>
-
 	<!-- WaitPage -->
 	<SetAttributeWhenEmpty XPath=".//WaitPage" Class="rdThemeWaitPanel" CaptionClass="rdThemeWaitCaption" StyleSheet="rdTemplate/rdTheme/Signal/Theme.css" />
 
@@ -73,7 +66,7 @@
 
 	<!-- CrossTabTable -->
 	<SetAttributeWhenEmpty XPath=".//CrosstabTable" CellSpacing="0" AltRowClass="ThemeAlternatingRow" />
-	<SetAttributeWithInsert XPath=".//CrosstabTable[not(ancestor::Report[@ID='AnalysisGrid.rdAgTemplate']) and not(@rdAnalysisGrid='True')]" Class="rdThemeDataTable" ColumnHeaderClass="rdThemeDataTableHeader" />
+	<SetAttributeWithInsert XPath=".//CrosstabTable[not(ancestor::Report[@ID='AnalysisGrid.rdAgTemplate']) and not(@rdAnalysisGrid='True')]" Class="rdAgDataTable"/>
 	<SetAttributeWithInsert XPath=".//CrosstabTableLabelColumn" Class="rdThemeDataTableCell" />
 	<SetAttributeWithInsert XPath=".//CrosstabTableValueColumns" Class="rdThemeDataTableCell ThemeAlignRight" />
 	<SetAttributeWithInsert XPath=".//CrosstabTable/HeaderRow" Class="rdThemeDataTableHeaderRow" />
@@ -270,23 +263,6 @@
 		<CycleValue Color="#3B4247" />
 	</CycleAttributeValues>
 
-	<!-- BallonBar -->
-	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BalloonBar']" FontName="Segoe UI" BalloonLabelFontName="Segoe UI" TickLabelFontName="Segoe UI" FontSize="18" FontBold="True" BackgroundColor="#ffffff" CaptionColor="#3B4247" BalloonLabelColor="#3B4247" TickColor="#3B4247" BalloonColor="#ffffff" BarBorderColor="Transparent" TickLabelFontSize="11" BalloonBorderColor="#3B4247" />
-	<CycleAttributeValues XPath=".//Gauge[@Type='BalloonBar']" CycleOnChildElement="GaugeRange">
-		<CycleValue Color="#C64533" />
-		<CycleValue Color="#c0c0c0" />
-		<CycleValue Color="#7FB15E" />
-	</CycleAttributeValues>
-
-	<!-- BulletBar -->
-	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BulletBar']" BackgroundColor="Transparent" BulletColor="#5e5e5e" BarBorderColor="Transparent" CaptionColor="#333333" FontSize="18" FontBold="True" TickColor="#333333" MarkerBorderColor="#333333" MarkerColor="#ffffff" TickLabelFontSize="11" FontName="Segoe UI" TickLabelFontName="Segoe UI" />
-	<CycleAttributeValues XPath=".//Gauge[@Type='BulletBar']" CycleOnChildElement="GaugeRange">
-		<CycleValue Color="#7FB15E" />
-		<CycleValue Color="#dbeb92" />
-		<CycleValue Color="#edfdbc" />
-		<CycleValue Color="#f4fed3" />
-		<CycleValue Color="#f8ffe2" />
-	</CycleAttributeValues>
 
 	<!-- Sparkline -->
 	<SetAttributeWhenEmpty XPath=".//Sparkline[@Type='Line']" Color="#72C8C1" LineWidth="1" ChartBackgroundColor="Transparent" OuterBorderColor="Transparent" BackgroundColor="Transparent" />
@@ -500,11 +476,11 @@
 
 	<!-- ChartCanvas -->
 
-	<SetAttributeWhenEmpty XPath=".//ChartCanvas" PlotBackgroundColor="#ffffff" BackgroundColor="Transparent" BorderColor="Transparent" BorderRadius="0" />
+	<SetAttributeWhenEmpty XPath=".//ChartCanvas" PlotBackgroundColor="#ffffff" BackgroundColor="Transparent" BorderColor="Transparent" BorderRadius="0" BorderColorTransparency="15" />
 	<SetAttributeWhenEmpty XPath=".//ChartCanvas/ChartXAxis/ChartTicksAndGrid" GridLineColor="#cccccc" GridLineThickness="3" />
 
 	<!-- ChartCanvas series -->
-	<SetAttributeWhenEmpty XPath=".//ChartCanvas[DataLayer/CrosstabFilter]/Series | .//ChartCanvas/Series[DataLayer/CrosstabFilter]" Color="#72C8C1, #E2CE5D, #dedede, #7FB15E, #C64533, #003241, #b0dedb, #47515A, #3B4247" />
+	<SetAttributeWhenEmpty XPath=".//ChartCanvas[.//DataLayer/CrosstabFilter or .//DataLayer/SqlCrosstab]/Series" Color="#72C8C1, #E2CE5D, #dedede, #7FB15E, #C64533, #003241, #b0dedb, #47515A, #3B4247" />
 	<SetAttributeWhenEmpty XPath=".//ChartCanvas/Series" ChartSymbolEdgeColor="Transparent" Transparency="3"  />
 	<SetAttributeWhenEmpty XPath=".//ChartCanvas/Series[@BarStacking='Overlay']" Transparency="6" />
 
@@ -519,7 +495,7 @@
 	</CycleAttributeValues>
 
 	<!-- Legend -->
-	<UpdateOrAppendChildElement XPath=".//ChartCanvas[DataLayer/CrosstabFilter] | .//ChartCanvas[Series/DataLayer/CrosstabFilter] | .//ChartCanvas[Series[@LegendLabel]]">
+  <UpdateOrAppendChildElement XPath=".//ChartCanvas[DataLayer/CrosstabFilter] | .//ChartCanvas[DataLayer/SqlCrosstab] | .//ChartCanvas[Series/DataLayer/CrosstabFilter] | .//ChartCanvas[Series/DataLayer/SqlCrosstab] | .//ChartCanvas[Series[@LegendLabel]]">
 		<NewElement>
 			<ChartCanvasLegend />
 		</NewElement>
@@ -654,6 +630,31 @@
 
 	<!-- Gauges -->
 	
+	<SetAttributeWhenEmpty XPath=".//Gauge" BackgroundColor="Transparent" FontName="Segoe UI" FontSize="24" FontBold="False" FontColor="#333333" CaptionColor="#333333" AlignmentHorizontal="Center" TickColor="#333333" TickLabelFontName="Segoe UI" TickLabelFontBold="False" TickLabelFontSize="18" TickLabelColor="#555555" LabelFontName="Segoe UI" LabelFontSize="24" LabelFontBold="False" LabelColor="#333333" LabelFontFamily="Segoe UI" BorderColorTransparency="15"  />
+	
+	<!-- Solid Gauge -->
+	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='Arc']" ArcBackgroundColor="#f9f9f9" ArcColor="#86cac3" ArcBorderThickness="1" ArcBorderColor="#e9e9e9" />
+	<SetAttributeWhenEmpty XPath=".//GaugeRange" Color="#86CAC3"/>
+
+	<!-- BallonBar -->
+	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BalloonBar']" BarBackgroundColor="#86cac3" BalloonLabelFontName="Segoe UI" CaptionColor="#3B4247" BalloonLabelColor="#ffffff" BalloonColor="#3B4247" BarBorderColor="Transparent" BalloonBorderColor="#ffffff" />
+	<CycleAttributeValues XPath=".//Gauge[@Type='BalloonBar']" CycleOnChildElement="GaugeRange">
+		<CycleValue Color="#C64533" />
+		<CycleValue Color="#c0c0c0" />
+		<CycleValue Color="#7FB15E" />
+	</CycleAttributeValues>
+
+	<!-- BulletBar -->
+	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='BulletBar']" BarBackgroundColor="#f9f9f9" BackgroundColor="Transparent" BulletColor="#86cac3" BarBorderColor="Transparent" CaptionColor="#333333" MarkerBorderColor="#3B4247" MarkerColor="#3B4247" />
+	<CycleAttributeValues XPath=".//Gauge[@Type='BulletBar']" CycleOnChildElement="GaugeRange">
+		<CycleValue Color="#7FB15E" />
+		<CycleValue Color="#dbeb92" />
+		<CycleValue Color="#edfdbc" />
+		<CycleValue Color="#f4fed3" />
+		<CycleValue Color="#f8ffe2" />
+	</CycleAttributeValues>
+
+	
 	<!-- NeedleGauge -->
 	<SetAttributeWhenEmpty XPath=".//Gauge[@Type='Needle']" TickLabelFontName="Segoe UI" D3Effects="False" BorderColor="Transparent" BackgroundColor="#ffffff" NeedleColor="#1994b6" TickColor="#3B4247" TickThickness="3" NeedleThickness="4" />
 	<SetAttributeWhenEmpty XPath=".//GaugeRing" Color="#cccccc" RingThickness="3" />
@@ -743,8 +744,14 @@
 
     <!-- Minus and pluss button -->
 	<SetAttribute XPath="/Report[@ID='AnalysisGrid.rdAgTemplate']//ToggleImage[starts-with(@ID, 'toggleShow')]" FalseImage="rdTemplate/rdTheme/Signal/images/rdMinus.png" TrueImage="rdTemplate/rdTheme/Signal/images/rdPlus.png" />
+  
+  <!-- Minus and pluss button -->
+  <SetAttribute XPath="/Report[@ID='AnalysisGrid.rdAgTemplate']//Image[starts-with(@ID, 'imgMinus')]" Caption="rdTemplate/rdTheme/Signal/images/rdMinus.png" />
+  <SetAttribute XPath="/Report[@ID='AnalysisGrid.rdAgTemplate']//Image[starts-with(@ID, 'imgPlus')]" Caption="rdTemplate/rdTheme/Signal/images/rdPlus.png" />
 
-	<!-- Help icon -->
+
+
+  <!-- Help icon -->
     <SetAttribute XPath=".//Image[@ID='imgHelp']" Caption="rdTemplate/rdTheme/Signal/images/icoBtnHelp.png" />
 
 	<!-- SubMenu -->
@@ -762,5 +769,7 @@
 	<!-- Date / Time Picker Images -->
 	<SetAttributeWhenEmpty XPath="//InputDate" CalendarLink="rdTemplate/rdTheme/Signal/images/imgCalendar.png" />
 	<SetAttributeWhenEmpty XPath="//InputTime" ClockLink="rdTemplate/rdTheme/Signal/images/imgClock.png" />
+	
+
 
 </TemplateModifier>
