@@ -476,7 +476,7 @@ Y.Resize = Y.extend(
 	     * @property HANDLE_TEMPLATE
 	     * @type {String}
 	     */
-		HANDLE_TEMPLATE: '<div class="'+concat(CSS_RESIZE_HANDLE, CSS_RESIZE_HANDLE_PLACEHOLDER)+'">' +
+		HANDLE_TEMPLATE: '<div style="touch-action: none !important;" class="'+concat(CSS_RESIZE_HANDLE, CSS_RESIZE_HANDLE_PLACEHOLDER)+'">' +
 							'<div class="'+concat(CSS_RESIZE_HANDLE_INNER, CSS_RESIZE_HANDLE_INNER_PLACEHOLDER)+'">&nbsp;</div>' +
 						'</div>',
 
