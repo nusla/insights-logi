@@ -25,7 +25,11 @@ function rdDataMenuTreeInit(sID) {
 		        break;
 	        case "-":
 	            eleMenuImage.src = eleMenuImage.src.replace("rdArrowBlank.gif","rdArrowDown.gif")
-		        break;
+	            break;
+            default:                
+                if (eleMenuImage.parentNode) { //24709
+                    eleMenuImage.parentNode.tabIndex = "-1";
+                }               
 //	        default:
 //	            eleMenuImage.src = eleMenuImage.src.replace("rdArrowBlank.png","rdBlank.gif")
 	    }

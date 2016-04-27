@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿//"use strict";
 
 Array.prototype.unique = function() {
     var sorted = this.sort();
@@ -66,45 +66,54 @@ var restoreChartState = function (chart) {
     restoreOptions3DState(chart);
 };
 
-var setLegendStateEventHandlers = function (chart) {
-    var persistViewState = function(value, type) {
-        var input = getInputViewStateElement(chart, type);
-        input.value = value;
-    };
+var persistViewState = function (value, type, chart) {
+    var input = getInputViewStateElement(chart, type);
+    input.value = value;
+};
+
+var populateLegendVisibilityData = function() {
     
+    this.isLegendInvisible = !this.visible;
+    var currentChart = this.chart;
+
+    var data = currentChart.legend.getAllItems();
+
+    var invisibleData = [];
+
+    for (var i = 0; i < data.length; i++) {
+        if (data[i]&&(data[i].isLegendInvisible===true)) {
+            invisibleData.push(data[i]);
+        }
+    }
+
+    data = invisibleData;
+
+    var ids = [];
+    for (var dataIndex = 0; data && dataIndex < data.length; dataIndex++) {
+        var currentDataItem = data[dataIndex];
+        if (currentDataItem && currentDataItem.series) {
+            var serieIndex = currentDataItem.series.index;
+            if (!ids[serieIndex])
+                ids[serieIndex] = [];
+            ids[serieIndex].push({
+                value: currentDataItem.series.data.indexOf(currentDataItem),
+                name: currentDataItem.name
+        });
+        } else {
+            ids[currentDataItem.index] = {value: true, name: currentDataItem.name};
+        }
+    }
+
+    persistViewState(JSON.stringify(ids), 'legend', currentChart);
+    mergeHandlers(currentChart);
+};
+
+var setLegendStateEventHandlers = function (chart) {
     if (!chart.legend.allItems)
         return;
-    
-    for (var i = 0; i < chart.legend.allItems.length; i++) {
-        var currentItem = chart.legend.allItems[i];
-        currentItem.legendItem.element.serie = chart.series[currentItem.index];
-        currentItem.legendItem.element.item = currentItem; 
-        currentItem.legendItem.on('click', function (event) {
-            var serie = this.serie || this.item;
-            var item = this.item;
-            serie.isLegendInvisible = !(serie.isLegendInvisible);
-            var currentChart = this.item && this.item.series ? this.item.series.chart : this.serie.chart;
-
-            var data = currentChart.legend.getAllItems();
-
-            data = data.filter(function(s) { return s && s.isLegendInvisible === true; });
-
-            var ids = [];
-            for (var dataIndex = 0; data && dataIndex < data.length; dataIndex++) {
-                var currentDataItem = data[dataIndex];
-                if (currentDataItem && currentDataItem.series) {
-                    var serieIndex = currentDataItem.series.index;
-                    if (!ids[serieIndex])
-                        ids[serieIndex] = [];
-                    ids[serieIndex].push(currentDataItem.series.data.indexOf(currentDataItem));
-                } else {
-                    ids[currentDataItem.index] = true;
-                }
-            }
-            
-            persistViewState(JSON.stringify(ids), 'legend');
-            mergeHandlers(chart);
-        });
+    for (var j = 0; j < chart.series.length; j++) {
+        Highcharts.addEvent(chart.series[j], 'hide', populateLegendVisibilityData);
+        Highcharts.addEvent(chart.series[j], 'show', populateLegendVisibilityData);
     }
 };
 var setZoomStateEventHandlers = function (chart) {
@@ -114,21 +123,19 @@ var setZoomStateEventHandlers = function (chart) {
     if (!chart.events) {
         chart.events = {};
     }
-    var minmax = function (axis) {
-        return {
-            min: axis.min,
-            max: axis.max
-        };
-    };
 
     chart.HCEvents.selection = [
         function(event) {
-            var xRet, yRet;
+            var xRet = [], yRet = [];
             if (event.xAxis) {
-                xRet = event.xAxis.map(minmax);
+                for (var i = 0; i < event.xAxis.length; i++) {
+                    xRet.push({ min: event.xAxis[i].min, max: event.xAxis[i].max });
+                }
             }
             if (event.yAxis) {
-                yRet = event.yAxis.map(minmax);
+                for (var j = 0; j < event.yAxis.length; j++) {
+                    yRet.push({ min: event.yAxis[j].min, max: event.yAxis[j].max });
+                }
             }
             getInputViewStateElement(chart, 'zoom').value = (xRet || yRet) ? JSON.stringify({ xZoom: xRet, yZoom: yRet, zType: chart.userOptions.chart.zoomType }) : "";
             
@@ -193,18 +200,17 @@ var restoreZoomState = function (chart) {
 };
 
 var restoreLegendState = function(chart) {
-    if (!chart.viewstates)
+    if (!chart.viewstates || !chart.viewstates.legend || !chart.legend.allItems)
         return;
-    var state = chart.viewstates.legend;
-    getInputViewStateElement(chart, 'legend').value = state;
-    if (!state || !chart.legend.allItems) {
+    
+    if (typeof (chart.viewstates.legend) === 'string') {
+        var val = chart.viewstates.legend;
+        getInputViewStateElement(chart, 'legend').value = val;
+    }
+    if (chart.viewstates.legend.value === '') {
         return;
     }
-
-    if (typeof(state) !== "string") {
-        return;
-    }
-    var stJson = JSON.parse(state);
+    var stJson = JSON.parse(chart.viewstates.legend.value);
 
     for (var i = 0; i < stJson.length; i++) {
         var currentItem = stJson[i];
@@ -222,7 +228,7 @@ var restoreLegendState = function(chart) {
                 chart.series[i].data[pieIndex].setVisible(false);
             }
         }
-    }
+    } 
 };
 
 

@@ -41,6 +41,74 @@ function SubmitForm(sPage, sTarget, bValidate, sConfirm, bFromOnClick, waitCfg) 
 	} else {
 		document.rdForm.target='_self'
 	}
+
+
+	if (!document.createHiddenInput) {
+	    document.createHiddenInput = function (id, value, name) {
+	        var input = document.createElement("INPUT");
+	        input.type = "HIDDEN";
+	        input.id = id;
+	        input.name = name || id;
+	        input.value = value;
+	        return input;
+	    };
+	}
+
+	var aCheckBoxIds = new Array(0);
+	var aCheckBoxListIds = new Array(0);
+    //23862 23865
+	for (var i = 0; i < document.rdForm.elements.length; i++) {
+	    var ele = document.rdForm.elements[i]
+        
+	    if (!ele.type) {
+	        continue;  //Not an input element.
+	    }
+
+	    else if ((ele.type == 'checkbox') && (ele.name != "") && (aCheckBoxIds.indexOf(ele.name) == -1) && (aCheckBoxListIds.indexOf(ele.name) == -1)) { //21555,25311
+	        var sCheckboxValue = rdGetInputValues(ele);
+	        var sCBId = sCheckboxValue.substring(1, sCheckboxValue.lastIndexOf("="));	        
+	        sCheckboxValue = decodeURIComponent(sCheckboxValue.substring(sCheckboxValue.lastIndexOf("=") + 1))
+	        aCheckBoxListIds.push(sCBId);
+	       	       
+	        if (sCheckboxValue != "rdNotSent" && aCheckBoxIds.indexOf(sCBId) == -1) {
+	            if ((sCheckboxValue == "") || (sCheckboxValue == ele.getAttribute("rdUncheckedValue"))) {
+
+	                var inputNodes = Y.all('#' + sCBId);
+	                var found = false;
+	                inputNodes.each(function (inputNode) {
+	                    var domNode = inputNode.getDOMNode();
+	                    var nodeType = domNode.type;
+	                    if (nodeType && nodeType.toLowerCase() === "hidden") {
+	                        found = true;
+	                    }
+	                });
+	                if (!found) {
+	                    var hiddenCBV = document.createHiddenInput(sCBId, sCheckboxValue);
+	                    document.rdForm.appendChild(hiddenCBV);
+	                }
+	                aCheckBoxIds.push(sCBId);
+	            } else {
+
+	                var inputNodes = Y.all('#' + sCBId);
+
+	                inputNodes.each(function (inputNode) {
+	                    var domNode = inputNode.getDOMNode();
+	                    var nodeType = domNode.type;
+	                    if (nodeType && nodeType.toLowerCase() === "hidden" )  {
+	                        domNode.parentNode.removeChild(domNode);
+	                    }
+	                });
+	             }
+	        }
+	    }    
+	    
+	    else {
+            if(ele.type == 'text')
+	            rdFixupInputs(ele);
+	    }
+
+        
+	}
 	
     var eleRemoved = new Array(0)
 	
@@ -98,16 +166,16 @@ function SubmitForm(sPage, sTarget, bValidate, sConfirm, bFromOnClick, waitCfg) 
 	if (typeof rdSaveInputCookies != 'undefined'){rdSaveInputCookies()}
 	if (typeof rdSaveInputsToLocalStorage != 'undefined'){rdSaveInputsToLocalStorage()}
 
-    if (!document.createHiddenInput) {
-        document.createHiddenInput = function (id, value, name) {
-            var input = document.createElement("INPUT");
-            input.type = "HIDDEN";
-            input.id = id;
-            input.name = name || id;
-            input.value = value;
-            return input;
-        };
-    }
+    //if (!document.createHiddenInput) {
+    //    document.createHiddenInput = function (id, value, name) {
+    //        var input = document.createElement("INPUT");
+    //        input.type = "HIDDEN";
+    //        input.id = id;
+    //        input.name = name || id;
+    //        input.value = value;
+    //        return input;
+    //    };
+    //}
 
     var hiddenRnd = document.createHiddenInput("rdRnd", Math.floor(Math.random() * 100000));
     document.rdForm.appendChild(hiddenRnd);
@@ -135,6 +203,27 @@ function SubmitForm(sPage, sTarget, bValidate, sConfirm, bFromOnClick, waitCfg) 
 	    document.rdForm.appendChild(eleRemoved.pop())
 	}
 
+}
+
+//23865 23862
+function rdFixupInputs(ele) {
+
+    switch (ele.type) {
+
+        case 'text':
+            if (ele.autocomplete) {
+                var delimiter = ele.getAttribute('data-delimiter');
+
+                if (delimiter && delimiter.length > 0) {
+                    //Get rid of extra spaces added by the autocomplete
+                    ele.value = ele.value.split(delimiter + ' ').join(delimiter);
+
+                    //Get rid of the last delimiter added by the autocomplete
+                    if (ele.value.lastIndexOf(delimiter) == ele.value.length - 1)
+                        ele.value = ele.value.substring(ele.value, ele.value.length - delimiter.length);
+                }
+            }         
+    }
 }
 
 function SubmitSort(sPage, RowCnt, SortRowLimit, SortRowLimitMsg) {

@@ -50,6 +50,246 @@ input.ThemeLinkButton, input.ThemeLinkButtonSmall {
 	line-height: 10px;
 }
 
+/*User classes*/
+
+.ThemeHeaderLargest  {
+	color: #0f0f0f;
+	font-size: 220%;
+	font-weight: bold;
+}
+
+.ThemeHeaderLarger  {
+	color: #0f0f0f;
+	font-size: 169%;
+	font-weight: bold;
+}
+
+.ThemeHeaderLarge  {
+	color: #0f0f0f;
+	font-size: 130%;
+	font-weight: bold;
+}
+
+.ThemeHeader{
+	color: #0f0f0f;
+	font-weight: bold;
+}
+
+.ThemeHeaderSmall {
+	color: #0f0f0f;
+	font-size: 85%;
+	font-weight: bold;
+}
+
+.ThemeHeaderSmaller {
+	color: #0f0f0f;
+	font-size: 75%;
+	font-weight: bold;
+}
+
+.ThemeHeaderSmallest {
+	color: #0f0f0f;
+	font-size: 60%;
+	font-weight: bold;
+}
+
+.ThemeTextLargest {
+	font-size: 160%;
+}
+
+.ThemeTextLarger {
+	font-size: 145%;
+}
+
+.ThemeTextLarge {
+	font-size: 130%;
+}
+
+.ThemeTextSmall {
+	font-size: 85%;
+}
+
+.ThemeTextSmaller {
+	font-size: 75%;
+}
+
+.ThemeTextSmallest {
+	font-size: 60%;
+}
+
+.ThemeMarginLargest {
+	margin: 25px;
+}
+
+.ThemeMarginLarger {
+	margin: 20px;
+}
+
+.ThemeMarginLarge {
+	margin: 15px;
+}
+
+.ThemeMargin {
+	margin: 5px;
+}
+
+.ThemePaddingLargest {
+	padding: 25px;
+}
+
+.ThemePaddingLarger {
+	padding: 20px;
+}
+
+.ThemePaddingLarge {
+	padding: 15px;
+}
+
+.ThemePadding {
+	padding: 5px;
+}
+
+
+.ThemeBold {
+	font-weight: bold;
+}
+
+.ThemeItalic {
+	font-style: italic;
+}
+
+.ThemeContainerBordered {
+	border: solid 2px #6694e3;
+	padding: 3px;
+}
+
+.ThemeContainerShaded {
+	background-color: #e0ecff;
+	padding: 3px;
+}
+
+.ThemeContainerShadedAndBordered {
+	background-image: none;
+	background-repeat: repeat-x;
+	background-color: #fff;
+	vertical-align: top;
+	border: 1px solid #c1c1c1;
+	padding: 3px;
+}
+
+tr.ThemeAlternatingRow  td.rdThemeDataTableCell {
+	background-color: #eee;
+}
+
+.ThemeLinkButton {
+	color: #444;
+	background-image: none;
+	background-repeat: repeat-x;
+	background-color: #f9f9f9;
+	background-position: bottom;
+	text-decoration: none;
+	border: 1px solid #bbb;
+	padding-left: 11px;
+	padding-right: 10px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-right: 7px;
+	margin-bottom: 2px;
+	line-height: 28px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.ThemeLinkButtonSmall {
+	color: #444;
+	background-image: none;
+	background-repeat: repeat-x;
+	background-position: bottom;
+	background-color: #f9f9f9;
+	border: 1px solid #bbb;
+	text-decoration: none;
+	margin-left: 3px;
+	padding-right: 3px;
+	padding-left: 3px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	cursor: pointer;
+	vertical-align: middle;
+	line-height: 28px;
+	white-space: nowrap;
+}
+
+.ThemeTextPositive {
+	color: green;
+}
+
+.ThemeTextNegative {
+	color: darkred;
+}
+
+.ThemeTextNormal {
+	font-size: 13px;
+	color: #444;
+}
+
+.ThemeErrorText {
+	color: #790619;
+	font-family: arial, sans-serif;
+	font-size: 100%;
+	border: 1px solid #d8000c;
+	background-color: #ffbaba;
+}
+
+.ThemeNoWrap {
+	white-space: nowrap;
+}
+
+.ThemeHidden {
+	display: none;
+}
+
+.ThemeAlignCenter {
+	text-align: center;
+}
+
+.ThemeAlignLeft {
+	text-align: left;
+}
+
+.ThemeAlignRight {
+	text-align: right;
+}
+
+.ThemeAlignTop {
+	vertical-align: top;
+}
+
+.ThemeAlignTopLeft {
+	vertical-align: top;
+	text-align: left;
+}
+
+.ThemeAlignTopRight {
+	vertical-align: top;
+	text-align: right;
+}
+
+.ThemeAlignBottom {
+	vertical-align: bottom;
+}
+
+.ThemeAlignBottomLeft {
+	vertical-align: bottom;
+	text-align: left;
+}
+
+.ThemeAlignBottomRight {
+	vertical-align: bottom;
+	text-align: right;
+}
+
+/*User classes*/
+
 /*Datatable, Crosstab Table, AnalysisGrid*/
 .rdThemeDataTable , .rdAgDataTable, .rdOgOlapTable, .rdDgOlapTable {
 	border: none;
@@ -65,10 +305,11 @@ caption.rdThemeDataTableMainHeader {
     font-size: 18px;
 }
 
-.rdThemeDataTableHeader, table.rdAgDataTable th, tr.rdAgHeaderRow th {
+.rdThemeDataTableHeader, table.rdAgDataTable th, tr.rdAgHeaderRow th, tr.rdAgHeaderRow td {
 	background-image: none;
 	background-repeat: repeat-x;
-	background-color: #e4e9f3;
+	background-color: #e4e9f3 !important;
+	font-weight: bold !important;
 }
 .rdThemeDataTableHeader {
 	padding: 4px;
@@ -204,7 +445,7 @@ TABLE.rdThemeSubDataTable th, .rdThemeSubDataTable th {
 
 /* Paging */
 .rdThemePaging {
-	vertical-align : text-bottom;
+	vertical-align : middle;
 }
 
 .rdThemePagingCurrent {
@@ -252,12 +493,27 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
 	padding: 2px;
 }
 
+.rdAgContentRow input.rdThemeInput,
+#rowsAxControls input.rdThemeInput,
+#cellAcControls input.rdThemeInput{
+	min-width:150px;
+}
+
+.rdAgContentRow select.rdThemeInput,
+#rowsAxControls select.rdThemeInput,
+#cellAcControls select.rdThemeInput{
+	min-width:160px;
+	margin-left:3px;
+}
+
+
 /* Input checkbox list */
 .rd-checkboxlist, .rd-checkboxlist-dropdown {
 	font-family: arial, sans-serif;
 	background-color: none;
 	border: 1px solid #ccc;
-	color: #222;
+	color: #00558e !important;
+
 }
 
 .rd-checkboxlist-popup {
@@ -274,6 +530,9 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
 	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=90)";
 	filter: alpha(opacity=90);
 	opacity: 0.9;
+	padding: 7px;
+    padding-top: 1px;
+
 }
 
 .rdquicktip-content .rdquicktip-table {
@@ -326,6 +585,7 @@ td.rdPopupPanelControl
 {
     color: #222;
 	background-color: #f9f9f9;
+    font-weight: normal;
 }
 
 .yuimenubaritemlabel-selected, .yuimenuitemlabel-selected, .yuimenubaritem-selected, .yuimenuitem-selected
@@ -457,6 +717,8 @@ td.rdPopupPanelControl
 	padding-top: 2px;
 	padding-bottom: 2px;
 	cursor: pointer;
+	color: #444;
+	font-size: 13px;
 }
 
 .rdAcCommandMiddle
@@ -1049,31 +1311,81 @@ table.rdPopupPanel.rdTimePickerPopup {
     box-shadow: 2px 2px 6px 0px #a3a3a3;
 }
 
+/* AG Edit Gear and new Sub menu */
+
+.rdAgEditOff {
+	background-color: none;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAgEditOff:Hover{
+	background-color: #E4E9F3;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAgEditOn {
+	background-color: #00558E;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAgEditOn:Hover {
+	background-color: #474747;
+	width: 24px;
+	height:22px;
+	border-radius: 2px;
+	cursor:pointer;
+}
+
+.rdAcContentRow {
+	border: 0px solid #90909c;
+	background-color: transparent;
+}
+
+.rdAcCommandIdle, .rdAcCommandLeft, .rdAcCommandMiddle, .rdAcCommandRight, .rdAgCommandIdle, .rdAgCommandLeft, .rdAgCommandMiddle, .rdAgCommandRight {
+    color: #474747 !important;
+	cursor: pointer;
+	text-decoration: none;
+	vertical-align: baseline;
+	white-space: nowrap;
+	font-size: 16px;
+	border-bottom: 4px solid #E4E9F3;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+	padding: 3px;
+	margin: 1px;
+    border-radius: 0;
+	background: none;
+}
+
+.rdAcCommandHighlight, .rdAgCommandHighlight {
+	border-radius: 0;
+	color: #474747 !important;
+	cursor: pointer;
+	text-decoration: none;
+	vertical-align: baseline;
+	white-space: nowrap;
+	font-size: 16px;
+	border-bottom: 4px solid #00558E;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+	background: none;
+	padding: 3px;
+	margin: 1px;
+}
+
 /* Analysis Chart */
 
-span.rdAcCommand.rdAcCommandMiddle {
-    padding: 5px;
-}
-
-span.rdAcCommand.rdAcCommandRight {
-    padding: 5px;
-}
-
-span.rdAcCommandHighlight.rdAcCommandLeft {
-    padding: 5px;
-}
-
-span.rdAcCommandHighlight.rdAcCommandRight {
-    padding: 5px;
-}
-
-span.rdAcCommand.rdAcCommandLeft {
-    padding: 5px;
-}
-
-span.rdAcCommandHighlight.rdAcCommandMiddle {
-    padding: 5px;
-}
 
 #rowsChartLists {
     margin-top: 10px;
@@ -1240,246 +1552,6 @@ td.colOrderDate_Row1 {
     background-color: #b379b3;
 }
 
-/*User classes*/
-
-.ThemeHeaderLargest  {
-	color: #0f0f0f;
-	font-size: 220%;
-	font-weight: bold;
-}
-
-.ThemeHeaderLarger  {
-	color: #0f0f0f;
-	font-size: 169%;
-	font-weight: bold;
-}
-
-.ThemeHeaderLarge  {
-	color: #0f0f0f;
-	font-size: 130%;
-	font-weight: bold;
-}
-
-.ThemeHeader{
-	color: #0f0f0f;
-	font-weight: bold;
-}
-
-.ThemeHeaderSmall {
-	color: #0f0f0f;
-	font-size: 85%;
-	font-weight: bold;
-}
-
-.ThemeHeaderSmaller {
-	color: #0f0f0f;
-	font-size: 75%;
-	font-weight: bold;
-}
-
-.ThemeHeaderSmallest {
-	color: #0f0f0f;
-	font-size: 60%;
-	font-weight: bold;
-}
-
-.ThemeTextLargest {
-	font-size: 160%;
-}
-
-.ThemeTextLarger {
-	font-size: 145%;
-}
-
-.ThemeTextLarge {
-	font-size: 130%;
-}
-
-.ThemeTextSmall {
-	font-size: 85%;
-}
-
-.ThemeTextSmaller {
-	font-size: 75%;
-}
-
-.ThemeTextSmallest {
-	font-size: 60%;
-}
-
-.ThemeMarginLargest {
-	margin: 25px;
-}
-
-.ThemeMarginLarger {
-	margin: 20px;
-}
-
-.ThemeMarginLarge {
-	margin: 15px;
-}
-
-.ThemeMargin {
-	margin: 5px;
-}
-
-.ThemePaddingLargest {
-	padding: 25px;
-}
-
-.ThemePaddingLarger {
-	padding: 20px;
-}
-
-.ThemePaddingLarge {
-	padding: 15px;
-}
-
-.ThemePadding {
-	padding: 5px;
-}
-
-
-.ThemeBold {
-	font-weight: bold;
-}
-
-.ThemeItalic {
-	font-style: italic;
-}
-
-.ThemeContainerBordered {
-	border: solid 2px #6694e3;
-	padding: 3px;
-}
-
-.ThemeContainerShaded {
-	background-color: #e0ecff;
-	padding: 3px;
-}
-
-.ThemeContainerShadedAndBordered {
-	background-image: none;
-	background-repeat: repeat-x;
-	background-color: #fff;
-	vertical-align: top;
-	border: 1px solid #c1c1c1;
-	padding: 3px;
-}
-
-tr.ThemeAlternatingRow  td.rdThemeDataTableCell {
-	background-color: #eee;
-}
-
-.ThemeLinkButton {
-	color: #444;
-	background-image: none;
-	background-repeat: repeat-x;
-	background-color: #f9f9f9;
-	background-position: bottom;
-	text-decoration: none;
-	border: 1px solid #bbb;
-	padding-left: 11px;
-	padding-right: 10px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	margin-right: 7px;
-	margin-bottom: 2px;
-	line-height: 28px;
-	cursor: pointer;
-	white-space: nowrap;
-}
-
-.ThemeLinkButtonSmall {
-	color: #444;
-	background-image: none;
-	background-repeat: repeat-x;
-	background-position: bottom;
-	background-color: #f9f9f9;
-	border: 1px solid #bbb;
-	text-decoration: none;
-	margin-left: 3px;
-	padding-right: 3px;
-	padding-left: 3px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	cursor: pointer;
-	vertical-align: middle;
-	line-height: 28px;
-	white-space: nowrap;
-}
-
-.ThemeTextPositive {
-	color: green;
-}
-
-.ThemeTextNegative {
-	color: darkred;
-}
-
-.ThemeTextNormal {
-	font-size: 13px;
-	color: #444;
-}
-
-.ThemeErrorText {
-	color: #790619;
-	font-family: arial, sans-serif;
-	font-size: 100%;
-	border: 1px solid #d8000c;
-	background-color: #ffbaba;
-}
-
-.ThemeNoWrap {
-	white-space: nowrap;
-}
-
-.ThemeHidden {
-	display: none;
-}
-
-.ThemeAlignCenter {
-	text-align: center;
-}
-
-.ThemeAlignLeft {
-	text-align: left;
-}
-
-.ThemeAlignRight {
-	text-align: right;
-}
-
-.ThemeAlignTop {
-	vertical-align: top;
-}
-
-.ThemeAlignTopLeft {
-	vertical-align: top;
-	text-align: left;
-}
-
-.ThemeAlignTopRight {
-	vertical-align: top;
-	text-align: right;
-}
-
-.ThemeAlignBottom {
-	vertical-align: bottom;
-}
-
-.ThemeAlignBottomLeft {
-	vertical-align: bottom;
-	text-align: left;
-}
-
-.ThemeAlignBottomRight {
-	vertical-align: bottom;
-	text-align: right;
-}
-
-/*User classes*/
-
 /*rdElement: DataList | rdElement: ListItem*/
 
 .ThemeULNone {
@@ -1521,23 +1593,7 @@ tr.ThemeAlternatingRow  td.rdThemeDataTableCell {
 /*End Element*/
 
 /*ReportAuthor*/
-.rdAcCommandHighlight {
-font-weight: normal;
-color: #FFFFFF;
-background-image: url(../rdButtonIn.png);
-background-repeat: repeat-x;
-background-color: #8C8C8D;
-border-top: 1px solid #DDDDDD;
-border-bottom: 1px solid #777777;
-border-right: 1px solid #777777;
-border-left: 1px solid #DDDDDD;
-text-decoration: none;
-padding-right: 3px;
-padding-left: 3px;
-padding-top: 2px;
-padding-bottom: 2px;
-line-height: 24px;
-}
+
 .rdAcCommand{
 background-image: none;
 background-position: bottom;
@@ -1613,7 +1669,7 @@ table #dtBookmarkSharedWith a{
   display: inline-block;
   line-height: 28px;
   padding-right: 25px;
-  background: transparent url("../../rdBookmarkOrganizer/deleteOn.png") top right no-repeat; 
+  background: transparent url("../../rdBookmarkOrganizer/rdDelete.png") top right no-repeat; 
 }
 
 table #dtBookmarkSharedWith td:first-of-type > span{
@@ -1625,6 +1681,12 @@ table #dtBookmarkSharedWith td:first-of-type > span{
 
 .iconAddUser{
   background: transparent url("../../rdBookmarkOrganizer/rdBookmarkSharingAdd.png") top left no-repeat; 
+  height: 24px;
+  display: block;
+}
+
+.iconAddGroup{
+  background: transparent url("../../rdBookmarkOrganizer/rdBookmarkGroupSharingAdd.png") top left no-repeat; 
   height: 24px;
   display: block;
 }
@@ -1642,3 +1704,41 @@ table #dtBookmarkSharedWith td:first-of-type > span{
     margin-top: 2px;
 }
 
+.rdAgUnselectedTab a{
+	color: black;
+}
+
+div[id^=LinkSettingPopup] .rd-popup-content #rdRows-3 tr td:first-child{
+	width: 128px\9;
+}
+div[id^=LinkSettingPopup] .rd-popup-content #rdRows-4 tr td{
+	width: 100%\9;
+}
+
+.rdDgOlapTable tbody a{
+  display: inline-table;
+}
+
+/*
+#rdDataTableDiv-dtFilter table tr :hover {
+background-color:#00558e ! important ;
+color:white;
+}*/
+
+.rdAgControlsPosition {
+	padding-right:30px;
+}
+
+.rdAgControls {
+	padding-bottom:40px;
+}
+
+.rdAgBackground {
+	background-color:transparent;
+	width:100%;
+	white-space: nowrap
+}
+
+#lstFilter  tr td li {
+  color: gray;
+}

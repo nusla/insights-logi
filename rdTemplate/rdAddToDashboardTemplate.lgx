@@ -23,6 +23,7 @@
               rdPanelRequestIDs="@Request.rdPanelRequestIDs~"
               rdPanelSessionIDs="@Request.rdPanelSessionIDs~"
               rdPanelLocalDataIDs="@Request.rdPanelLocalDataIDs~"
+              rdAddPanelLocalDataLayerIDs="@Request.rdAddPanelLocalDataLayerIDs~"
               rdPanelImage="@Request.rdPanelImage~"
               rdMultipleInstances="@Request.rdMultipleInstances~"
               rdPanelSecurityRightID="@Request.rdPanelSecurityRightID~"
@@ -34,15 +35,11 @@
               rdBookmarkFrameID="@Request.rdBookmarkFrameID~"
               rdSkipLocalData="False"
 						/>
+		  <WaitPage />
       </Action>
-      <EventHandler DhtmlEvent="onmouseup" ID="evtHidePopup">
-        <Action Type="ShowElement" ElementID="ppAddToDashboardPrompt" ID="actHidePopup" ShowElementEffect="FadeIn" Display="Hide" />
-      </EventHandler>
-      <EventHandler DhtmlEvent="onmousedown" ID="evtShowStatus">
-        <Action Type="Javascript" ID="actShowStatus" Javascript="rdAjaxRequest('rdAjaxCommand=rdAjaxNotify&amp;rdNotifyCommand=AddToDashboard')" />
-      </EventHandler>
+
       <EventHandler DhtmlEvent="onclick" ID="evtBookmark">
-        <Action Type="Javascript" ID="actAddBookmark" Javascript="rdAddBookmark('actAddBookmark', 'sReport', 'sBookmarkReqIds', 'sBookmarkSessionIds', 'sCollection', 'sName', '', '', 'sDescription', '', '', 'sBookmarkId')" />
+        <Action Type="Javascript" ID="actAddBookmark" Javascript="rdAddBookmark('actAddBookmark', 'sReport', 'sBookmarkReqIds', 'sBookmarkSessionIds', 'sCollection', 'sName', '', '', 'sDescription', '', '', 'sBookmarkId');" />
       </EventHandler>
     </Label>
   </PopupPanel>

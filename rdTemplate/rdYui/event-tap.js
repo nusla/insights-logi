@@ -6,7 +6,7 @@
  * The inner workings are based on Tap.js, https://github.com/alexgibson/tap.js.
  */
 YUI.add('event-tap', function(Y) {
-	"use strict";
+	//"use strict";
 
 	var isValue = Y.Lang.isValue,
 		MAX_DISTANCE = 10,

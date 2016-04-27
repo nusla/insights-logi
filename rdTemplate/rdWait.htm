@@ -16,50 +16,49 @@
 		}
 	</style>
   <link rel="stylesheet" type="text/css" href="rdWaitStyle" />  
-  <script language="javascript" src="rdTemplate/rdYui/global.js"></script>
   <SCRIPT language="javascript" src="rdTemplate/rdCookie.js"></SCRIPT>
 	<SCRIPT language="javascript">
-		function rdGetReport(sUID) {
-		
-			if (sUID==getCookie2("rdShowWaitUID")) {
-				
-				//User pressed Back.
-				if ( history.length < 3 ) {				
-					//The report opened a new window, nowhere to go back to.
-					history.forward(1);
-				} else {
-					//Go back past this page.
-					history.back(-1);
-				}
-			} else {
-				setCookie2("rdShowWaitUID",sUID);
-				
-				var frm = document.getElementById("rdForm"),
+	    function rdGetReport(sUID) {
+
+	        if (sUID == getCookie2("rdShowWaitUID")) {
+
+	            //User pressed Back.
+	            if (history.length < 3) {
+	                //The report opened a new window, nowhere to go back to.
+	                history.forward(1);
+	            } else {
+	                //Go back past this page.
+	                history.back(-1);
+	            }
+	        } else {
+	            setCookie2("rdShowWaitUID", sUID);
+
+	            var frm = document.getElementById("rdForm"),
 				    loadingCounter = 0;
-				
-				frm.action = 'rdUrl';
-				frm.submit();
-				
-                /*
+
+	            frm.action = 'rdUrl';
+	            frm.submit();
+
+	            /*
                  * Act like an animated gif by constantly changing left offset on horizontal image.
                  * Image is comprised of side-by-side frames you would see in an gif.
                  * Div container acts like a viewport with height and width set to dimensions of a single frame.
                  * Time delay on window.setInterval controls how fast the image updates and thus animates.
                  */
-                var animateImage = function() {
-                    // 7 is the number of frames in the image
-                    // 32 is the width of a single frame					
-                    var mod = loadingCounter % 7,
+	            var animateImage = function () {
+	                // 7 is the number of frames in the image
+	                // 32 is the width of a single frame					
+	                var mod = loadingCounter % 60,
                         loadingImage = document.getElementById('rdLogo'),
                         offset = -32 * mod;
-                    loadingCounter++;
-        			
-                    loadingImage.style.left = offset + 'px';
-                };
+	                loadingCounter++;
 
-                window.setInterval(animateImage, 200);
-			}
-		}
+	                loadingImage.style.left = offset + 'px';
+	            };
+
+	            window.setInterval(animateImage, 30);
+	        }
+	    }
 	</SCRIPT>
  </head>
  <body onload="rdGetReport('rdUID')" >

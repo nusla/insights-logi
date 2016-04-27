@@ -1,5 +1,5 @@
 YUI.add('responsiveColumnResizer', function (Y) {
-    "use strict";
+    //"use strict";
 
     var Lang = Y.Lang,
         TRIGGER = 'rdResponsiveColumnResizer';

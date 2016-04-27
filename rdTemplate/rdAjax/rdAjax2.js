@@ -11,6 +11,10 @@ function rdAjaxRequest(commandParams, bValidate, sConfirm, bProcess, fnCallback,
 		return;
 	}
 	
+	if (commandParams.search("rdCSRFKey") == -1 && document.getElementById('rdCSRFKey1') && document.getElementById('rdCSRFKey1').value) { // check for rdCSRFKey on every ajax request - 24188 
+		commandParams = commandParams + '&rdCSRFKey=' + document.getElementById('rdCSRFKey1').value;
+	}
+	
 	if(commandParams.indexOf('rdDataTablePaging') != -1){  //Ajax Paging. 20543
 	    var aCommandParams = commandParams.split('&');
 	    var sDataTableId='';
@@ -189,10 +193,15 @@ function rdAjaxRequestWithFormVars(commandURL, bValidate, sConfirm, bFromOnClick
 	if (!frm) {
 	    return  //The debug page is likely the current document.
 	}
-	
+
+	var checkboxChildrenIndexes = [];
+    
 	for (var i=0; i < frm.elements.length; i++) { 
 	    var ele = frm.elements[i]
 	    
+	    if (checkboxChildrenIndexes.indexOf(i) >= 0)
+	        continue;
+
 	    if (!ele.type) {
             continue;  //Not an input element.
 	    }
@@ -200,7 +209,7 @@ function rdAjaxRequestWithFormVars(commandURL, bValidate, sConfirm, bFromOnClick
 	    if (ele.type == "file" && ele.getAttribute("data-ajax-upload") == "True") {
 	        if (ele.value != "") {
 	            var ext = ele.value.split('.')[1];
-	            if (!ele.value.match('(jpg|JPG|gif|GIF|png|PNG)$')) {
+	            if (!ele.value.match('(jpg|JPG|gif|GIF|png|PNG|bmp|BMP)$')) {
 	                alert('Wrong filetype!');
 	                return;
 	            }
@@ -234,11 +243,29 @@ function rdAjaxRequestWithFormVars(commandURL, bValidate, sConfirm, bFromOnClick
 	        //Don't forward a variable that's already in the list, perhaps from LinkParams.
 	        if (commandURL.indexOf("&" + ele.name + "=") != -1) continue;
 
+	        var sInputValue = rdGetInputValues(ele)
+
+	        if (ele.type == "checkbox" && sInputValue.indexOf("rdNotSent") != -1) {
+	            sInputValue = ""
+	        }
+
 	        //Sometimes there may be duplicate parameters in the command.  This prevents duplicates. 21117
 	        //22591 - Refactored. rdGetInputValues cannot be run twice in a row without changes. The second run will return Null.
-	        var sInputValue = rdGetInputValues(ele)
 	        if (commandURL.indexOf(sInputValue) == -1)
 	            commandURL += sInputValue;
+
+            //24111 24167
+	        if (ele.id && ele.id != "" && Y.Lang.isValue(Y.one("#" + ele.id))){
+	            if(Y.Lang.isValue(Y.one("#" + ele.id).ancestor("div")) && Y.one("#" + ele.id).ancestor("div").getAttribute("data-checkboxlist")) {
+	                var id = Y.one("#" + ele.id).ancestor("div").getAttribute("id");
+	                for (var j = 0; j < frm.elements.length; j++) {
+	                    if (frm.elements[j].id.indexOf(id + "_rdList") >= 0) {
+	                        checkboxChildrenIndexes.push(j);
+	                    }
+	                }
+	            }
+	        }
+
 	    }
 	}
 
@@ -311,29 +338,26 @@ function rdUpdatePage(xmlResponse, sResponse) {
 	    sResponse = sResponse.replace(/_rdamp_/g, "&");
 	    sResponse = sResponse.replace(/_rdlt_/g, "<");
 	    sResponse = sResponse.replace(/_rdgt_/g, ">");
-	    window.status =""		
+	    window.status = ""
+
+        //chartPartialUpdate (used in realtime ChartCanvas)
+	    var isObjectUpdate = false;
+	    if (sResponse.indexOf("data-linked-object-type=") != -1) {
+	        isObjectUpdate = true;
+	    }
+
 	    switch (xmlResponse.documentElement.getAttribute("rdAjaxCommand")) {
 
 		        case 'RefreshElement':
-		            var rdValidateFormText = sResponse.substring(sResponse.indexOf("function rdValidateForm()"), sResponse.indexOf("</SCRIPT>", sResponse.indexOf("function rdValidateForm()")));
-		            var rdHead = document.getElementsByTagName('head').item(0);
-		            var rdValidateFormScript = document.createElement("script");
-		            rdValidateFormScript.type = "text/javascript";
-		            //if (!(isIE() < 8)) {
-		            //    rdValidateFormScript.appendChild(document.createTextNode(rdValidateFormText));
-		            //}
-		            if (isIE()) {
-		                if (isIE() > 8) {
-		                    rdValidateFormScript.appendChild(document.createTextNode(rdValidateFormText));
-		                }
-		            } else {
-		                rdValidateFormScript.appendChild(document.createTextNode(rdValidateFormText));
-		            }
-		            rdHead.appendChild(rdValidateFormScript);
-                    //AJAX Paging 20543
+		            //AJAX Paging 20543
 		            var isDataTablePaging = xmlResponse.documentElement.getAttribute('id')
-
-		            
+		            var rdValidateFormText = sResponse.substring(sResponse.indexOf("function rdValidateForm()"), sResponse.indexOf("</SCRIPT>", sResponse.indexOf("function rdValidateForm()")));
+		            if (window.rdValidateForm) {
+		                var strrdValidateForm = rdValidateForm.toString();
+		                strrdValidateForm = strrdValidateForm.substring(strrdValidateForm.indexOf("{") + 1, strrdValidateForm.length - 1);
+		                strrdValidateForm += rdValidateFormText.substring(rdValidateFormText.indexOf("{") + 1, rdValidateFormText.length -1);
+		                rdValidateForm = new Function(strrdValidateForm);
+		            }
 
 				    if (isDataTablePaging && isDataTablePaging.indexOf("rdDataTableDiv") > -1) {
 				        //Find the HTML TABLE's DIV.
@@ -348,13 +372,9 @@ function rdUpdatePage(xmlResponse, sResponse) {
 					    var sElementIDs = xmlResponse.documentElement.getAttribute('rdRefreshElementID').split(",")
 					    for (var i = 0; i < sElementIDs.length; i++) {
 					        var eleOld = document.getElementById(sElementIDs[i])
-
 					        if (eleOld) {
 					            //Write the response html to the page, replacing the original html
 					            var sNewHtml = replaceHTMLElement(eleOld, sResponse, sElementIDs[i]);
-
-
-
 					            // Did we replace the content's of Dashboard Panel?
 					            var node = Y.one('#' + sElementIDs[i]);
 					            var panelContainer = node.ancestor('div.rdDashboardPanel');
@@ -529,14 +549,16 @@ function rdUpdatePage(xmlResponse, sResponse) {
         //event the scripts need to be run before the event is fired.
         //
         //May need to run some script.
-        rdAjaxRunOnLoad(xmlResponse)   
-		
-		LogiXML.Ajax.AjaxTarget().fire('reinitialize');
-	
-		if (typeof window.rdRepositionSliders != 'undefined') {
-			//Move CellColorSliders, if there are any.
-			rdRepositionSliders()
-		}		
+	    if (!isObjectUpdate) {
+	        rdAjaxRunOnLoad(xmlResponse)
+
+	        LogiXML.Ajax.AjaxTarget().fire('reinitialize');
+
+	        if (typeof window.rdRepositionSliders != 'undefined') {
+	            //Move CellColorSliders, if there are any.
+	            rdRepositionSliders()
+	        }
+	    }
     }
 
     //23492
@@ -801,6 +823,12 @@ function rdGetSelectedValuesFromCheckboxList(inputName) {
             if (Y.Array.indexOf(uniqueValues, nodeValue) == -1) {
                 uniqueValues.push(nodeValue);
             }
+        } else {
+            //unchecked
+            nodeValue = node.getAttribute("rdUncheckedValue")
+            if (node.hasAttribute("rdUncheckedValue") && Y.Array.indexOf(uniqueValues, nodeValue) == -1) {
+                uniqueValues.push(nodeValue);
+            }
         }
     });
     if (uniqueValues.length > 0) {
@@ -839,8 +867,7 @@ function rdGetInputValues(ele, urlRequest) {
     }
     else {
         switch (ele.type) {
-            case 'hidden':
-            case 'text':
+            case 'hidden':         
             case 'email':
             case 'number':
             case 'tel':
@@ -849,6 +876,29 @@ function rdGetInputValues(ele, urlRequest) {
             case 'select-one':
             case 'file':
                 sValue = rdGetFormFieldValue(ele);
+                if (urlRequest)
+                    return '&' + ele.name + "=" + rdAjaxEncodeValue(sValue);
+                else
+                    return sValue;
+                break;
+            case 'text':
+                
+                //23865 23862
+                if (ele.autocomplete) {
+                    var delimiter = ele.getAttribute('data-delimiter');
+
+                    if (delimiter && delimiter.length > 0) {
+                        //Get rid of extra spaces added by the autocomplete
+                        ele.value = ele.value.split(delimiter + ' ').join(delimiter).trim();
+
+                        //Get rid of the last delimiter added by the autocomplete
+                        if (ele.value.lastIndexOf(delimiter) == ele.value.length - 1)
+                            ele.value = ele.value.substring(ele.value, ele.value.length - delimiter.length);
+                    }
+                }
+
+                sValue = rdGetFormFieldValue(ele);
+
                 if (urlRequest)
                     return '&' + ele.name + "=" + rdAjaxEncodeValue(sValue);
                 else
@@ -875,8 +925,8 @@ function rdGetInputValues(ele, urlRequest) {
                 }
                 break;
             case 'checkbox':
-                //20388
-                if (Y.Lang.isValue(Y.one("#" + ele.id).ancestor("div")) && Y.one("#" + ele.id).ancestor("div").getAttribute("data-checkboxlist")) {
+                //20388,23861
+                if (Y.Lang.isValue(Y.one("#" + ele.id)) && (Y.Lang.isValue(Y.one("#" + ele.id).ancestor("div")) && Y.one("#" + ele.id).ancestor("div").getAttribute("data-checkboxlist"))) {
                     var parent = Y.one("#" + ele.id).ancestor("div");
                     sValue = rdGetSelectedValuesFromCheckboxList(parent.getAttribute("id"));
                     if (urlRequest)
@@ -907,6 +957,7 @@ function rdGetInputValues(ele, urlRequest) {
     }
     return "";
 }
+
 var getElementsByClassName = function (className, tag, elm){
     if (document.getElementsByClassName) {
         getElementsByClassName = function (className, tag, elm) {

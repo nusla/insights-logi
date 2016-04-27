@@ -155,9 +155,7 @@
                 <Rows Class="rdOgContentHeadingRow">
                   <Row>
                     <Column>
-                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgDimensions.gif" ID="imgDimension" AltText="Close" Tooltip="Close">
-                        <Action Type="ShowElement" ID="actHideDimensions" ElementID="rowDimension" Display="Hide"/>
-                      </Image>
+                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgDimensions.gif" ID="imgDimension" />
                       <Spaces Size="1"/>
                       <Label Caption="Dimensions" Class="rdOgContentHeading" ID="lblDimensions"/>
                       <Spaces Size="4"/>
@@ -318,9 +316,7 @@
                 <Rows Class="rdOgContentHeadingRow">
                   <Row>
                     <Column>
-                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgMeasures.gif" ID="imgMeasure" AltText="Close" Tooltip="Close">
-                        <Action Type="ShowElement" ID="actHideMeasures" ElementID="rowMeasure" Display="Hide"/>
-                      </Image>
+                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgMeasures.gif" ID="imgMeasure" />
                       <Spaces Size="1"/>
                       <Label Caption="Measures" Class="rdOgContentHeading" ID="lblMeasures"/>
                       <Spaces Size="4"/>
@@ -367,10 +363,12 @@
                   <DataTable ID="dtMeasures" Class="rdPanelScroll">
                     <Note Note="This is used for hierarchical measures."/>
                     <DataLayer ID="dlMeasures" Type="Static">
-                      <GroupFilter Hierarchical="True" GroupColumn="MEASUREGROUP_NAME" ID="groupMeasure" KeepGroupedRows="True">
+                      <SortFilter SortColumn="MEASURE_NAME"/>
+                      <GroupFilter Hierarchical="True" GroupColumn="MEASUREGROUP_NAME" ID="groupMeasure" KeepGroupedRows="True">      
                       </GroupFilter>
                     </DataLayer>
                     <DataLayer Type="Static" ID="dlPickableCalculatedMeasures">
+                      <SortFilter SortColumn="MEASURE_NAME"/>
                       <GroupFilter Hierarchical="True" GroupColumn="MEASUREGROUP_NAME" ID="groupMeasure" KeepGroupedRows="True">
                       </GroupFilter>
                     </DataLayer>
@@ -419,9 +417,7 @@
                 <Rows Class="rdOgContentHeadingRow">
                   <Row>
                     <Column>
-                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgCalculatedMeasure.gif" ID="imgCalculatedMeasure" AltText="Close" Tooltip="Close">
-                        <Action Type="ShowElement" ID="actHideCalc" ElementID="rowCalculatedMeasure" Display="Hide"/>
-                      </Image>
+                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgCalculatedMeasure.gif" ID="imgCalculatedMeasure" />
                       <Spaces Size="1"/>
                       <Label Caption="Calculated Measures" Class="rdOgContentHeading" ID="lblCalc"/>
                     </Column>
@@ -578,9 +574,7 @@
                 <Rows Class="rdOgContentHeadingRow">
                   <Row>
                     <Column>
-                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgFilter.gif" ID="imgFilter" AltText="Close" Tooltip="Close">
-                        <Action Type="ShowElement" ID="actHideFilters" ElementID="rowFilter" Display="Hide"/>
-                      </Image>
+                      <Image Class="rdOgContentHeading" Caption="rdTemplate/rdOlapGrid/rdOgFilter.gif" ID="imgFilter" />
                       <Spaces Size="1"/>
                       <Label Caption="Filter" Class="rdOgContentHeading" ID="lblFilter"/>
                     </Column>
@@ -590,7 +584,7 @@
                 <Division ID="divFilters" HtmlDiv="True">
                   <Rows >
                     <Row Class="rdOgContentRow">
-                      <Column Width="100" WidthScale="%"   xWidth="800" xWidthScale="px">
+                      <Column xWidth="800" xWidthScale="px">
                         <DataMultiColumnList ID="mclFilters" MultiListDirection="Down" MultiListColumns="2" Width="800" WidthScale="px">
                           <DataLayer ID="dlFilterDimensions" Type="Static"/>
                           <Division ID="divFilterAdd">
@@ -876,7 +870,7 @@
             <Row ID="rowContentChart">
               <Column ColSpan="2" Class="rdOgChartContainer">
                 <OlapChart>
-					<Chart Type="XY" XYChartType="Bar" ChartHeight="400" ChartWidth="600" LineWidth="2" ID="ogChart" BarShape="Square" BarShading="BottomLight" D3="3" Color="red, yellow, blue" OuterBorderColor="#7A7A7A" RoundedBorder="4" Transparency="2" ChartBackgroundColor="#D1D1D1" ChartBackgroundGradientColor="#FFFFFF" MaxLabelLength="20" OlapGrid="True">
+					<!--<Chart rdTranslateToChartCanvas="True" Type="XY" XYChartType="Bar" ChartHeight="400" ChartWidth="600" LineWidth="2" ID="ogChart" BarShape="Square" BarShading="BottomLight" D3="3" Color="red, yellow, blue" OuterBorderColor="#7A7A7A" RoundedBorder="4" Transparency="2" ChartBackgroundColor="#D1D1D1" ChartBackgroundGradientColor="#FFFFFF" MaxLabelLength="20" OlapGrid="True">
 						<FontChartTitle FontSize="10" FontFilename="arialbd.ttf"/>
 						<FontLabel FontSize="8"/>
 						<FontData FontSize="8"/>
@@ -888,7 +882,24 @@
 						<Resizer ID="rdChartResizerTemplate" MinWidth="250" MinHeight="250" />
 						<HoverHighlight />
 						<Quicktip ID="rdOgGaugeQuicktip"/>
-					</Chart>
+					</Chart>-->
+                  <ChartCanvas ID="ogChart" ChartWidth="600" ChartHeight="400" BorderColor="#7A7A7A" BorderRadius="4" BackgroundColor="#D1D1D1" SpacingTop="20" SpacingRight="20">
+                    <Series Type="Bar" ID ="templateSeries">
+                      <Action Type="Report" ID="actChartDrilldown">
+                        <Target Type="Report" KeepScrollPosition="True" KeepShowElements="True" />
+                        <LinkParams rdOgCommand="DrillChart" rdOlapTableID="@Request.rdOlapTableID~" rdDrilldownDimension="@Data.rdDrilldownDimension~" rdOgCommandID="@Function.FUID~" rdDrilldownPosition="&quot;@Data.rdDrilldownPosition-&quot; &amp; sDimensionName &amp; &quot;~&quot;" rdDrilledDown="&quot;@Data.rdDrilledDown-&quot; &amp; sDimensionName &amp; &quot;~&quot;" />
+                      </Action>
+                      <Quicktip ID="rdOgGaugeQuicktip" />
+                    </Series>
+                    <ChartXAxis>
+                      <AxisLabelStyle FontSize="8pt" />
+                    </ChartXAxis>
+                    <ChartYAxis>
+                      <AxisLabelStyle FontSize="8pt" />
+                    </ChartYAxis>
+                    <Resizer ID="rdChartResizerTemplate" MinWidth="250" MinHeight="250" />
+                    <ChartCaptionStyle FontFamily="arialbd.ttf" FontSize="10pt" />
+                  </ChartCanvas>
                 </OlapChart>
               </Column>
             </Row>

@@ -5,7 +5,7 @@
 
 .rdquicktip {
 	position: absolute;
-	z-index: 210; /* PopupPanel uses z-index of 201 and 202.  YUI Resize uses 100 and 200.  Need to be above it */
+	z-index: 9010; /* PopupPanel uses z-index of 9001 and 9002.  YUI Resize uses 100 and 200.  Need to be above it */
 	opacity: 0;
 }
 

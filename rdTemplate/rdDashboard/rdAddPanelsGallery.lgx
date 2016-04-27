@@ -10,12 +10,20 @@
 									<Row>
 										<Column>
 											<Division ID="divAddPanelsSearch" HtmlDiv="True" Class="rdAddPanelSearch">
+                        <Label Caption="Find " ID="lblAddPanelsFind" Class="rdDashboardTitleCaption"/>
+                        <InputText ID="rdInputAddPanelFind" Placeholder="Type to search...">
+                          <EventHandler DhtmlEvent="onkeyup" >
+                            <Action Type="RefreshElement"  ElementID="rdAddPanelsList" ID="actAddPanelFind" >
+                              <LinkParams  EnterKeyDefault="True" rdRefreshDashboard="True" rdRefreshAddPanelsList="True"/>
+                            </Action>
+                          </EventHandler>
+                        </InputText>              
 												<Label Caption="Sort By " ID="lblAddPanelsSort" Class="rdDashboardTitleCaption"/>
-												<InputSelectList ID="rdInputAddPanelSort" OptionValueColumn="SortColumn" OptionCaptionColumn="SortDescription">
+												<InputSelectList ID="rdInputAddPanelSort" OptionValueColumn="SortColumn" OptionCaptionColumn="SortDescription" DefaultValue="SaveTime">
 													<DataLayer Type="Static">
-														<StaticDataRow SortColumn="Caption" SortDirection="Ascending" SortDescription="Title" />
 														<StaticDataRow SortColumn="SaveTime" SortDirection="Descending" SortDescription="Newest" />
 														<StaticDataRow SortColumn="SaveTime-" SortDirection="Ascending" SortDescription="Oldest" />
+														<StaticDataRow SortColumn="Caption" SortDirection="Ascending" SortDescription="Title" />
 													</DataLayer>
 													<EventHandler DhtmlEvent="onchange">
 														<Action Type="RefreshElement" ElementID="dtPanelList" ID="actAddPanelSort" >
@@ -23,15 +31,6 @@
 														</Action>
 													</EventHandler>
 												</InputSelectList>
-
-												<Label Caption="Find " ID="lblAddPanelsFind" Class="rdDashboardTitleCaption"/>
-												<InputText ID="rdInputAddPanelFind" Placeholder="Type to search...">
-													<EventHandler DhtmlEvent="onkeyup" >
-														<Action Type="RefreshElement"  ElementID="rdAddPanelsList" ID="actAddPanelFind" >
-															<LinkParams  EnterKeyDefault="True" rdRefreshDashboard="True" rdRefreshAddPanelsList="True"/>
-														</Action>
-													</EventHandler>
-												</InputText>
 											</Division>
 
 											<Division HtmlDiv="True" Class="rdScrollableList" ID="rdAddPanelsList">
@@ -46,7 +45,7 @@
 															<SwitchIf NewValue="1999-01-01" />
 														</SwitchColumn>
 														<AggregateColumn AggregateFunction="Count" AggregateColumn="Caption" ID="PanelListRowCount" />
-														<SortFilter ID="rdPanelListSortFilter" SortColumn="Caption"/>
+														<SortFilter ID="rdPanelListSortFilter" SortColumn="SaveTime" SortSequence="Descending"/>
 													</DataLayer>
 													<Rows WidthScale="%" Width="100">
 														<Row>

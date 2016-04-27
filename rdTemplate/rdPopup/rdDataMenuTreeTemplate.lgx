@@ -8,9 +8,9 @@
 							<Column ID="rdIndent_rdDataMenuTreeID" Width="@Data.rdIndent~" WidthScale="px" />
 							<Column ID="rdImage">
 								<Image ID="rdExpando_rdDataMenuTreeID" Caption="rdTemplate/rdArrowBlank.gif">
-									<EventHandler DhtmlEvent="onclick">
-										<Action Type="Javascript" Javascript="rdDataMenuTreeExpandCollapse('rdDataMenuTreeID',this)" />
-									</EventHandler>
+									<Action Type="Link" ID="actLink_rdDataMenuTreeID">
+                    <Target Type="Link" ID="tgt_rdDataMenuTreeID" Link="javascript:rdDataMenuTreeExpandCollapse('rdDataMenuTreeID',document.getElementById('rdExpando_rdDataMenuTreeID_Row@Function.RowNumber~'));" />
+                  </Action>
 								</Image>
 								<Image ID="rdDmtImage" Caption="_SupportFiles/@Data.rdMenuImage~">
 									<Note Note="Height and Width come from attributes optionally set in the Menu element." />

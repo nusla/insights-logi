@@ -32,11 +32,18 @@ Y.use('dd-plugin', 'dd-scroll', 'escape', function(Y){
             }
         }
 
+        //hotfix 24678
+        var bMovePanelInDashboard = true;
+        if (elePopupPanel.id.match('ppColors_')) {
+            bMovePanelInDashboard = false;
+        }
+
         var eleDashboardPanel = Y.Selector.ancestor(elePopupPanel, '.rdDashboardPanel');
         if (eleDashboardPanel != null) {  //#15153, #15135.
             var eleDashboardPanelTable = document.getElementById("rdDivDashboardPanelTable")
             // Get the Dashboard Panel Table(Div) and add the Modal and the Popup Panel to the Table.
-            if (eleDashboardPanelTable != null) {
+            if (eleDashboardPanelTable != null && bMovePanelInDashboard) {
+                console.log(elePopupPanel);
                 var eleModalPanel = elePopupPanel.previousSibling;
                 if (eleModalPanel) {
                     if (eleModalPanel.id) {
@@ -117,9 +124,18 @@ Y.use('dd-plugin', 'dd-scroll', 'escape', function(Y){
                 
         if (elePopupPanel.getAttribute("rdModal") == "True") {
 
+            var yuiPopupPanel = Y.one(elePopupPanel);
+            var dashboardPanel = yuiPopupPanel.ancestor('.rdDashboardPanel');
+
+            if (dashboardPanel && dashboardPanel.getDOMNode()) {
+                dashboardPanel.getDOMNode().setAttribute('oldOpacity', dashboardPanel.getDOMNode().style['opacity']);
+                dashboardPanel.getDOMNode().style['opacity'] = null;
+            }
+
             //Set tab index of everything to a value we can look up later, so it is not tab-able 22585
             var popupChildren = Y.one(document).all('a, BODY, button, frame, iframe, img, input, object, select, textarea, span[onclick]')._nodes;
             for (var i = 0; i < popupChildren.length; i++) {
+                popupChildren[i].setAttribute('oldTabindex', popupChildren[i].tabIndex);
                 popupChildren[i].tabIndex = -13579;
             }
 
@@ -201,6 +217,14 @@ Y.use('dd-plugin', 'dd-scroll', 'escape', function(Y){
 		        		
         }
         rdPutAShimBelowPopupPanel(elePopupPanel);
+        //if we are under responsive column
+        var rdYUIPopuppanel = Y.one(elePopupPanel);
+        var ancestorRespColumn = rdYUIPopuppanel.ancestor('.rdResponsiveColumn');
+        if (ancestorRespColumn != undefined) {
+            if (ancestorRespColumn.ancestor('.rd-gridsystem-scrollbar-horizontalScrollbar') == undefined)
+                return;
+            ancestorRespColumn.setStyle('overflow-x', 'visible');
+        }    
     }
 });
 
@@ -405,15 +429,35 @@ function rdHidePopupPanelAndModalShade(elePanelElement) {
     elePanelElement.style.display = 'none';
     if (rdModalShade) {
         //22585
-        var popupChildren = Y.one(document).all('*[tabindex=-13579]')._nodes;
-        for (var i = 0; i < popupChildren.length; i++) {
-            popupChildren[i].tabIndex = 0;
+        var yuiPopupPanel = Y.one(elePanelElement);
+        var dashboardPanel = yuiPopupPanel.ancestor('.rdDashboardPanel');
+
+        if (dashboardPanel && dashboardPanel.getDOMNode()) {
+            dashboardPanel.getDOMNode().style['opacity'] = dashboardPanel.getDOMNode().getAttribute('oldOpacity');
         }
 
-        rdModalShade.style.display="none"
+        var popupChildren = Y.one(document).all('*[tabindex=-13579]')._nodes;
+        for (var i = 0; i < popupChildren.length; i++) {
+            if (popupChildren[i].getAttribute('oldTabindex') !== '') {
+                popupChildren[i].tabIndex = popupChildren[i].getAttribute('oldTabindex');
+            } else {
+                popupChildren[i].tabIndex = 0;
+            }
+        }
+
+        rdModalShade.style.display = "none";
         rdModalShade=null
     }
     rdRemoveTheShim();
+
+    //if we are under responsive column
+    var rdYUIPopuppanel = Y.one(elePanelElement);
+    var ancestorRespColumn = rdYUIPopuppanel.ancestor('.rdResponsiveColumn');
+    if (ancestorRespColumn != undefined) {
+        if (ancestorRespColumn.ancestor('.rd-gridsystem-scrollbar-horizontalScrollbar') == undefined)
+            return;
+        ancestorRespColumn.setStyle('overflow-x', 'auto');
+    }
 }
 
 function rdHidePopupPanelOnEscKeyPress(e){
@@ -429,17 +473,24 @@ function rdHidePopupPanelOnEscKeyPress(e){
 
 function rdGetModalShade(elePanelElement){
     var rdModalShade;
-    try{
+    try {
         if (elePanelElement.previousSibling) {
             //14909,19075
-            if(elePanelElement.previousSibling.id.indexOf("_rdModalShade") > 0 ){ 
+            if (elePanelElement.previousSibling.id.indexOf("_rdModalShade") > 0) {
                 rdModalShade = elePanelElement.previousSibling
             }
         }
     }
-    catch(e){}
-    if(!rdModalShade){
-        rdModalShade = document.getElementById( elePanelElement.id + "_rdModalShade") 
+    catch (e) { }
+    try {
+        var xsltShade = Y.one(elePanelElement).ancestor().previous('.popupPanelModal');//if caller is wrapped
+        if (!rdModalShade && xsltShade) {
+            rdModalShade = xsltShade.getDOMNode();
+        }
+    }
+    catch (e) { }
+    if (!rdModalShade) {
+        rdModalShade = document.getElementById(elePanelElement.id + "_rdModalShade")
     }
     return rdModalShade;
 }
@@ -601,15 +652,17 @@ function rdPutAShimBelowPopupPanel(elePopupPanel){
    
 }
 
-// rdMouse.js code moved in to this file.
-var rdMouse = new Object(); 
-rdMouse.x = 0; 
-rdMouse.y = 0; 
-rdMouse.currentTarget = null; 
-Y.on('domready', function() {
-    Y.one('body').on('mousemove', function(ev) {
-        rdMouse.x = ev.pageX;
-        rdMouse.y = ev.pageY;
-        rdMouse.currentTarget = ev.currentTarget;
+Y.use('event-base', function (Y) {
+    // rdMouse.js code moved in to this file.
+    window.rdMouse = new Object();
+    rdMouse.x = 0;
+    rdMouse.y = 0;
+    rdMouse.currentTarget = null;
+    Y.on('domready', function () {
+        Y.one('body').on('mousemove', function (ev) {
+            rdMouse.x = ev.pageX;
+            rdMouse.y = ev.pageY;
+            rdMouse.currentTarget = ev.currentTarget;
+        });
     });
 });

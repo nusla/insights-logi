@@ -1,5 +1,5 @@
 YUI.add('chartCanvas', function (Y) {
-    "use strict";
+    //"use strict";
     if (!Array.prototype.indexOf) {
         Array.prototype.indexOf = function (obj, start) {
             for (var i = (start || 0), j = this.length; i < j; i++) {
@@ -35,6 +35,8 @@ YUI.add('chartCanvas', function (Y) {
         changeFlagElement: null,
         mask: null,
         restoreSelectionForSeriesIndex: null,
+        maxVisiblePoints: null,
+        refreshTimers: [], 
 
         initializer: function(config) {
             this._parseHTMLConfig();
@@ -44,11 +46,6 @@ YUI.add('chartCanvas', function (Y) {
 
             this._handlers.chartError = Highcharts.addEvent(this.configNode.getDOMNode(), 'error', Y.LogiXML.ChartCanvas.handleError);
             this._handlers.setSize = this.configNode.on('setSize', this.resized, this);
-            Highcharts.setOptions({
-                global: {
-                    useUTC: false
-                }
-            });
             this.initChart(chartOptions);
         },
 
@@ -58,85 +55,203 @@ YUI.add('chartCanvas', function (Y) {
             return chartOptions;
         },
 
-        updateChart: function (chartNode) {
+        rdUpdateChartData: function (requestParams) {
+            var requestUrl = 'rdAjaxCommand=RefreshElement&rdRefreshElementID=' + this.id + '&rdReport=' + this.reportName + '&rdRequestForwarding=Form';
+            requestUrl += "&rdChartRefreshType=UpdateData";
+            requestUrl = this.attachRequestParams(requestUrl, requestParams);
+            rdAjaxRequest(requestUrl);
+        },
+
+        rdAppendChartData: function (requestParams, maxVisiblePoints) {
+            this.maxVisiblePoints = maxVisiblePoints;
+            var requestUrl = 'rdAjaxCommand=RefreshElement&rdRefreshElementID=' + this.id + '&rdReport=' + this.reportName + '&rdRequestForwarding=Form';
+            requestUrl += "&rdChartRefreshType=AppendData";
+            requestUrl = this.attachRequestParams(requestUrl, requestParams);
+            rdAjaxRequest(requestUrl);
+        },
+
+        attachRequestParams: function (url, requestParams) {
+            if (requestParams) {
+                for (var key in requestParams) {
+                    url += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(requestParams[key]);
+                }
+            }
+            return url;
+        },
+
+        setChartDataFromRefreshElement: function (chartNode) {
             var chartOptions = this.extractOptionsFromHtmlNode(chartNode),
-                actionType = chartNode.getAttribute('data-action-type');
-            switch (actionType) {
-                case "refresh-series":
+               refreshType = chartNode.getAttribute('data-refresh-type');
+            if (!refreshType || refreshType == '') {
+                refreshType = "UpdateData";
+            }
+            this.rdSetChartData(chartOptions, refreshType);
+        },
+
+        rdSetChartData: function (chartOptions, updateType, maxVisiblePoints) {
+            this.preProcessChartOptions(chartOptions);
+            if (!updateType || updateType == '') {
+                updateType = "UpdateData";
+            }
+            if (!maxVisiblePoints && this.maxVisiblePoints) {
+                maxVisiblePoints = this.maxVisiblePoints;
+            }
+            switch (updateType) {
+                case "UpdateData":
                     {
-                        this.chart.showLoading('Series updating...');
                         var i = 0, length = chartOptions.series.length,
                             j = 0, jLength = this.chart.series.length,
                             seriesId;
                         for (; i < length; i++) {
                             seriesId = chartOptions.series[i].id;
-                            for (j=0; j < jLength; j++) {
+                            for (j = 0; j < jLength; j++) {
                                 if (this.chart.series[j].options.id == seriesId) {
-                                    if (chartOptions.series[i].data.length) {                                     
+                                    if (chartOptions.series[i].data && chartOptions.series[i].data.length) {
                                         this.chart.series[j].setData(chartOptions.series[i].data);
                                     }
                                 }
                             }
                         }
-                        this.chart.hideLoading();
+                        
                     }
                     break;
-                case "realtime-update-series"://RealtimeSeriesUpdate
+                case "AppendData":
                     {
-                        
-                      //  this.chart.showLoading('Series updating...');
                         var i = 0, length = chartOptions.series.length,
                             j = 0, jLength = this.chart.series.length,
-                            seriesId;                        
+                            seriesId;
                         for (; i < length; i++) {
                             seriesId = chartOptions.series[i].id;
                             for (j = 0; j < jLength; j++) {
                                 if (this.chart.series[j].options.id == seriesId) {
-
-                                   var timespan = chartNode.getAttribute('timeSpan')
-                                   var timeArr = timespan.split(':')
-                                   var dateIndent = timeArr[0] * 3600000 + timeArr[1] * 60000 + timeArr[2] * 1000//in milliseconds
-                                    //  var currDateTime = new Date();//localTime
-                                    var currDateTime = new Date(chartOptions.series[i].lastDataValue);
-                                    var date = currDateTime - dateIndent;
-
-
-                                    if (chartOptions.series[i].data.length) {                                 
-                                        for (var index = 0; index < chartOptions.series[i].data.length; index++) {
-                                            var dataPoint = chartOptions.series[i].data[index];
-                                            this.chart.series[j].addPoint(dataPoint)//fresh data
-                                        }
-                                    }
-
-                                    for (var k = 0; k < this.chart.series[j].data.length; k++) {
-                                        try {
-                                            if (this.chart.series[j].data[k] && this.chart.series[j].data[k].x < date) {
-                                                this.chart.series[j].data[k].remove();
+                                    var timespan = chartOptions.series[i].visibleTimespan,
+                                        shiftCount = 0;
+                                    if (timespan) {
+                                        var timeArr = timespan.split(':'),
+                                            dateIndent = timeArr[0] * 3600000 + timeArr[1] * 60000 + timeArr[2] * 1000, //in milliseconds
+                                            maxDate = LogiXML.getTimestampWithoutClientOffset(new Date()),
+                                            minDate = new Date(maxDate - dateIndent);
+                                        for (var k = this.chart.series[j].data.length; k >= 0; k--) {
+                                            if (this.chart.series[j].data[k] && new Date(this.chart.series[j].data[k].x) < minDate) {
+                                                shiftCount++;
                                             }
-                                        } catch (exception_var) {
-                                            console.log('exception');
+                                        }
+                                        if (chartOptions.series[i].data) {
+                                            for (var index = 0; index < chartOptions.series[i].data.length; index++) {
+                                                var dataPoint = chartOptions.series[i].data[index];
+                                                if (shiftCount > 0) {
+                                                    this.chart.series[j].addPoint(dataPoint, false, true);
+                                                    shiftCount--;
+                                                } else {
+                                                    this.chart.series[j].addPoint(dataPoint, false, false);
+                                                }
+                                            }
+                                        }
+                                        this.setRefreshTimerPreviousValue();
+                                        this.chart.xAxis[0].setExtremes(minDate, maxDate);
+                                    } else {
+
+                                        if (maxVisiblePoints && maxVisiblePoints > 0) {
+                                            var pointsLength = this.chart.series[j].data.length,
+                                                pointsToDeleteCnt = pointsLength - maxVisiblePoints;
+                                            if (pointsToDeleteCnt > 0) {
+                                                for (var k = 0; k < pointsToDeleteCnt; k++) {
+                                                    shiftCount++;
+                                                }
+                                            }
+                                        }
+
+                                        if (chartOptions.series[i].data) {
+                                            for (var index = 0; index < chartOptions.series[i].data.length; index++) {
+                                                var dataPoint = chartOptions.series[i].data[index];
+                                                if (shiftCount > 0) {
+                                                    this.chart.series[j].addPoint(dataPoint, false, true);
+                                                    shiftCount--;
+                                                } else {
+                                                    this.chart.series[j].addPoint(dataPoint, false, false);
+                                                }
+                                            }
                                         }
                                     }
-                                    var dataInput = document.getElementById(chartOptions.series[i].correspondingHiddenInput);                                  
-                                    if (dataInput) {                                     
-                                        dataInput.setAttribute("Value", date)//filter value on the server side
-                                    }
-                                  //  date -= currDateTime.getTimezoneOffset()*60*1000;
-                                   // currDateTime = currDateTime.getTime() - currDateTime.getTimezoneOffset() * 60 * 1000;
-                                    this.chart.xAxis[0].setExtremes(date, currDateTime,true);
-                                    
-                                    //console.log(this.chart.xAxis[0].getExtremes());
+                                    this.chart.redraw();
                                 }
-                                //this.chart.redraw();
                             }
                         }
-                     //   this.chart.hideLoading();
                     }
                     break;
                 default:
-                    throw ('Action type is undefined');
+                    throw ('Refresh type is undefined');
             }
+            this.postProcessChartOptions(chartOptions);
+        },
 
+        setRefreshTimerInitialDateRange: function (chartOptions) {
+            if (!chartOptions.series || chartOptions.series.length == 0) {
+                return;
+            }
+            var i = 0, length = chartOptions.series.length,
+                xAxis, ret = false, isAppend = false;
+            for (; i < length; i++) {
+                isAppend = false;
+                var serie = chartOptions.series[i];
+                if (serie.visibleTimespan) {
+                    isAppend = true;
+                    var timeSpan = serie.visibleTimespan,
+                        timeArr = timeSpan.split(':'),
+                        dateIndent = timeArr[0] * 3600000 + timeArr[1] * 60000 + timeArr[2] * 1000, //in milliseconds
+                        maxDate = LogiXML.getTimestampWithoutClientOffset(new Date()),
+                        minDate = new Date(maxDate - dateIndent),
+                        axisId = LogiXML.getGuid();
+                    if (!chartOptions.xAxis) {
+                        chartOptions.xAxis = [];
+                    }
+                    if (chartOptions.xAxis.length == 0) {
+                        chartOptions.xAxis.push({ id: axisId, labels: {}, title: { text: null }, type: 'datetime' });
+                        serie.xAxis = axisId;
+                    } 
+                    chartOptions.xAxis[0].min = minDate.getTime();
+                    chartOptions.xAxis[0].max = new Date(maxDate).getTime();
+                    ret = true;
+                }
+
+                if (serie.refreshInterval) {
+                    var prms = "rdAjaxCommand=RefreshElement&rdRefreshElementID=" + this.id +
+                                    "&rdRefreshSeriesTimerEvent=True"+
+                                    "&rdChartRefreshType=" + (isAppend? "AppendData" : "UpdateData") +
+                                    "&rdChartCanvasId=" + this.id +
+                                    "&rdChartCanvasSeriesId=" + serie.id +
+                                    "&rdReport=" + this.reportName;
+                    this.refreshTimers.push(this.createRefreshInterval(prms, serie.refreshInterval));
+                }
+            }
+            return ret;
+        },
+
+        createRefreshInterval: function (prms, timeout) {
+            return setInterval(function () { rdAjaxRequestWithFormVars(prms); }, timeout);
+        },
+
+        setRefreshTimerPreviousValue: function () {
+            if (!this.chart || !this.chart.series || !this.chart.series.length > 0) {
+                return;
+            }
+            var i = 0, length = this.chart.series.length,
+                serie, maxDataValue;
+            for (; i < length; i++) {
+                var serie = this.chart.series[i];
+                if (serie.userOptions && serie.userOptions.visibleTimespan) {
+                    maxDataValue = null;
+                    if (serie.xData && serie.xData.length > 0) {
+                        maxDataValue = serie.xData[serie.xData.length - 1];
+                    }
+                    if (maxDataValue) {
+                        var inputIdForLastValue = serie.userOptions.inputIdForLastValue;
+                        if (inputIdForLastValue) {
+                            this.getOrCreateInputElement(inputIdForLastValue).setAttribute('value', new Date(maxDataValue).toISOString());
+                        }
+                    }
+                }
+            }
         },
 
         destructor: function () {
@@ -154,6 +269,12 @@ YUI.add('chartCanvas', function (Y) {
                     item = null;
                 }
             });
+
+            Y.each(this.refreshTimers, function (item) {
+                if (item) {
+                    clearTimeout(item);
+                }
+            });
         },
 
         _parseHTMLConfig: function() {
@@ -169,7 +290,6 @@ YUI.add('chartCanvas', function (Y) {
             this.isUnderSE = this.configNode.getAttribute('data-under-se');
         },
 
-       
         initChart: function(chartOptions) {
             //what about resizer?
             if (this.id) {
@@ -184,17 +304,139 @@ YUI.add('chartCanvas', function (Y) {
             } else {
                 this.createChart(chartOptions);
                 this.chart.showLoading('<img src="rdTemplate/rdWait.gif" alt="loading..."></img>');
-                this.requestChartData();
+                this.requestChartData(null, "createChart", true);
             }
-            
         },
 
-        createChart: function(chartOptions, fromPostProcessing) {
+        preProcessChartOptions: function (chartOptions) {
+            if (chartOptions.series) {
+                this.setActions(chartOptions.series);
+            }
+
+            if (chartOptions.tooltip) {
+                chartOptions.tooltip.formatter = LogiXML.HighchartsFormatters.tooltipFormatter;
+            }
+
+            if (!chartOptions.chart.events) {
+                chartOptions.chart.events = {};
+            }
+
+            if (chartOptions.title && chartOptions.title.text) {
+                chartOptions.title.text = LogiXML.decodeHtml(chartOptions.title.text);
+            }
+
+            if (chartOptions.legend && chartOptions.legend.title && chartOptions.legend.title.text) {
+                chartOptions.legend.title.text = LogiXML.decodeHtml(chartOptions.legend.title.text, chartOptions.legend.labelFormat == 'HTML');
+            }
+
+            if (chartOptions.subtitle && chartOptions.subtitle.text) {
+                chartOptions.subtitle.text = LogiXML.decodeHtml(chartOptions.subtitle.text);
+            }
+
+            if (chartOptions.series && chartOptions.series.length > 0) {
+                for (i = 0; i < chartOptions.series.length; i++) {
+                    var series = chartOptions.series[i];
+                    if (series.name) {
+                        series.name = LogiXML.decodeHtml(series.name);
+                    }
+                    var data = series.data;
+                    for (var j = 0; data && j < data.length; j++) {
+                        if (data[j].name) {
+                            data[j].name = LogiXML.decodeHtml(data[j].name/*, series.dataLabels && series.dataLabels.format === 'HTML'*/);
+                        }
+                    }
+                }
+            }
+
+            if (chartOptions.xAxis && chartOptions.xAxis.length > 0) {
+                for (var i = 0; i < chartOptions.xAxis.length; i++) {
+                    var axis = chartOptions.xAxis[i];
+                    if (axis.title && axis.title.text) {
+                        axis.title.text = LogiXML.decodeHtml(axis.title.text);
+                    }
+
+                    var plotBands = axis.plotBands;
+                    if (plotBands){
+                        for (var k = 0; k < plotBands.length; k++) {
+                            var plotBand = plotBands[k];
+                            if (plotBand && plotBand.label && plotBand.label.text) {
+                                plotBand.label.text = LogiXML.decodeHtml(plotBand.label.text, plotBand.label.format == 'HTML');
+                            }
+                        }
+                    }
+
+                    var plotLines = axis.plotLines;
+                    if (plotLines) {
+                        for (k = 0; k < plotLines.length; k++) {
+                            var plotLine = plotLines[k];
+                            if (plotLine && plotLine.label && plotLine.label.text) {
+                                plotLine.label.text = LogiXML.decodeHtml(plotLine.label.text, plotLine.label.format == 'HTML');
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (chartOptions.yAxis && chartOptions.yAxis.length > 0) {
+                for (i = 0; i < chartOptions.yAxis.length; i++) {
+                    var axis = chartOptions.yAxis[i];
+                    if (axis.title && axis.title.text) {
+                        axis.title.text = LogiXML.decodeHtml(axis.title.text);
+                    }
+
+                    var plotBands = axis.plotBands;
+                    if (plotBands) {
+                        for (var k = 0; k < plotBands.length; k++) {
+                            var plotBand = plotBands[k];
+                            if (plotBand && plotBand.label && plotBand.label.text) {
+                                plotBand.label.text = LogiXML.decodeHtml(plotBand.label.text, plotBand.label.format == 'HTML');
+                            }
+                        }
+                    }
+
+                    var plotLines = axis.plotLines;
+                    if (plotLines) {
+                        for (k = 0; k < plotLines.length; k++) {
+                            var plotLine = plotLines[k];
+                            if (plotLine && plotLine.label && plotLine.label.text) {
+                                plotLine.label.text = LogiXML.decodeHtml(plotLine.label.text, plotLine.label.format == 'HTML');
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (chartOptions.quicktips && chartOptions.quicktips.length > 0) {
+                for (i = 0; i < chartOptions.quicktips.length; i++) {
+                    if (chartOptions.quicktips[i].rows && chartOptions.quicktips[i].rows.length > 0) {
+                        for (var j = 0; j < chartOptions.quicktips[i].rows.length; j++) {
+                            var row = chartOptions.quicktips[i].rows[j];
+                            if (row && row.caption) {
+                                row.caption = LogiXML.decodeHtml(row.caption, row.format == 'HTML');
+                            }
+                        }
+                    }
+                }
+            }
+
+            LogiXML.HighchartsFormatters.setFormatters(chartOptions);
+        },
+
+        postProcessChartOptions: function (chartOptions) {
+            if (chartOptions.quicktips) {
+                this.setQuicktipsData(chartOptions.quicktips);
+            }
+        },
+
+        createChart: function (chartOptions, fromPostProcessing) {
+            this.configNode.fire('beforeCreateChart', { id: this.id, options: chartOptions, chartCanvas: this, chart: this.chart });
+            var viewstates;
 
             if (this.chart) {
+                viewstates = this.chart.viewstates;
                 this.chart.destroy();
             }
-            LogiXML.HighchartsFormatters.setFormatters(chartOptions, false);
+
             //width and height by parent?
             var dataWidth = this.configNode.getAttribute('data-width'),
                 dataHeight = this.configNode.getAttribute('data-height');
@@ -210,15 +452,10 @@ YUI.add('chartCanvas', function (Y) {
 
             chartOptions.chart.renderTo = this.configNode.getDOMNode();
 
-            if (chartOptions.series) {
-                this.setActions(chartOptions.series);
-            }
-
-            if (chartOptions.tooltip) {
-                chartOptions.tooltip.formatter = LogiXML.HighchartsFormatters.tooltipFormatter;
-            }
+            this.preProcessChartOptions(chartOptions);
 
             this.setSelection(chartOptions);
+            var shouldSetPrevValue = this.setRefreshTimerInitialDateRange(chartOptions);
 
             if (chartOptions.chart.options3d) {
                 //Fix for Pie chart depth
@@ -244,6 +481,10 @@ YUI.add('chartCanvas', function (Y) {
 
             this.chart = new Highcharts.Chart(chartOptions);
 
+            if (shouldSetPrevValue) {
+                this.setRefreshTimerPreviousValue();
+            }
+
             this.chart.options3d = chartOptions.chart.options3d;
 
             if (this.chart.options3d) {
@@ -256,12 +497,11 @@ YUI.add('chartCanvas', function (Y) {
                 }
             }
 
-            
-            
-
-            if (chartOptions.quicktips) {
-                this.setQuicktipsData(chartOptions.quicktips);
+            if (viewstates) {
+                this.chart.viewstates = viewstates;
             }
+
+            this.postProcessChartOptions(chartOptions);
 
             if (chartOptions.autoQuicktip === false) {
                 this.chart.autoQuicktip = false;
@@ -271,19 +511,50 @@ YUI.add('chartCanvas', function (Y) {
                 this.syncSelectedValues(this.chart.series[this.restoreSelectionForSeriesIndex]);
                 this.restoreSelectionForSeriesIndex = null;
             }
+            if (typeof setChartStateEventHandlers != 'undefined') {
+                setChartStateEventHandlers(this.chart);
+            }
+            if (fromPostProcessing) {
+                
+                //23988 restore chart viewstates from bookmark
+                if (!this.chart.viewstates) {
+                    var viewstateElem = document.getElementById('rdBookmarkReqId_' + this.chart.userOptions.id + '_viewstates');
+                    if (viewstateElem) {
+                        this.chart.viewstates = viewstateElem.innerHTML;
+                    }
+                }
+            }
+            if (typeof restoreChartState != 'undefined') {
+                restoreChartState(this.chart);
+            }
+
+            //export 
+            var wrapperNode = this.configNode.ancestor('.rdBrowserBorn');
+            if (wrapperNode) {
+                wrapperNode.setAttribute("data-rdBrowserBornReady", "true");
+            }
+            this.configNode.fire('afterCreateChart', { id: this.id, options: chartOptions, chartCanvas: this, chart: this.chart});
         },
 
-        requestChartData: function(url) {
+        requestChartData: function (url, callbackFunctionName, prm1, prm2, prm3) {
+            var chartUrl = url ? url : this.jsonUrl;
+            if (this.chart) {
+                chartUrl += "&rdDynamicChartWidth=" + this.chart.chartWidth;
+                chartUrl += "&rdDynamicChartHeight=" + this.chart.chartHeight;
+            }
+            chartUrl += "&guid=" + LogiXML.getGuid();
+            if (!callbackFunctionName) {
+                callbackFunctionName = "createChart";
+            }
 
-            Y.io(url ? url : this.jsonUrl, {
+            this.configNode.fire('beforeRequestData', { id: this.id, chartCanvas: this, chart: this.chart, dataUrl: chartUrl });
+            Y.io(chartUrl, {
                 on: {
                     success: function(tx, r) {
                         var parsedResponse = this.parseJson(r.responseText);
+                        this.configNode.fire('afterRequestData', { id: this.id, chartCanvas: this, chart: this.chart, options: parsedResponse });
                         if (parsedResponse) {
-                            this.createChart(parsedResponse, true);
-                            if (typeof setChartStateEventHandlers != 'undefined') {
-                                setChartStateEventHandlers(this.chart);
-                            }
+                            this[callbackFunctionName](parsedResponse, prm1, prm2, prm3);
                         }
                     },
                     failure: function(id, o, a) {
@@ -308,7 +579,12 @@ YUI.add('chartCanvas', function (Y) {
                     this.showError();
                     return;
                 }
-                obj = Y.JSON.parse(jsonString);
+                if (document.URL && document.URL.indexOf('file:') != -1) {
+                    eval("window.tmp=" + jsonString + ";");
+                    obj = window.tmp;
+                } else {
+                    obj = Y.JSON.parse(jsonString);
+                }
                 if (LogiXML.EventBus && LogiXML.EventBus.ChartCanvasEvents) {
                     LogiXML.EventBus.ChartCanvasEvents().fire('load', { id: this.id, options: obj });
                 }
@@ -323,7 +599,6 @@ YUI.add('chartCanvas', function (Y) {
             if (!chartOptions.series || chartOptions.series.length == 0) {
                 return;
             }
-
             var series,
                 selection,
                 i = 0,
@@ -398,8 +673,6 @@ YUI.add('chartCanvas', function (Y) {
             }
         },
 
-        
-
         pointsSelected: function (series, fireEvent) {
             var point, idx, value, values = [],
                 i = 0, length = series.points.length,
@@ -423,13 +696,11 @@ YUI.add('chartCanvas', function (Y) {
 
             if (selection.valueElementId && selection.valueElementId.length > 0) {
                 valueElement = this.getOrCreateInputElement(selection.valueElementId);
-                oldValue = valueElement.get('value');
+                oldValue = this.getInputElementValue(valueElement);
                 //TODO do encoding for commas in values
                 newValue = values.join(',');
-                valueElement.set('value', newValue);
-
                 if (oldValue != newValue) {
-
+                    this.setInputElementValue(valueElement, newValue);
                     if (selection.changeFlagElementId && selection.changeFlagElementId.length > 0) {
                         changeFlagElement = this.getOrCreateInputElement(selection.changeFlagElementId);
                         changeFlagElement.set('value', 'True');
@@ -531,26 +802,25 @@ YUI.add('chartCanvas', function (Y) {
                 valueElement.set('value', 'True');
             }
 
-            if (selection.minXElementId && selection.minXElementId.length > 0) {
-                valueElement = this.getOrCreateInputElement(selection.minXElementId);
-                valueElement.set('value', xMin);
-            }
-            if (selection.maxXElementId && selection.maxXElementId.length > 0) {
-                valueElement = this.getOrCreateInputElement(selection.maxXElementId);
-                valueElement.set('value', xMax);
-            }
-
-            if (selection.minYElementId && selection.minYElementId.length > 0) {
-                valueElement = this.getOrCreateInputElement(selection.minYElementId);
-                valueElement.set('value', yMin);
-            }
-
-            if (selection.maxYElementId && selection.maxYElementId.length > 0) {
-                valueElement = this.getOrCreateInputElement(selection.maxYElementId);
-                valueElement.set('value', yMax);
-            }
-
             if (fireEvent) {
+                if (selection.minXElementId && selection.minXElementId.length > 0) {
+                    valueElement = this.getOrCreateInputElement(selection.minXElementId);
+                    valueElement.set('value', xMin);
+                }
+                if (selection.maxXElementId && selection.maxXElementId.length > 0) {
+                    valueElement = this.getOrCreateInputElement(selection.maxXElementId);
+                    valueElement.set('value', xMax);
+                }
+
+                if (selection.minYElementId && selection.minYElementId.length > 0) {
+                    valueElement = this.getOrCreateInputElement(selection.minYElementId);
+                    valueElement.set('value', yMin);
+                }
+
+                if (selection.maxYElementId && selection.maxYElementId.length > 0) {
+                    valueElement = this.getOrCreateInputElement(selection.maxYElementId);
+                    valueElement.set('value', yMax);
+                }
                 var eventArgs = {
                     rect: rect,
                     xMin: xMin,
@@ -564,12 +834,75 @@ YUI.add('chartCanvas', function (Y) {
         },
 
         getOrCreateInputElement: function (id) {
-            var inputElement = Y.one('#' + id);
+            var inputElement = Y.one("input[name='" + id + "'],select[name='" + id + "']");
             if (inputElement === null) {
                 inputElement = Y.Node.create('<input type="hidden" name="' + id + '" id="' + id + '" />');
                 this.configNode.ancestor().appendChild(inputElement);
             }
             return inputElement;
+        },
+
+        getInputElementValue: function (inputElement) {
+            var inputElementType = inputElement.getAttribute('type'),
+                selectedValues = [];
+            switch (inputElementType) {
+                case "checkbox":
+                case "radio":
+                    Y.all("input[name='" + inputElement.getAttribute('name') + "']").each(function (inputNode) {
+                        if (inputNode.get('checked')) {
+                            selectedValues.push(inputNode.get('value'));
+                        }
+                    });
+                    return selectedValues.join(',');
+                    break;
+                default:
+                    if (inputElement.get('nodeName').toLowerCase() == "select") {
+                        inputElement.all('option').each(function (inputNode) {
+                            if (inputNode.get('selected')) {
+                                selectedValues.push(inputNode.get('value'));
+                            }
+                        });
+                        return selectedValues.join(',');
+                    } else {
+                        return inputElement.get('value');
+                    }
+                    break;
+            }
+            return "";
+        },
+
+        setInputElementValue: function (inputElement, value) {
+            var inputElementType = inputElement.getAttribute('type'),
+                selectedValues = value.split(',');
+            switch (inputElementType) {
+                case "checkbox":
+                case "radio":
+                    Y.all("input[name='" + inputElement.getAttribute('name') + "']").each(function (inputNode) {
+                        if (selectedValues.indexOf(inputNode.get('value')) != -1) {
+                            inputNode.set('checked', true);
+                        } else {
+                            
+                            inputNode.set('checked', false);
+                        }
+                        console.log(inputNode.get('value'));
+                    });
+                    break;
+                default:
+                    if (inputElement.get('nodeName').toLowerCase() == "select") {
+                        inputElement.all('option').each(function (inputNode) {
+                            if (selectedValues.indexOf(inputNode.get('value')) != -1) {
+                                inputNode.set('selected', true);
+                            } else {
+                                inputNode.set('selected', false);
+                            }
+                            console.log(inputNode.get('value'));
+                        });
+                    } else {
+                        return inputElement.set('value', value);
+                    }
+                    break;
+            }
+            return "";
         },
 
         destroySelection: function (e, fireEvent) {
@@ -581,8 +914,6 @@ YUI.add('chartCanvas', function (Y) {
                 wasSelected = true;
             }
             //clear selected points
-
-
             for (; i < length; i++) {
                 series = this.chart.series[i];
                 selection = series.options.selection;
@@ -645,13 +976,6 @@ YUI.add('chartCanvas', function (Y) {
         },
 
         chartRedrawn: function (e) {
-            var self = this,
-                zoomType = this.chart.options.chart.zoomType,
-                i = 0, length = this.chart.series.length, series, selection;
-
-            //if (this.rangeSelection) {
-            //this.destroySelection(e);
-            //}
 
             var chart = e.target,
                 oldWidth = chart.oldChartWidth,
@@ -659,6 +983,9 @@ YUI.add('chartCanvas', function (Y) {
                 chartHeight = chart.chartHeight,
                 chartWidth = chart.chartWidth,
                 diffWidth, diffHeight;
+
+            var zoomType = chart.options.chart.zoomType,
+                i = 0, length = chart.series.length, series, selection;
 
             if (oldWidth && oldWidth != chartWidth) {
                 diffWidth = chartWidth - oldWidth;
@@ -709,17 +1036,46 @@ YUI.add('chartCanvas', function (Y) {
 
                 //TODO: check if series has x/y axis
                 if (this.chart.inverted) {
-                    xMin = series.xAxis.toValue(rect.y + rect.height);
-                    xMax = series.xAxis.toValue(rect.y);
-                    yMin = series.yAxis.toValue(rect.x);
-                    yMax = series.yAxis.toValue(rect.x + rect.width);
+                    switch (selection.selectionType) {
+                    case 'AreaXAxis':
+                        xMin = series.xAxis.toValue(rect.x);
+                        xMax = series.xAxis.toValue(rect.x + rect.width);
+                        yMin = null;
+                        yMax = null;
+                        break;
+                    case 'AreaYAxis':
+                        xMin = null;
+                        xMax = null;
+                        yMin = series.yAxis.toValue(rect.y + rect.height);
+                        yMax = series.yAxis.toValue(rect.y);
+                        break;
+                    default:
+                        xMin = series.xAxis.toValue(rect.y + rect.height);
+                        xMax = series.xAxis.toValue(rect.y);
+                        yMin = series.yAxis.toValue(rect.x);
+                        yMax = series.yAxis.toValue(rect.x + rect.width);
+                    }
                 } else {
-                    xMin = series.xAxis.toValue(rect.x);
-                    xMax = series.xAxis.toValue(rect.x + rect.width);
-                    yMin = series.yAxis.toValue(rect.y + rect.height);
-                    yMax = series.yAxis.toValue(rect.y);
+                    switch (selection.selectionType) {
+                    case 'AreaXAxis':
+                        xMin = series.xAxis.toValue(rect.x);
+                        xMax = series.xAxis.toValue(rect.x + rect.width);
+                        yMin = null;
+                        yMax = null;
+                        break;
+                    case 'AreaYAxis':
+                        xMin = null;
+                        xMax = null;
+                        yMin = series.yAxis.toValue(rect.y + rect.height);
+                        yMax = series.yAxis.toValue(rect.y);
+                        break;
+                    default:
+                        xMin = series.xAxis.toValue(rect.x);
+                        xMax = series.xAxis.toValue(rect.x + rect.width);
+                        yMin = series.yAxis.toValue(rect.y + rect.height);
+                        yMax = series.yAxis.toValue(rect.y);
+                    }
                 }
-
                 this.rangeSelected(series, xMin, xMax, yMin, yMax, rect, fireEvent);
             }
         },
@@ -736,16 +1092,16 @@ YUI.add('chartCanvas', function (Y) {
                     return;
                 }
 
-                valueElement = Y.one('#' + selection.valueElementId);
+                valueElement = this.getOrCreateInputElement(selection.valueElementId);
                 if (!valueElement) {
                     return;
                 }
-                value = valueElement.get('value');
+                value = this.getInputElementValue(valueElement);
                 if (!value || value.length == 0) {
                     return;
                 }
                 values = value.split(',');
-                length = series.data.length;
+                length = series.data ? series.data.length : 0;
                 for (; i < length; i++) {
                     id = series.data[i].id;
                     if (values.indexOf(id) != -1) {
@@ -758,38 +1114,51 @@ YUI.add('chartCanvas', function (Y) {
             }
 
             if (selection.mode == 'Range') {
-                //if (selection.maskType == 'x' || selection.maskType == 'xy') {
-                if (selection.minXElementId && selection.minXElementId.length > 0) {
-                    valueElement = this.getOrCreateInputElement(selection.minXElementId);
-                    minX = valueElement.get('value');
-                }
-                if (selection.maxXElementId && selection.maxXElementId.length > 0) {
-                    valueElement = this.getOrCreateInputElement(selection.maxXElementId);
-                    maxX = valueElement.get('value');
-                }
-                //}
-
-                //if (selection.maskType == 'y' || selection.maskType == 'xy') {
-                if (selection.minYElementId && selection.minYElementId.length > 0) {
-                    valueElement = this.getOrCreateInputElement(selection.minYElementId);
-                    minY = valueElement.get('value');
-                }
-
-                if (selection.maxYElementId && selection.maxYElementId.length > 0) {
-                    valueElement = this.getOrCreateInputElement(selection.maxYElementId);
-                    maxY = valueElement.get('value');
-                }
-                //}
-
-                if ((minX && minX != "") || (minY && minY != "")) {
-                    selectionBox = this.getSelectionBox(series, minX, maxX, minY, maxY);
-                    if (this.rangeSelection) {
-                        this.destroySelection();
+                if (selection.RestoreSelection) {
+                    if (selection.SelectedValues[0]) {
+                        minX = selection.SelectedValues[0];
                     }
-                    this.selectionDrawn({ selectionBox: selectionBox }, false);
+                    if (selection.SelectedValues[1]) {
+                        minY = selection.SelectedValues[1];
+                    }
+                    if (selection.SelectedValues[2]) {
+                        maxX = selection.SelectedValues[2];
+                    }
+                    if (selection.SelectedValues[3]) {
+                        maxY = selection.SelectedValues[3];
+                    }
+                    selectionBox = this.getSelectionBox(series, minX, maxX, minY, maxY);
+                    series.chart.renderer.rect(selectionBox.x, selectionBox.y, selectionBox.width, selectionBox.height, 5).attr({ fill: this.chart.options.chart.selectionMarkerFill || 'rgba(69,114,167,0.25)' }).add();
+                } else {
+                    if (selection.minXElementId && selection.minXElementId.length > 0) {
+                        valueElement = this.getOrCreateInputElement(selection.minXElementId);
+                        minX = valueElement.get('value');
+                    }
+                    if (selection.maxXElementId && selection.maxXElementId.length > 0) {
+                        valueElement = this.getOrCreateInputElement(selection.maxXElementId);
+                        maxX = valueElement.get('value');
+                    }
+                    //}
+
+                    //if (selection.maskType == 'y' || selection.maskType == 'xy') {
+                    if (selection.minYElementId && selection.minYElementId.length > 0) {
+                        valueElement = this.getOrCreateInputElement(selection.minYElementId);
+                        minY = valueElement.get('value');
+                    }
+
+                    if (selection.maxYElementId && selection.maxYElementId.length > 0) {
+                        valueElement = this.getOrCreateInputElement(selection.maxYElementId);
+                        maxY = valueElement.get('value');
+                    }
+                    if ((minX && minX != "") || (minY && minY != "")) {
+                        selectionBox = this.getSelectionBox(series, minX, maxX, minY, maxY);
+                        if (this.rangeSelection) {
+                            this.destroySelection();
+                        }
+                        this.selectionDrawn({ selectionBox: selectionBox }, false);
+                    }
                 }
             }
-            
         },
 
         getSelectionBox: function(series, minX, maxX, minY, maxY) {
@@ -821,17 +1190,25 @@ YUI.add('chartCanvas', function (Y) {
             y1 = series.yAxis.toPixels(minY != null && minY.toString() != "" ? minY : series.yAxis.getExtremes().min);
             y2 = series.yAxis.toPixels(maxY != null && maxY.toString() != "" ? maxY : series.yAxis.getExtremes().max);
 
-            if (isNaN(x1)) {
+            if (isNaN(x1) || x1 < series.xAxis.toPixels(series.xAxis.getExtremes().min)) {
                 x1 = series.xAxis.toPixels(series.xAxis.getExtremes().min);
             }
-            if (isNaN(x2)) {
+            if (isNaN(x2) || x2 > series.xAxis.toPixels(series.xAxis.getExtremes().max)) {
                 x2 = series.xAxis.toPixels(series.xAxis.getExtremes().max);
             }
-            if (isNaN(y1)) {
+            if (isNaN(y1) || y1 > series.yAxis.toPixels(series.yAxis.getExtremes().min)) {
                 y1 = series.yAxis.toPixels(series.yAxis.getExtremes().min);
             }
-            if (isNaN(y2)) {
+            if (isNaN(y2) || y2 < series.yAxis.toPixels(series.yAxis.getExtremes().max)) {
                 y2 = series.yAxis.toPixels(series.yAxis.getExtremes().max);
+            }
+
+            if (y1 < y2 + 15) {
+                y1 = y2 + 15;
+            }
+
+            if (x1 > x2 - 15) {
+                x1 = x2 - 15;
             }
 
             if (this.chart.inverted) {
@@ -860,28 +1237,20 @@ YUI.add('chartCanvas', function (Y) {
             }
         },
 
-        setActions: function (series) {
-            var i = 0, length = series.length,
+        setActions: function(series) {
+            var i = 0,
+                length = series.length,
                 options;
-            
+
             for (; i < length; i++) {
-                var serie = options = series[i];
-                switch (serie.type) {
-                    case 'treemap':
-                        options._events = options.events;
-                        options.events = {};
-                        break;
-                    default:
-                        if (options.events) {
-                            for (var event in options.events) {
-                                if (Lang.isString(options.events[event])) {
-                                    options.events[event] = new Function('e', options.events[event]);
-                                }
-                            }
+                options = series[i];
+                if (options.events) {
+                    for (var event in options.events) {
+                        if (Lang.isString(options.events[event])) {
+                            options.events[event] = new Function('e', options.events[event]);
                         }
-                        break;
-                }                    
-                
+                    }
+                }
             }
         },
 
@@ -889,11 +1258,25 @@ YUI.add('chartCanvas', function (Y) {
             if (this.chart && this.chart.options) {
                 var width = e.width > 0 ? e.width : this.chart.chartWidth,
                     height = e.height > 0 ? e.height : this.chart.chartHeight;
+                var isGauge = this.chart.userOptions.series[0].type.indexOf("gauge") > -1;
+                if (this.chart.userOptions.series[0].type.indexOf("bulletgauge")> -1) {
+                    this.chart.animation = !this.chart.animation;
+                }
                 this.chart.setSize(width, height);
+
                 if (e.finished) {
+                    if (isGauge) {
+                        this.chart.animation = true;
+                        var tempUserOptions = this.chart.userOptions;
+                        tempUserOptions.chart.width = width;
+                        tempUserOptions.chart.height = height;
+                        //tempUserOptions.chart.animation = null;
+                        this.createChart(tempUserOptions);
+                        this.chart.setSize(width, height);
+                    }
                     var requestUrl = null;
-                    if (this.refreshAfterResize == true && this.isUnderSE) {
-                        this.requestChartData(this.jsonUrl + '&rdResizerNewWidth=' + width + '&rdResizerNewHeight=' + height + "&rdResizer=True");
+                    if (this.refreshAfterResize == true) {
+                        this.requestChartData(this.jsonUrl + '&rdResizerNewWidth=' + width + '&rdResizerNewHeight=' + height + "&rdResizer=True","createChart");
                         //return;
                         requestUrl = 'rdAjaxCommand=rdAjaxNotify&rdNotifyCommand=SetElementSize&rdWidth=' + width + '&rdHeight=' + height + '&rdElementId=' + this.id + '&rdReport=' + this.reportName + '&rdRequestForwarding=Form';
                     } else if (this.refreshAfterResize) {
@@ -903,7 +1286,7 @@ YUI.add('chartCanvas', function (Y) {
                     }
                     if (requestUrl !== null) {
                         if (this.isUnderSE === "True") {
-                            requestUrl += "&rdUnderSuperElement=True"
+                            requestUrl += "&rdUnderSuperElement=True";
                         }
                         rdAjaxRequest(requestUrl);
                     }
@@ -1046,3 +1429,14 @@ YUI.add('chartCanvas', function (Y) {
     });
 
 }, '1.0.0', { requires: ['base', 'node', 'event', 'node-custom-destroy', 'json-parse', 'io-xdr', 'chartCanvasRangeSelection'] });
+
+function rdGetChartCanvasObject(chartId) {
+    if (!chartId || chartId == '') {
+        return null;
+    }
+    var div = Y.one('#' + chartId);
+    if (!div) {
+        return null;
+    }
+    return div.getData('rdChartCanvas');
+}

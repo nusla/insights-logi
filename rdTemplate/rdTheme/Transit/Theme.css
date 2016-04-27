@@ -107,12 +107,12 @@ span:active.rdPopupPanelCommand  {
 }
 
 .rdAg .rdThemeDataTableHeader td {
-	background-color: #fff !important;
+	/*background-color: #fff !important;*/
 	color: #fff;
 }
 
 .rdAg .rdThemeDataTableCell  {
-	background-color: #fff;
+	/*background-color: #fff;*/
 }
 
 #rowMenu table{
@@ -188,24 +188,22 @@ span:active.rdPopupPanelCommand  {
 }
 
 .rdAgPanel{
-   background-color: #25a0da;
-   color: #2f2f2f;
-   vertical-align: top;
-   border: none;
+   background-color: #FFFFFF;
 }
 
 .rdAgContentHeadingRow {
   margin-top: -1px;
   margin-left: -1px;
   padding: 0px;
-  background-color: #2f2f2f;
+  background-color: transparent;
   color: #fff;
 }
 
 .rdAgContentHeading{
   font-family: 'Segoe UI Light','Segoe UI', 'Lucida Grande', 'Verdana', 'Arial', 'helvetica', 'sans-serif';
   font-weight: 100;
-  font-size: 200%;
+  font-size: 180%;
+  color: #fff;
 }
 
     /*Buttons*/
@@ -242,23 +240,86 @@ span.rdCgCommand ,
 	background-color: #38c2e9;
 }
 
+/* AG Edit Gear and new Sub menu */
+.rdAgEditOff {
+	background-color: none;
+	width: 24px;
+	height:22px;
+	border-radius: 0px;
+	cursor:pointer;
+}
+
+.rdAgEditOff:Hover{
+	-webkit-transition: background-color 0.20s ease-in-out 0s;
+	-moz-transition: background-color 0.20s ease-in-out 0s;
+	transition: background-color 0.20s ease-in-out 0s;
+	background-color: #e1e1e1;
+	width: 24px;
+	height:22px;
+	border-radius: 0px;
+	cursor:pointer;
+}
+
+.rdAgEditOn {
+	background-color: #25a0da;
+	width: 24px;
+	height:22px;
+	border-radius: 0px;
+	cursor:pointer;
+}
+
+.rdAgEditOn:Hover {
+	-webkit-transition: background-color 0.20s ease-in-out 0s;
+	-moz-transition: background-color 0.20s ease-in-out 0s;
+	transition: background-color 0.20s ease-in-out 0s;
+	background-color: #474747;
+	width: 24px;
+	height:22px;
+	border-radius: 0px;
+	cursor:pointer;
+}
+
 .rdAcContentRow {
-	border: 1px solid #90909c;
+	border: 0px solid #90909c;
 	background-color: transparent;
 }
 
-.rdAcCommandLeft, .rdAcCommandMiddle, .rdAcCommandRight {
-	padding-right: 3px;
-	padding-left: 3px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	margin: 2px;
-	border-radius: 0px 0px 0px 0px;
+.rdAcBackground{
+   background-color: #ffffff;
 }
-.rdAcCommandHighlight {
-	background-image: none;
-	background-color: #2f2f2f;
-	font-size: 105%;
+
+.rdAcCommandIdle, .rdAcCommandLeft, .rdAcCommandMiddle, .rdAcCommandRight, .rdAgCommandIdle, .rdAgCommandLeft, .rdAgCommandMiddle, .rdAgCommandRight {
+    color: #474747 !important;
+	cursor: pointer;
+	text-decoration: none;
+	vertical-align: baseline;
+	white-space: nowrap;
+	font-size: 16px;
+	border-bottom: 4px solid #e1e1e1;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+	padding: 3px;
+	margin: 1px;
+    border-radius: 0;
+	background: none;
+}
+
+.rdAcCommandHighlight, .rdAgCommandHighlight {
+	border-radius: 0;
+	color: #474747 !important;
+	cursor: pointer;
+	text-decoration: none;
+	vertical-align: baseline;
+	white-space: nowrap;
+	font-size: 16px;
+	border-bottom: 4px solid #2f2f2f;
+	border-top: none;
+	border-right: none;
+	border-left: none;
+	background: none;
+	padding: 3px;
+	margin: 1px;
 }
 
 .rdRemoveTableStyle td,
@@ -311,7 +372,7 @@ table.rdThemeSubDataTable th, .rdThemeSubDataTable th {
 	padding-left: 3px;
 }
 
-.rdThemeSubDataTableSummaryRow td th {
+.rdThemeSubDataTableSummaryRow td {
 	background-color: #2f2f2f;
 	color: #fff;
 	padding-left: 3px;
@@ -330,11 +391,26 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
 	padding: 4px;
 }
 
+
+.rdAgContentRow input.rdThemeInput,
+#rowsAxControls input.rdThemeInput,
+#cellAcControls input.rdThemeInput{
+	min-width:150px;
+}
+
+.rdAgContentRow select.rdThemeInput,
+#rowsAxControls select.rdThemeInput,
+#cellAcControls select.rdThemeInput{
+	min-width:160px;
+	margin-left:3px;
+}
+
 /* Input checkbox list */
 .rd-checkboxlist, .rd-checkboxlist-dropdown {
 	font-family: 'Segoe UI', 'Lucida Grande', 'Verdana', 'Arial', 'helvetica', 'sans-serif';
 	background-color: #fff;
 	border: 1px solid #90909C;
+	
 }
 
 .rd-checkboxlist-popup {
@@ -348,9 +424,10 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
 .rdThemePaging{
 	font-size:14px;
 	margin-bottom: 2px;
+	vertical-align: middle;
 }
 .rdAg .rdThemePaging {
-	background-color:#25a0da;
+	/*background-color:#25a0da;*/
 }
 
 .rdThemePaging a{
@@ -358,14 +435,14 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
 }
 
 .rdAg .rdThemePaging a span{
-	color: #fff;
+	/*color: #fff;
     padding-bottom: 1px;
     padding-top: 0px;
     padding-left: 5px;
     padding-right: 5px;
 	text-align: center;
     border: #fff 1px solid;
-    border-radius: 2px 2px 2px 2px;
+    border-radius: 2px 2px 2px 2px;*/
 }
 
 .rdThemePagingCurrent {
@@ -379,8 +456,8 @@ input.rdThemeInput, textarea.rdThemeInput, select.rdThemeInput, select.rdDataCal
     border-radius: 2px 2px 2px 2px;
 }
 .rdAg .rdThemePagingCurrent {
-	background-color: #fff;
-	color: #25a0da;
+	/*background-color: #fff;
+	color: #25a0da;*/
 }
 
 input.rdThemePagingCurrent {
@@ -405,6 +482,8 @@ input.rdThemePagingCurrent {
 	filter: alpha(opacity=90);
 	opacity: 0.9;
 	border-radius: 0px;
+	  padding: 7px;
+  padding-top: 1px;
 }
 
 .rdquicktip-content .rdquicktip-table,
@@ -444,16 +523,50 @@ input.rdThemePagingCurrent {
 
 /* Analysis / Dimension / OLAP Chart Grid */
 
-table.rdAgDataTable th, tr.rdAgHeaderRow th {
-    background-image: none;
-    background-color: #fff;
-	border-right: 2px solid #25a0da;
-	border-bottom: 2px solid #25a0da;
-	color: #25a0da;
+table.rdAgDataTable th {
+	color: #fff;
+	background-color: #25A0DB;
+	border-right: 2px solid #fff;
+	border-bottom: 2px solid #fff;
+	padding: 4px;
+	font-size: 100%;
+	background-image: none;
 }
+
+tr.rdAgHeaderRow th {
+  background-image: none;
+  background-color: #000;
+  color: #fff;
+  font-family: 'Segoe UI', 'Avenir Next', 'Avenir', 'Helvetica Neue', Helvetica, 'Arial', 'sans-serif';
+  	border-right: none;
+	border-bottom: none;
+	padding: 4px;
+	font-weight: normal;
+  font-size: 12px;
+}
+
+tr.rdAgHeaderRow td {
+  background-image: none;
+  background-color: #000;
+  color: #fff;
+  font-family: 'Segoe UI', 'Avenir Next', 'Avenir', 'Helvetica Neue', Helvetica, 'Arial', 'sans-serif';
+    border-right: none;
+	border-bottom: none;
+	padding: 4px;
+	font-weight: normal;
+  font-size: 12px;
+  border-bottom: 2px solid #FFFFFF;
+  border-right: 2px solid #FFFFFF;
+}
+
+tr.rdAgHeaderRow th {
+  border-bottom: 2px solid #FFFFFF;
+  border-right: 2px solid #FFFFFF;
+}
+
 table.rdAgDataTable th a {
 	font-size: 110%;
-	color: #25a0da;
+	color: #fff;
 }
 
 .rdDgCaptionRow td,
@@ -812,7 +925,7 @@ td.rdDataCalendarDay{
 	border-bottom: 2px solid #fff;
 }
 
-.rdThemeDataTableSummaryRow td{
+.rdThemeDataTableSummaryRow td {
 	background-color: #25a0db;
 	color: #fff;
 }
@@ -849,18 +962,17 @@ td.rdDataCalendarDay{
 
 .rdThemeDataTableGroupSummaryRow td {
 
-
 	padding: 4px;
 }
 
 /* WaitPage */
 .rdThemeWaitPanel {
-	background-color: #25a0da;
+	background-color: #FFF;
 	padding: 10px;
 
 }
 .rdThemeWaitCaption {
-	color: #fff;
+	color: #25A0DA;
 	font-size: 18px;
 }
 
@@ -986,7 +1098,6 @@ td.rdDataCalendarDay{
 }
 
 tr.ThemeAlternatingRow td.rdThemeDataTableCell {
-	background-color: #E8E8E8;
 	padding: 4px;
 }
 
@@ -1181,6 +1292,7 @@ tr.ThemeAlternatingRow td.rdThemeDataTableCell {
 .yuimenubaritemlabel, .yuimenuitemlabel, .yuimenubaritem, .yuimenuitem
 {
     color: #fff !important;
+    font-weight: normal;
 }
 
 .yuimenubaritemlabel-selected, .yuimenuitemlabel-selected, .yuimenubaritem-selected, .yuimenuitem-selected
@@ -1309,7 +1421,7 @@ td .rdDgPanelLine, td .rdDgPanelLine table{
 /*buttom menu*/
 .rdAcCommandHighlight {
 padding-top: 0px!important;
-padding-bottom: 4px!important;
+padding-bottom: 3px!important;
 }
 .rdAcCommand{
 padding-top: 0px!important;
@@ -1373,7 +1485,7 @@ table #dtBookmarkSharedWith a{
   display: inline-block;
   line-height: 28px;
   padding-right: 25px;
-  background: transparent url("../../rdBookmarkOrganizer/deleteOn.png") top right no-repeat; 
+  background: transparent url("../../rdBookmarkOrganizer/rdDelete.png") top right no-repeat; 
 }
 
 table #dtBookmarkSharedWith td:first-of-type > span{
@@ -1389,6 +1501,12 @@ table #dtBookmarkSharedWith td:first-of-type > span{
   display: block;
 }
 
+.iconAddGroup{
+  background: transparent url("../../rdBookmarkOrganizer/rdBookmarkGroupSharingAdd.png") top left no-repeat; 
+  height: 24px;
+  display: block;
+}
+
 #dtBookmarkSharedWith a, #dtBookmarkSharedWith a:hover,
 #rdDivBookmarkShareTemplate a, #rdDivBookmarkShareTemplate a:hover{
 	text-decoration: none;
@@ -1397,6 +1515,9 @@ table #dtBookmarkSharedWith td:first-of-type > span{
 #lblDimSwap, #lblExport{
 color:#fff;
 }
+#rowExport #lblExport{
+color:#363B42;
+}
 
 #DpForInputDate_txtOrderDate_rdInputDateElement td{ /*Issue 22365*/
 	vertical-align: top;
@@ -1404,4 +1525,83 @@ color:#fff;
 .rdDataCalendar .rdDataCalendarDropdown{ /*Issue 22365*/
 	margin-bottom: 2px;
     margin-top: 2px;
+}
+.rdAgUnselectedTab a{
+	color: white;
+}
+
+.rdDgSelectedNot a{
+  background-color: transparent !important;
+}
+#rdDataTableDiv-otFilterTable{
+	padding: 7px;
+}
+#rowsFilterDone #actFilterMember{
+	padding-left: 7px;
+}
+.rdPopupPanelTitle .rdPopupPanelTitleCaption{
+	padding-left: 7px;
+}
+div[id^=LinkSettingPopup] .rd-popup-content #rdRows-3 tr td:first-child{
+	width: 117px\9;
+}
+div[id^=LinkSettingPopup] .rd-popup-content #rdRows-4 tr td{
+	width: 100%\9;
+}
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+	div[id^=LinkSettingPopup] .rd-popup-content #rdRows-3 tr td:first-child{
+		width: 117px;
+	}
+	.rd-settings-popup .rd-popup-content td + td{
+		padding-left: 4px !important;
+	}
+	div[id^=LinkSettingPopup] .rd-popup-content #rdRows-4 tr td{
+		width: 100%;
+	}	
+}
+
+.rdDgOlapTable tbody a{
+  display: inline-table;
+}
+
+.rdAgDataTable tr.ThemeAlternatingRow td {
+    background-color: #ECEDEE;
+}
+
+#colTableEditSelected table, #divTableEditSelected table{
+  width: 24px !important;
+}
+
+.rdThemeDataTable tr.ThemeAlternatingRow td {
+    background-color: #ECEDEE;
+}
+
+#divReportAuthorWorkContainer{
+margin-left:28px;
+}
+
+/*
+#rdDataTableDiv-dtFilter table tr :hover {
+background-color:#25A0DB ! important ;
+color:#555555 ! important;
+}*/
+
+.rdAgControlsPosition {
+	padding-right:35px;
+}
+
+.rdAgControls {
+	padding-bottom:45px;
+}
+
+.rdAgBackground {
+	background-color:#000000;
+	width:100%;
+	white-space: nowrap;
+}
+
+#colCalc .rdAgContentHeading ,
+#colFilter .rdAgContentHeading,
+#rowAgMenuDetails .rdAgContentHeading {
+     color: #5A5A5A !important;
 }

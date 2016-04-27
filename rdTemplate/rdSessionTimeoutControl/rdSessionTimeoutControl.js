@@ -1,5 +1,5 @@
 ﻿YUI.add('sessionTimeout', function (Y) {
-    "use strict";
+    //"use strict";
 
     Y.namespace('LogiXML').SessionTimeoutControl = Y.Base.create('SessionTimeoutControl', Y.Base, [], {
         _config : null,

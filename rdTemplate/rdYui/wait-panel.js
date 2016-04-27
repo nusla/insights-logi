@@ -91,7 +91,7 @@ YUI.add('waitpanel', function (Y) {
 			if (!Y.Lang.isValue(this._pnlWait)) {
 				this._pnlWait = new Y.Panel({
 					srcNode			: '#rdWait',								
-					zIndex			: 300,
+					zIndex			: 9300,
 					centered		: true,
 					modal			: true,
 					render			: true,
@@ -122,7 +122,7 @@ YUI.add('waitpanel', function (Y) {
 			var animateImage = function() {
 				// 7 is the number of frames in the image
 				// 32 is the width of a single frame
-				var mod = LogiXML.WaitPanel._loadingCounter % 7,
+				var mod = LogiXML.WaitPanel._loadingCounter % 60,
 				loadingImage = document.getElementById('rdWaitImage'),
 				offset = -32 * mod;
 				LogiXML.WaitPanel._loadingCounter++;
@@ -136,7 +136,7 @@ YUI.add('waitpanel', function (Y) {
 				}					
 			};
 
-			this._intervalKey = window.setInterval(animateImage, 100);
+			this._intervalKey = window.setInterval(animateImage, 30);
 		},
 		
 		hideWaitPanel : function() {			

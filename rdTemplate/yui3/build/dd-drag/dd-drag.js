@@ -248,6 +248,8 @@ YUI.add('dd-drag', function(Y) {
                 if (!n) {
                     Y.error('DD.Drag: Invalid dragNode Given: ' + node);
                 }
+                n.setStyle('touch-action', 'none');
+                n.setStyle('-ms-touch-action', 'none');
                 return n;
             }
         },
@@ -790,6 +792,9 @@ YUI.add('dd-drag', function(Y) {
             }
             if (this.validClick(ev)) {
                 this._fixIEMouseDown(ev);
+
+                var n = Y.one(ev.currentTarget);
+                n.setStyle('touch-action', 'none');
                 if (this.get('haltDown')) {
                     ev.halt();
                 } else {
@@ -871,6 +876,10 @@ YUI.add('dd-drag', function(Y) {
                     this.set('activeHandle', this.get(NODE));
                 }
             }
+
+            if(!r) {
+                Y.one(this.get(NODE)).setStyle('touch-action', 'auto');
+            }
             return r;
         },
         /**
@@ -932,6 +941,11 @@ YUI.add('dd-drag', function(Y) {
                 this._handles = {};
             }
             var key = str;
+            var n = Y.one(str);
+            if (n) {
+                n.setStyle('touch-action', 'none');
+                n.setStyle('-ms-touch-action', 'none');
+            }
             if (str instanceof Y.Node || str instanceof Y.NodeList) {
                 key = str._yuid;
             }
@@ -1012,6 +1026,7 @@ YUI.add('dd-drag', function(Y) {
             node.on('mouseup', Y.bind(this._handleMouseUp, this));
             node.on('dragstart', Y.bind(this._fixDragStart, this));
         },
+
         /**
         * @private
         * @method _unprep
@@ -1080,6 +1095,10 @@ YUI.add('dd-drag', function(Y) {
         * @chainable
         */
         end: function() {
+
+            document.body.style.cssText = document.body.style.cssText.replace('touch-action: none !important;' , '');
+            document.body.style.cssText = document.body.style.cssText.replace('-ms-touch-action: none !important;', '');
+
             this._endTime = (new Date()).getTime();
             if (this._clickTimeout) {
                 this._clickTimeout.cancel();
@@ -1094,6 +1113,7 @@ YUI.add('dd-drag', function(Y) {
                     endTime: this._endTime
                 });
             }
+
             this.get(NODE).removeClass(DDM.CSS_PREFIX + '-dragging');
             this.set(DRAGGING, false);
             this.deltaXY = [0, 0];

@@ -8,8 +8,9 @@
 		<Division ID="rdDivBookmarkShareTemplate">
 			<Rows Width="100" WidthScale="%">
 				<Row ID="rowNonSharingList">
-					<Column Class="yui3-skin-sam">
-						<InputText ID="InpUser" AutoComplete="True" Class="rdAutoCompleteElement rdThemeInput  &quot; placeholder=&quot;Type user name..." InputSize="60">
+					<Column>
+            <Label Caption="User Name to Add"/>
+            <InputText ID="InpUser" AutoComplete="True" Class="rdThemeInput" InputSize="55" DefaultValue="@Request.InpUser~">
 							<AutoComplete ColumnName="BookmarkUserName" ID="acText">
 								<DataLayer Type="Bookmarks" BookmarkCollection="@Request.rdBookmarkCollection~" ListSharedWithCollections="True" ID="dlAllSharedWiths" />
 							</AutoComplete>
@@ -33,12 +34,10 @@
 										<Label Caption="Find  " Class="ThemeHeader" />
 									</Column>
 									<Column>
-										<InputText ID="InpUser" DefaultValue="@Request.InpUser~" Class="rdThemeInput &quot; placeholder=&quot;Type to search..." InputSize="55">
+										<InputText ID="InpUser" DefaultValue="@Request.InpUser~" Class="rdThemeInput" InputSize="55">
 											<EventHandler DhtmlEvent="onkeyup">
 												<Action Type="RefreshElement" ID="actFind" ElementID="dtUserList">
-													<LinkParams rdBookmarkCollection="@Request.rdBookmarkCollection~" rdFolderID="@Request.rdFolderID~" rdBookmarkID="@Request.rdBookmarkID~"
-
-/>
+													<LinkParams rdBookmarkCollection="@Request.rdBookmarkCollection~" rdFolderID="@Request.rdFolderID~" rdBookmarkID="@Request.rdBookmarkID~"/>
 												</Action>
 											</EventHandler>
 										</InputText>
@@ -64,11 +63,15 @@
 
 						  CompareValue="@Function.UserName~" DataType="Text" />
 												</DataLayer>
+                        
 												<DataTableColumn ID="colAddUser" Width="39" WidthScale="px">
-													<Label Caption=" &amp;nbsp;" ID="lblAddUser" Format="HTML" Class="iconAddUser" Tooltip="Add User">
-														<Action Type="ShareBookmark" BookmarkCollection="@Request.rdBookmarkCollection~" FolderID="@Request.rdFolderID~"
+													<Label Caption=" &amp;nbsp;" ID="lblAddUser" Format="HTML" Class="" Tooltip="Share">
+                            <ConditionalClass Class="iconAddUser" ID="iconAddUser" Condition="'@Data.rdGroupIdentifierColumn~' == ''" />
+                            <ConditionalClass Class="iconAddGroup" ID="iconAddGroup" Condition="'@Data.rdGroupIdentifierColumn~' &lt;&gt; ''" />
 
-							BookmarkID="@Request.rdBookmarkID~" SharedWith="@Data.rdSharingCollectionColumn~" RefreshDTID="dtBookmarkOwner" ID="actShare" />
+                            <Action Type="ShareBookmark" BookmarkCollection="@Request.rdBookmarkCollection~" FolderID="@Request.rdFolderID~"
+
+							                BookmarkID="@Request.rdBookmarkID~" SharedWith="@Data.rdSharingCollectionColumn~" RefreshDTID="dtBookmarkOwner" ID="actShare" />
 													</Label>
 												</DataTableColumn>
 												<InteractivePaging PageRowCount="4" ShowPageNumber="Numbered" Location="Bottom" HideShowPrevNextCaptions="True" HideWhenOnePage="True" CaptionType="Image" />
@@ -123,5 +126,4 @@
 			</Division>
 		</Division>
 	</Body>
-	<ideTestParams rdBookmarkCollection="" rdBookmarkID="" rdFolderID="" InpUser="" />
 </Report>

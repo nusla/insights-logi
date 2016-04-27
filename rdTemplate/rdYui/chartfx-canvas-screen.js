@@ -11,7 +11,7 @@
  * For IE 7/8 we rely on excanvas
  */
 YUI.add('chartfx-canvas-screen', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var ImageUtils = Y.LogiXML.Image,
 		Lang = Y.Lang,

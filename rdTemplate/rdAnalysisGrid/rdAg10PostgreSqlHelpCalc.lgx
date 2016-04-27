@@ -7,7 +7,7 @@
 		<Rows ID="rowsAnalysisGrid" CellSpacing="4">
 			<Row ID="rowTitle" Class="rdAgCaptionRow">
 				<Column ID="colTitle">
-					<Label ID="lblTitle" Caption="Formula Help - PostgreSQL"/>
+					<Label ID="lblTitle" Caption="Formula Help"/>
 				</Column>
 			</Row>
 			<Row ID="rowInstruct">
@@ -22,7 +22,7 @@ Functions return values, usually computations based on columns and constants.
 
 Operators do arithmetic and logical comparisons. Logical comparisons must be used with Case statements.
 
-Since all of these formulas are sent to the PosgreSQL server for processing, please consult the PostgreSQL documenation for additional help.
+Please consult the PostgreSQL documentation for additional help.
 
 Here are some examples:
 

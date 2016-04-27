@@ -1,5 +1,5 @@
 ﻿YUI.add('draggableElement', function (Y) {
-    "use strict";
+    //"use strict";
 
     var Lang = Y.Lang,
         TRIGGER = 'rdDraggableElement';
@@ -77,6 +77,11 @@
             this.handlers.onDragEnd = this.handlers.drag.on('drag:end', this.onDragEnd, this);
             this.handlers.onDrag = this.handlers.drag.on('drag:drag', this.onDrag, this);
             this.handlers.onDropMiss = this.handlers.drag.on('drag:dropmiss', this.onDropMiss, this);
+            this.handlers.onDropHit = this.handlers.drag.on('drag:drophit', this.onDropHit, this);
+        },
+
+        onDropHit: function (e) {
+            e.drop.get('node').getData('rdDroppableContainer').onDropHit(e);
         },
 
         onDragStart: function (e) {
@@ -163,7 +168,7 @@
             this.forcedDragExit(e.drop.get('node'), e.drop, e.drag);
         },
 
-        forcedDragExit: function(dropNode, drop, drag) {
+        forcedDragExit: function (dropNode, drop, drag) {
             var dropId = dropNode.get('id'),
                 dropIndex = this.dropStack.indexOf(dropId);
             if (dropIndex != -1) {

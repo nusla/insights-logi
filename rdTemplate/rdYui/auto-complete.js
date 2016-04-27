@@ -1,5 +1,5 @@
 YUI.add('rdAutoComplete', function (Y) {
-    "use strict";
+    //"use strict";
 
     var Lang = Y.Lang,
         TRIGGER = 'rdAutoCompleteElement';
@@ -16,21 +16,38 @@ YUI.add('rdAutoComplete', function (Y) {
         configNode: null,
         id: null,
 		values: [],
+		multiselect: "",
+		delimiter: null,
+		rdEventOnAutoComplete: "",
 		
         initializer: function (config) {
             var self = this;
             this._parseHTMLConfig();
             this.configNode.setData(TRIGGER, this);
-			var inputNode = this.configNode
+
+            var inputNode = this.configNode
+
+            var parent = inputNode.get('parentNode');
+            if (parent)
+                parent.addClass('yui3-skin-sam');
+				
+			var EventOnAutoComplete = this.rdEventOnAutoComplete;
 			
 			this._handlers.AutCompletePlugin = this.configNode.plug(Y.Plugin.AutoComplete, {
 				allowTrailingDelimiter: true,
 				minQueryLength: 0,
 				queryDelay: 0,
-				queryDelimiter: ',',
-				// queryDelimiter: '||',
+				// queryDelimiter: ',',
+				queryDelimiter: this.delimiter,
 				resultHighlighter: 'startsWith',
 				source: this.values,
+				
+				//24592
+				after : {
+					select : function() {
+						eval(EventOnAutoComplete);
+					}
+				},
 				
 				resultFilters: ['startsWith', function (query, results) {
 					// var selected = this._inputNode.get('value').split(/\s*,\s*/);
@@ -41,12 +58,21 @@ YUI.add('rdAutoComplete', function (Y) {
 					return Y.Array.filter(results, function (result) {
 						return !selected.hasOwnProperty(result.text);
 					  });
-					}]
-				});
-				
-			/* inputNode.on('focus', function () {
-				inputNode.ac.sendRequest('');			
-			}); */
+					}]									
+			});
+
+            //23862 23865
+			if (inputNode.getDOMNode().value && inputNode.getDOMNode().value.length > 0 && this.delimiter != "") {
+			    var inputVal = inputNode.getDOMNode().value;
+			    var inputArray = inputVal.trim().split(this.delimiter);
+			    for (var i = 0; i < inputArray.length; i++) {
+			        inputArray[i] = inputArray[i].trim();
+			    }
+			    inputNode.getDOMNode().value = inputArray.join(this.delimiter + ' ');
+			}
+
+			if (inputNode.getDOMNode().value && inputNode.getDOMNode().value.length > 0 && inputNode.getDOMNode().value.trim().lastIndexOf(this.delimiter) != inputNode.getDOMNode().value.trim().length - 1)
+			    inputNode.getDOMNode().value = inputNode.getDOMNode().value + this.delimiter;				
             
         },
 				
@@ -55,6 +81,13 @@ YUI.add('rdAutoComplete', function (Y) {
             this.id = this.configNode.getAttribute('id');
             // this.values = this.configNode.getAttribute('data-values').split(',');
 			this.values = this.configNode.getAttribute('data-values').split('||');
+			this.multiselect = this.configNode.getAttribute('data-multiselect');
+			if (this.multiselect == "True") {
+					this.delimiter = this.configNode.getAttribute('data-delimiter');		
+				} else {
+					this.delimiter = "";
+				}	
+			this.rdEventOnAutoComplete = this.configNode.getAttribute('data-event');			
         },
         
 

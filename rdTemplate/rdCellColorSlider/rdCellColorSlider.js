@@ -3,7 +3,6 @@ YUI.add('cell-color-slider', function(Y) {
 	Y.namespace('LogiInfo').CellColorSlider = Y.Base.create('CellColorSlider', Y.Base, [], {
 	
 		initializer : function(config) {
-									
 			this.set('_id', config.id); 						//Set ID
 			this.set('spectrum1ID', config.spectrum1ID);		//Set spectrum 1 ID
 			this.set('spectrum2ID', config.spectrum2ID);		//Set spectrum 2 ID
@@ -222,23 +221,27 @@ YUI.add('cell-color-slider', function(Y) {
 	
 }, '1.0.0', {requires: ['base', 'dd-constrain', 'dd-drop-plugin', 'dd-plugin']});
 
+
+
 //NEEDS to be replaced with uniform event that can be fired by tabs and action-show-element
-function rdRepositionSliders() {
-	var aImages = document.getElementsByTagName("IMG");
-	for (var i=0; i < aImages.length; i++) {
-		var sSrc = aImages[i].getAttribute("src");
-		if (sSrc) {
-			if (sSrc.indexOf('rdCellColorSlider.png') != -1) { 
-				var eleSlider = aImages[i];
-				var sliderID = eleSlider.getAttribute("id"); //sliderID is something like:  rdCellColorSlider-da6b4e9c-ebb3-4d4d-b084-1b207d693dc0
-				var sSpectrum1Id = sliderID.replace('rdCellColorSlider','rdColorSpectrum1');
-				var eleSpectrum1 = document.getElementById(sSpectrum1Id);
-				var xSpectrum = Y.LogiInfo.CellColorSlider.prototype._getObjectX(eleSpectrum1);
-				var ySpectrum = Y.LogiInfo.CellColorSlider.prototype._getObjectY(eleSpectrum1);
-				eleSlider.style.left = (xSpectrum + eleSpectrum1.width) + 'px';
-				eleSlider.style.top = (ySpectrum - 2) + 'px'
+window.rdRepositionSliders = function () {
+    var aImages = document.getElementsByTagName("IMG");
+    for (var i = 0; i < aImages.length; i++) {
+        var sSrc = aImages[i].getAttribute("src");
+        if (sSrc) {
+            if (sSrc.indexOf('rdCellColorSlider.png') != -1) {
+                var eleSlider = aImages[i];
+                var sliderID = eleSlider.getAttribute("id"); //sliderID is something like:  rdCellColorSlider-da6b4e9c-ebb3-4d4d-b084-1b207d693dc0
+                var sSpectrum1Id = sliderID.replace('rdCellColorSlider', 'rdColorSpectrum1');
+                var eleSpectrum1 = document.getElementById(sSpectrum1Id);
+                var xSpectrum = LogiXML.getObjectX(eleSpectrum1);
+                var ySpectrum = LogiXML.getObjectY(eleSpectrum1);
+                eleSlider.style.left = (xSpectrum + eleSpectrum1.width) + 'px';
+                eleSlider.style.top = (ySpectrum - 2) + 'px';
             }
-		}
-	}	
-}
-	
+        }
+    }
+};
+
+
+

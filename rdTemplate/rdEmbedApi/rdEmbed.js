@@ -73,7 +73,7 @@ var EmbeddedReport = function (container, options) {
     this.secureKey = options.secureKey == null ? null : options.secureKey;
     this.autoSizing = options.autoSizing == null ? 'none' : options.autoSizing.toLowerCase();
     this.linkParams = options.linkParams == null ? {} : options.linkParams;
-    this.requestMethod = options.requestMethod == null ? 'get' : options.requestMethod;
+    this.requestMethod = options.requestMethod == null ? 'post' : options.requestMethod;
     this.heightOffset = null;
     this.widthOffset = null;
 	//if(EmbeddedReporting.pingIsEstablished) {
@@ -81,7 +81,7 @@ var EmbeddedReport = function (container, options) {
 	//}
 };
 EmbeddedReport.prototype.parseContainerParams = function () {
-	'use strict';
+	//'use strict;
     var options = {
 		applicationUrl : this.container.getAttribute('data-applicationUrl'),
 		report : this.container.getAttribute('data-report'),
@@ -94,7 +94,7 @@ EmbeddedReport.prototype.parseContainerParams = function () {
     return options;
 };
 EmbeddedReport.prototype.show = function () {
-	'use strict';
+	//'use strict;
 	if(this.applicationUrl == null) {
 		throw ("Application URL is not specified.");
 	}
@@ -107,7 +107,7 @@ EmbeddedReport.prototype.show = function () {
     this.genFrame();
 };
 EmbeddedReport.prototype.hide = function () {
-	'use strict';
+	//'use strict;
     if (this.iframe == null) {
         return;
     }
@@ -119,12 +119,12 @@ EmbeddedReport.prototype.hide = function () {
     this.iframe = null;
 };
 EmbeddedReport.prototype.loadReport = function () {
-    'use strict';
+    //'use strict;
     this.hide();
     this.show();
 };
 EmbeddedReport.prototype.parseInitParams = function () {
-    'use strict';
+    //'use strict;
     var linkParams = null;
     var initParams = this.container.getAttribute('data-linkParams');
     if (initParams != null && typeof initParams == 'string' && initParams.length > 0) {
@@ -139,7 +139,7 @@ EmbeddedReport.prototype.parseInitParams = function () {
 };
 
 EmbeddedReport.prototype.genFrame = function () {
-    'use strict';
+    //'use strict;
 
     //Determine height.
     var height = "";
@@ -195,6 +195,10 @@ EmbeddedReport.prototype.genFrame = function () {
         hiddenParam.name = "rdSecureKey";
         hiddenParam.value = this.secureKey;
         frmPost.appendChild(hiddenParam);
+        //24845
+        if (this.requestMethod == "post") {
+            frmPost.action = frmPost.action + "&rdSecureKey=" + this.secureKey;
+        }
     }
 
     //Add the LinkParams into hidden form vars.
@@ -202,12 +206,17 @@ EmbeddedReport.prototype.genFrame = function () {
         //19609
         for (var name in this.linkParams) {
             if (this.linkParams.hasOwnProperty(name) && this.linkParams[name] != null) {
-                var hiddenLinkParam = docFrame.createElement("INPUT");
-                hiddenLinkParam.type = "HIDDEN";
-                hiddenLinkParam.name = name;
-                hiddenLinkParam.value = this.linkParams[name];
-                frmPost.appendChild(hiddenLinkParam);
-            }
+				//24657
+				if (name == "rdShowWait") { 
+					frmPost.action = frmPost.action + "&rdShowWait=" + this.linkParams[name] ;
+				} else {
+					var hiddenLinkParam = docFrame.createElement("INPUT");
+					hiddenLinkParam.type = "HIDDEN";
+					hiddenLinkParam.name = name;
+					hiddenLinkParam.value = this.linkParams[name];
+					frmPost.appendChild(hiddenLinkParam);
+				}                
+            }			
         }
     }
 
@@ -223,7 +232,7 @@ EmbeddedReport.prototype.genFrame = function () {
 };
 
 EmbeddedReport.prototype.processMessage = function (evt) {
-	'use strict';
+	//'use strict;
 	if (evt == null || evt.data == null) {
         return;
 	}
@@ -234,6 +243,12 @@ EmbeddedReport.prototype.processMessage = function (evt) {
     if (this.iframeId == null || message.iframeId !== this.iframeId) {
         return;
     }
+
+    //23096
+    if (message.prms != null && message.prms.resetFrame) {
+        this.iframe.setAttribute("width", "100%");
+    }
+
     var callback, args;
     switch (message.command) {
         case "rdGetWindowSize_response":
@@ -255,13 +270,18 @@ EmbeddedReport.prototype.processMessage = function (evt) {
 		}
 
 		if (this.autoSizing === "all" || this.autoSizing === "height") {
-			if (message.prms.docHeight !== message.prms.winHeight) {
+		    if (message.prms.docHeight !== message.prms.winHeight && message.prms.docHeight !== (message.prms.winHeight + 1) && (message.prms.docHeight + 1) !== message.prms.winHeight) {
 				this.iframe.setAttribute("height", message.prms.docHeight + "px");
 			}
-			else if (message.prms.docHeight > (message.prms.region.height + this.heightOffset) || message.prms.modalHeight > 0) {
-			    this.iframe.setAttribute("height", (message.prms.region.height + this.heightOffset) + "px");
-			    if (message.prms.modalHeight > (message.prms.region.height + this.heightOffset)) //20343 Modal heights are not included in body height, so must be considered after the fact
-			        this.iframe.setAttribute("height", (message.prms.modalHeight) + "px");  
+			else if (message.prms.region &&  (message.prms.docHeight > (message.prms.region.height + this.heightOffset) || message.prms.modalHeight > 0)) {
+
+			    if (message.prms.modalHeight > (message.prms.region.height + this.heightOffset)) { //20343 Modal heights are not included in body height, so must be considered after the fact
+			        if (message.prms.modalHeight > message.prms.docHeight)
+			            this.iframe.setAttribute("height", (message.prms.modalHeight) + "px");
+			    }
+			    else
+			        this.iframe.setAttribute("height", (message.prms.region.height + this.heightOffset) + "px");
+
 			}
 		}
 		break;
@@ -299,29 +319,29 @@ EmbeddedReport.prototype.processMessage = function (evt) {
 };
 
 EmbeddedReport.prototype.setParam = function (name, value) {
-	'use strict';
+	//'use strict;
     this.linkParams[name] = value;
 };
 
 EmbeddedReport.prototype.getParam = function (name) {
-	'use strict';
+	//'use strict;
     return this.linkParams[name];
 };
 
 EmbeddedReport.prototype.removeParam = function (name) {
-	'use strict';
+	//'use strict;
     if (this.linkParams.hasOwnProperty(name)) {
         delete this.linkParams[name];
     }
 };
 
 EmbeddedReport.prototype.removeAllParams = function () {
-	'use strict';
+	//'use strict;
     this.linkParams = {};
 };
 
 EmbeddedReport.prototype.execEmbeddedFunction = function (functionName) {
-	'use strict';
+	//'use strict;
     if (arguments.length === 0) {
         return false;
     }
@@ -341,7 +361,7 @@ EmbeddedReport.prototype.execEmbeddedFunction = function (functionName) {
 };
 
 EmbeddedReport.prototype.getElementAttribute = function (elementName, attributeName, callback) {
-	'use strict';
+	//'use strict;
     var prms = {};
     prms.query = elementName;
     prms.attributeName = attributeName;
@@ -350,7 +370,7 @@ EmbeddedReport.prototype.getElementAttribute = function (elementName, attributeN
 };
 
 EmbeddedReport.prototype.setElementAttribute = function (elementName, attributeName, attributeValue, callback) {
-	'use strict';
+	//'use strict;
     var prms = {};
     prms.query = elementName;
     prms.attributeName = attributeName;
@@ -360,7 +380,7 @@ EmbeddedReport.prototype.setElementAttribute = function (elementName, attributeN
 };
 
 EmbeddedReport.prototype.frameLoaded = function () {
-    'use strict';
+    //'use strict;
     if (this.iframe && this.iframe.contentWindow != null) {
         EmbeddedReporting.frameLoaded(this.guid);
 
@@ -373,7 +393,7 @@ EmbeddedReport.prototype.frameLoaded = function () {
 };
 
 EmbeddedReport.prototype.getOuterHtml = function (node) {
-	'use strict';
+	//'use strict;
     var wrap = document.createElement('div');
     wrap.appendChild(node.cloneNode(true));
     var outerHtml = wrap.innerHTML;
@@ -381,7 +401,7 @@ EmbeddedReport.prototype.getOuterHtml = function (node) {
 };
 
 EmbeddedReport.prototype.executeFunctionByName = function (functionName, args) {
-	'use strict';
+	//'use strict;
     //var args = Array.prototype.slice.call(arguments).splice(1);
     var namespaces = functionName.split(".");
     var func = namespaces.pop();
@@ -394,7 +414,7 @@ EmbeddedReport.prototype.executeFunctionByName = function (functionName, args) {
 };
 
 EmbeddedReport.prototype.postMessage = function (commandName, prms) {
-	'use strict';
+	//'use strict;
     var message = {};
     message.id = EmbeddedReporting.getGuid();
     message.iframeId = this.iframeId;
@@ -420,7 +440,7 @@ var EmbeddedReporting = {
     firstFrameWasLoaded: false,
 
     rdGetDomElement: function (element) {
-        'use strict';
+        //'use strict;
         if (typeof element == 'string') {
             element = document.getElementById(element);
         }
@@ -430,7 +450,7 @@ var EmbeddedReporting = {
         return element;
     },
     get: function (container) {
-        'use strict';
+        //'use strict;
         container = this.rdGetDomElement(container);
         if (container == null) {
             return null;
@@ -442,7 +462,7 @@ var EmbeddedReporting = {
         return this.reports[reportGuid];
     },
     create: function (container, options) {
-        'use strict';
+        //'use strict;
         var report = this.get(container);
         if (report != null) {
             return report;
@@ -491,7 +511,7 @@ var EmbeddedReporting = {
         }
     },
     remove: function (container) {
-        'use strict';
+        //'use strict;
         var report = this.get(container);
         if (report == null) {
             return false;
@@ -505,14 +525,14 @@ var EmbeddedReporting = {
         return true;
     },
     transferMessage: function (evt) {
-        'use strict';
+        //'use strict;
         var i, arrLength = EmbeddedReporting.reports.length;
         for (i = 0; i < arrLength; i++) {
             EmbeddedReporting.reports[EmbeddedReporting.reports[i]].processMessage(evt);
         }
     },
     init: function () {
-        'use strict';
+        //'use strict;
 		if (window.addEventListener) {
 			window.addEventListener("message", EmbeddedReporting.transferMessage, false);
 		} else {
@@ -528,7 +548,7 @@ var EmbeddedReporting = {
         }
     },
     ajaxPing: function (url, callback) {
-        'use strict';
+        //'use strict;
         try {
             var req;
             if (window.XMLHttpRequest) {

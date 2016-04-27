@@ -2,7 +2,7 @@
 /*global LogiXML: true, YUI: false, document: false, window: false */
 
 YUI.add('chartfx-highlight', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var AttributeHelpers = Y.LogiXML.Attribute,
 		CanvasUtils = Y.LogiXML.Canvas,

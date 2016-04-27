@@ -3,20 +3,34 @@
   <StyleSheet StyleSheet="rdTemplate/rdAnalysisGrid/rdAg10Style.css"/>
   <Body >
 	  
-	<AnalysisGridActiveSqlDistinctValues />
+	<AnalysisGridDistinctValues />
 		   
-    <DataTable ID="dtFilter" CellSpacing="1" Width="230" Layout="Fixed" Class="rdAgDataTable">
+    <DataTable ID="dtFilter" CellSpacing="1" Width="230" Layout="Fixed" Class="DataTable">
+		<Note Note="For picking a single value.  Otherwise this gets removed." />
 		<DataLayer Type="XMLFile" ID="rdAgPickDistinct" XMLFile="@Session.rdDataCacheLocation~\@Request.XMLFile~" >
 			<GroupFilter GroupColumn="@Request.rdAgDataColumn~" KeepGroupedRows="False" DataType="Text" />
 			<CalculatedColumn ID="Value" Formula="&quot;@Data.@Request.rdAgDataColumn~~&quot;" />
 		</DataLayer>
 		<DataTableColumn>
-			<Label Caption="@Data.Value~" ID="lblFilter">
+			<Label Caption="@Data.Value~" ID="lblFilter" Format="@Request.rdAgColumnFormat~">
 			  <Action Type="Link" ID="actionUpdateFilterValue">
-				<Target Type="Link" Link="javascript:window.parent.LogiXML.AnalysisGrid.rdAgSetPickedFilterValue(&quot;@Function.RowNumber~&quot;);window.parent.ShowElement(this.id,'popupPickDistinct','Hide')" />
+				<Target Type="Link" Link="javascript:window.parent.LogiXML.AnalysisGrid.rdAgSetPickedFilterValueByRow(&quot;@Function.RowNumber~&quot;);window.parent.ShowElement(this.id,'popupPickDistinct','Hide')" />
 			  </Action>
 			</Label>
       </DataTableColumn>
     </DataTable>
+
+	<InputCheckboxList ID="lstFilter" CheckboxListDropdown="False" OptionCaptionColumn="Value" OptionValueColumn="Value" MultiSelect="True" CheckAllCaption="(All)">
+		<Note Note="For picking multiple values.  Otherwise this gets removed." />
+		<DataLayer Type="XMLFile" ID="rdAgPickDistinct" XMLFile="@Session.rdDataCacheLocation~\@Request.XMLFile~" >
+			<GroupFilter GroupColumn="@Request.rdAgDataColumn~" KeepGroupedRows="False" DataType="Text" />
+			<FormattedColumn ID="Value" Format="@Request.rdAgColumnFormat~" DataColumn="@Request.rdAgDataColumn~" />
+      <CalculatedColumn ID="Value" Formula="&quot;@Data.@Request.rdAgDataColumn~~&quot;" />
+		</DataLayer>
+		<EventHandler DhtmlEvent="onclick">
+			<Action Type="Javascript" Javascript="javascript:window.parent.LogiXML.AnalysisGrid.rdAgSetPickedFilterValues(rdGetSelectedValuesFromCheckboxList('lstFilter'))" />
+		</EventHandler>
+	</InputCheckboxList>
+	  
   </Body>
 </Report>

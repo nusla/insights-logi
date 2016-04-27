@@ -94,7 +94,7 @@ Array.prototype.flattern = function(fnChildren) {
 
 (function (Highcharts) {
    
-    'use strict';
+    //'use strict;
 
     var NORMAL_STATE = '',
         HOVER_STATE = 'hover',
@@ -401,7 +401,9 @@ Array.prototype.flattern = function(fnChildren) {
                 point.getLabelConfig = parentPrototype.getLabelConfig;
                 point.setState = parentPrototype.setState;
                 point.onMouseOut = parentPrototype.onMouseOut;
-                
+                point.select = parentPrototype.select;
+                point.options = {};
+
                 point.series = series;
                 point.half = half;
                 point.color = parseFloat(point.color) || 10;
@@ -429,6 +431,8 @@ Array.prototype.flattern = function(fnChildren) {
 
                 point.style.cellBorderColor = point.isGroup ? point.style.cellBorderColor : options.cellBorderColor;
                 point.style.cellBorderThickness = point.isGroup ? point.style.cellBorderThickness : options.cellBorderThickness;
+                // #23585 - ChartCanvas: Heatmap label must have "hand" cursor when action under series
+                point.style.cursor = point.isGroup ? point.style.cursor : options.cursor;
                 point.getColor = function () {
                     return this.isGroup ? this.style.backgroundColor : point.Color;
                 };
@@ -667,11 +671,15 @@ Array.prototype.flattern = function(fnChildren) {
                     point.rect = point.graphic = renderer.rect(x, y, width, height, 0).
                         attr(pointAttr).add(chart.cellsGroup);
                 }
-
-                if (point.events)
+                if (point.selected) {
+                    point.setState('select');
+                }
+                if (point.events) {
                     point.graphic.element.onclick = new Function('e', point.events.click);
-                
-                
+                    if (point.dataLabel && point.dataLabel.element) {
+                        point.dataLabel.element.onclick = new Function('e', point.events.click);
+                    }
+                }
                 point.rect.element.point = point;
                 if(point.children)
                     each(point.children, drawPoint);

@@ -10,7 +10,7 @@
 			</Row>
 			<Row ID="rowDrillthroughTitle">
 				<Column ID="colDrillthroughTitle" ColSpan="2">
-					<Label ID="lblDrillthroughTitle" Caption="Drillthrough" Class="ThemeHeaderLargest" />
+					<Label ID="lblDrillthroughTitle" Caption="Drillthrough" Class="ThemeHeaderLarger" />
 				</Column>
 			</Row>
 			<Row ID="rowTable">
@@ -18,16 +18,14 @@
 					<Division ID="divHeader">
 						<Rows>
 							<Row>
-								<Column Width="20" />
 								<Column>
-									<Label Caption="Drill down by:" ID="lblDrillDownBy" Class="ThemeBold" />
+									<Label Caption="Drillthrough on:" ID="lblDrillDownBy" Class="ThemeBold" />
 								</Column>
 								<Column>
 									<Label ID="lblDrillDownByValue" />
 								</Column>
 							</Row>
 							<Row ID="rowExport" ShowModes="rdBrowser" >
-								<Column Width="20" />
 								<Column>
 									<Label Caption="Export: " ID="lblExportTypes" Class="ThemeBold" />
 								</Column>
@@ -74,7 +72,10 @@
 						<DataLayer Type="Static" ID="dlDrillthrough" />
 						<AutoColumns Class="ThemeTextNormal" />
 						<InteractivePaging ShowPageNumber="Numbered" IDnotSupportedHere="pagingTableNumbered" HideShowPrevNextCaptions="False" PageRowCount="1000" HideWhenOnePage="True" Location="Top" CaptionType="Image" />
-					</DataTable>					
+					</DataTable>
+					<Division ID="rdNoIrrelevanceDrillthrough" ShowModes="None">
+						<Label Caption="Drillthrough is not available for this selection." />
+					</Division>
 				</Column>
 			</Row>
 		</Rows>

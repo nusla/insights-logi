@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿//"use strict";
 if (Highcharts && LogiXML && LogiXML.Localization) {
     Highcharts.setOptions({
         lang: {

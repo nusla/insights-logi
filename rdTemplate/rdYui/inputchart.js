@@ -3,7 +3,7 @@
 /*global LogiXML, YUI, document, window*/
 
 YUI.add('inputchart', function(Y) {
-	"use strict";
+	//"use strict";
 
 	var Lang = Y.Lang,
 		LogiForm = Y.LogiXML.Form,

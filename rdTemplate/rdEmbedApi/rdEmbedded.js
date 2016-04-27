@@ -4,7 +4,7 @@ if (!document.querySelectorAll) {
 }
 
 YUI.add('rd-embedded-plugin', function (Y) {
-    'use strict';
+    //'use strict;
 
     //create namespaced plugin class
     Y.namespace('LogiXML').rdEmbedded = Y.Base.create("rdEmbedded", Y.Plugin.Base, [], {
@@ -23,6 +23,9 @@ YUI.add('rd-embedded-plugin', function (Y) {
                 var origin = e._event.origin;
                 var data = e._event.data;
                 var message = null;
+
+                var resetFrame = false;
+
                 if (data != null && data.length > 0) {
                     message = Y.JSON.parse(e._event.data);
                 }
@@ -30,7 +33,10 @@ YUI.add('rd-embedded-plugin', function (Y) {
                     return;
                 }
 				if(this._frameId == null){
-					this._frameId = message.iframeId;
+				    this._frameId = message.iframeId;
+
+                    //23096 on load always remove any previously set width and make sure that it is set to the default 100%.
+				    resetFrame = true;
 				}
                 var response = {
 					id : message.id,
@@ -78,13 +84,10 @@ YUI.add('rd-embedded-plugin', function (Y) {
 				                    }
 				                }
 				            }
-				            if (navigator.userAgent.indexOf("MSIE") != -1 || !!navigator.userAgent.match(/Trident.*rv[ :]*11\./)) {
-				                height += 1;
-				            }
 				        }
 				    }
 
-					response.prms = { "docHeight": docHeight, "docWidth": docWidth, "winHeight": winHeight, "winWidth": winWidth, "region": region, "modalHeight" : height };
+					response.prms = { "resetFrame": resetFrame, "docHeight": docHeight, "docWidth": docWidth, "winHeight": winHeight, "winWidth": winWidth, "region": region, "modalHeight" : height };
 					break;
 	            case "rdExecEmbeddedFunction":
 					var functionName = message.prms.functionName;
@@ -202,7 +205,7 @@ YUI.add('rd-embedded-plugin', function (Y) {
 }, "1.0.0", { requires: ["base", "plugin", "node", "json"] });
 
 YUI().use("node", "rd-embedded-plugin", function (Y) {
-    'use strict';
+    //'use strict;
     var wnd = Y.one(window);
     wnd.plug(Y.LogiXML.rdEmbedded);
 });

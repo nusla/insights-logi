@@ -2,7 +2,7 @@
 /*global LogiXML: true, YUI: false, document: false, window: false */
 
 YUI.add('color-utils', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var colorUtils = Y.namespace('LogiXML.Color'),
 		Lang = Y.Lang,

@@ -2,7 +2,7 @@
 /*global LogiXML: true, YUI: false, document: false, window: false, console: false */
 
 YUI.add('canvas-utils', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var CanvasUtils = Y.namespace('LogiXML.Canvas'),
 		ImageUtils = Y.LogiXML.Image,

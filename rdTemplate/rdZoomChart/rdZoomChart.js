@@ -1,5 +1,5 @@
 YUI.add('zoomchart', function(Y) {
-	"use strict";
+	//"use strict";
 	var Lang = Y.Lang,
 		TRIGGER = 'rdZoomChart',
 		ZOOMOUT_PREFIX ='rdZoomChartZoomOut_',

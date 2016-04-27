@@ -193,7 +193,7 @@ LogiXML.rd.setLocalStorage = function( key, value, json ) {
 };
 
 // Map new call to legacy call for now, remove later
-rdSetLocalStorage = LogiXML.rd.setLocalStorage;
+window.rdSetLocalStorage = LogiXML.rd.setLocalStorage;
 
 // Use new call but keep old behavior
 function rdGetLocalStorage( sKey ) {

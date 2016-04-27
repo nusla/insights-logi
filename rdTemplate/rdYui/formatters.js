@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿//"use strict";
 if (window.LogiXML === undefined) {
     window.LogiXML = {};
 }
@@ -8,6 +8,9 @@ LogiXML.Formatter = {
     format: function (value, format) {
         if (value === undefined || value === null) {
             return value;
+        }
+        if (format && format.toLowerCase() === 'html') {
+            value = LogiXML.decodeHtml(value, true);
         }
         if (value instanceof Date) {
             return LogiXML.Formatter.formatDate(value, format);
@@ -242,7 +245,7 @@ LogiXML.Formatter = {
 
         var customFormat = format, prefix = "", suffix = "", negativeSymbol = "-",
             i, y, iLength, yLength;
-
+        format = LogiXML.decodeHtml(format, true);
         if (format.indexOf(';') > -1) {
             if (num >= 0) {
                 format = format.substring(0, format.indexOf(';'));
@@ -252,7 +255,7 @@ LogiXML.Formatter = {
             }
             customFormat = format;
         }
-
+        format = LogiXML.decodeHtml(format);
         //pre-defined format to custom
         switch (format) {
             case "General Number":
@@ -448,11 +451,28 @@ LogiXML.Formatter = {
             //metric prefix
             var mpPattern = new RegExp("mp");
             if (mpPattern.test(format)) {
+                mpPattern = new RegExp("mps([1-9]+)");
+                if (mpPattern.test(format)) {
+                    var matchGroups = format.match(mpPattern);
+                    if (matchGroups && matchGroups.length == 2 && matchGroups[1]) {
+                        var signDigitsCount = parseInt(matchGroups[1]);
+                        if (signDigitsCount && signDigitsCount > 0) {
+                            num = LogiXML.Formatter.roundToSignificantDigit(num, signDigitsCount);
+                        }
+                    }
+                    format = format.substr(0, format.indexOf("mps") + 2);
+                } else {
+                    mpPattern = new RegExp("mps");
+                    if (mpPattern.test(format)) {
+                        format = format.replace("mps", "mp");
+                    }
+                }
+
                 var result = LogiXML.Formatter.Helpers.getMetricPrefix(num, LogiXML.Localization.metricPrefixes);
                 num = num / result[1];
                 format = format.replace(/mp/g, result[0]);
                 if (format == result[0]) {
-                    format = "#.###" + format;
+                    format = "0.###" + format;
                 }
             }
 
@@ -480,7 +500,7 @@ LogiXML.Formatter = {
     formatCustomNumber: function (number, format, suffix, prefix, negativeSymbol, dec, group) {
 
         var nanForceZero = false,
-            round = false,
+            round = true,
             decimalSeparatorAlwaysShown = false;
 
 
@@ -496,8 +516,13 @@ LogiXML.Formatter = {
         }
 
         // special case for percentages
-        if (suffix.charAt(suffix.length - 1) == '%') {
+        if (suffix.indexOf('%') !== -1) {
             number = number * 100;
+        }
+
+        // round off percentages to match rounded values from server for QT's etc.23344
+        if (suffix && suffix.indexOf('%') != -1) {
+            round = true ;
         }
 
         var returnString = "";
@@ -630,6 +655,24 @@ LogiXML.Formatter = {
         }
 
         return str;
+    },
+
+    roundToSignificantDigit: function (num, signDigitsCount) {
+        var bNegative = false;
+        var result;
+        if (num==0) {
+            return 0;
+        }
+        if (num<0) {
+            bNegative = true;
+            num = -num;
+        }
+        var mult = Math.pow(10, signDigitsCount - Math.floor(Math.log(num) / Math.log(10)) - 1);
+        result = (Math.round(num * mult) / (mult * 1000000)) * 1000000;
+        if (bNegative) {
+            result = -result;
+        }
+        return result;
     }
 }
 

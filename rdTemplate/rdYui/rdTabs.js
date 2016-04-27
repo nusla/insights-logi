@@ -12,8 +12,10 @@
          * Initialization Code: Sets up privately used state
          * properties, and publishes the events Tooltip introduces
          */
+	    configNode: null,
         initializer : function(config) {
 			
+            this.configNode = config;
 			this.set('_id', config.id);
 			this.set('_orientation', config.orientation);
 			this.set('reportID', config.reportid);
@@ -88,7 +90,7 @@
 
 			this.rdTabsSetMinWidth();
 		    //Make the tabs draggable
-			if (!Y.Lang.isNull(Y.one('#rdDraggableTabs'))) {
+			if ((!Y.Lang.isNull(Y.one('#rdDraggableTabs'))) && this.get('_id') == 'rdDashboardTabs') {
 			    this.rdDraggableTabs();
 			}
 		},
@@ -169,7 +171,7 @@
 		                opacity: '1'
 		            });
 		            //if (!bDropHit) {
-		                var lis = Y.Node.all('#rdTabs ul li');
+		            var lis = Y.Node.all('#rdTabs-rdDashboardTabs>#rdTabs ul li');
 		                lis._nodes[lis._nodes.length - 1].getAttribute("id");
 		                var rdParams = "&rdReport=" + document.getElementById("rdDashboardDefinition").value
 		                rdParams += "&TabID=" + e.target.get("node").getAttribute("id");
@@ -197,7 +199,7 @@
 		        var goingUp = false, lastY = 0, lastX = 0, dragDirection = 'right', bDropHit = false, dropTab = null;
 
 		        //Get the list of li's in the lists and make them draggable
-		        var lis = Y.Node.all('#rdTabs ul li');
+		        var lis = Y.Node.all('#rdTabs-rdDashboardTabs>#rdTabs ul li');
 		        lis.each(function (v, k) {
 		            var dd = new Y.DD.Drag({
 		                node: v,
@@ -207,12 +209,12 @@
 		            }).plug(Y.Plugin.DDProxy, {
 		                moveOnEnd: false
 		            }).plug(Y.Plugin.DDConstrained, {
-		                constrain2node: '#rdTabs'
+		                constrain2node: '#rdTabs-rdDashboardTabs>#rdTabs'
 		            }).removeInvalid('a');
 		        });
 
 		        //Create simple targets for the 2 lists.
-		        var uls = Y.Node.all('#rdTabs ul');
+		        var uls = Y.Node.all('#rdTabs-rdDashboardTabs>#rdTabs ul li');
 		        uls.each(function (v, k) {
 		            var tar = new Y.DD.Drop({
 		                node: v

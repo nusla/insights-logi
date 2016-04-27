@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿//"use strict";
 if (window.LogiXML === undefined) {
     window.LogiXML = {};
 }
@@ -199,7 +199,7 @@ LogiXML.HighchartsFormatters = {
             s.push(tooltip.options.footerFormat || '');
 
             html = '<div class="rdquicktip-content"><div class="body">';
-            html += s.join('').replace(/style\=\"[^\"]*\"/g, '').replace(/<span >Series [0-9]+<\/span>(<br\/>|:)/g, '');
+            html += s.join('').replace(/style\=\"[^\"]*\"/g, '').replace(/<span >Series [0-9]+<\/span>(<br\/>|:)/g, '').replace(/<br\/><span .+ Series [0-9:]+(<br\/> |: )/g, '<br/>').replace(/<span .+ Series [0-9]+<\/span><br\/>/g, '');
             html += '</div></div>';
             return html;
         }
@@ -224,7 +224,7 @@ LogiXML.HighchartsFormatters = {
             i = 0;
             length = quicktip.rows.length;
             for (; i < length; i++) {
-                html += '<tr><td>' + quicktip.rows[i].caption + '</td><td>' + (quicktip.rows[i].value || "") + '</td></tr>';
+                html += '<tr><td>' + quicktip.rows[i].caption + '</td><td>' + LogiXML.decodeHtml(quicktip.rows[i].value || "", quicktip.rows[i].format == 'HTML') + '</td></tr>';
             }
             html += '</table>';
         }
@@ -233,7 +233,11 @@ LogiXML.HighchartsFormatters = {
             i = 0;
             length = this.point.qt.length;
             for (; i < length; i++) {
-                html = html.replace(new RegExp('\\{' + i + '\\}', 'g'), this.point.qt[i])
+                var qtPointValue = this.point.qt[i];
+                if (qtPointValue.startsWith('$0')) { // 23595 - we need to escape $0 sign
+                    qtPointValue = '$' + qtPointValue;
+                }
+                html = html.replace(new RegExp('\\{' + i + '\\}', 'g'), LogiXML.decodeHtml(qtPointValue, quicktip.rows[i] && quicktip.rows[i].format && quicktip.rows[i].format == 'HTML'));
             }
         }
         html += '</div></div></div>';
@@ -352,6 +356,9 @@ LogiXML.HighchartsFormatters = {
         var format = this.series.options.dataLabels._format,
             value = this.y;
         //TODO: may be percent, total, etc. Digg it later
+        if (format=='HTML' && this.key) {
+            this.key = LogiXML.decodeHtml(this.key, true)
+        }        
         return LogiXML.Formatter.format(value, format);
     },
 
@@ -380,7 +387,7 @@ LogiXML.HighchartsFormatters = {
     },
 
     legendLabelFormatter: function () {
-        var format = this.chart ? this.chart.options.legend._format : this.series.chart.options.legend._format;
+        var format = this.chart ? this.chart.options.legend._format == 'HTML' ? "" : this.chart.options.legend._format : this.series.chart.options.legend._format;
         return LogiXML.Formatter.format(this.name, format);
     },
 
@@ -402,5 +409,18 @@ LogiXML.HighchartsFormatters = {
         //    return LogiXML.Formatter.formatString(this.value, format, lang, global);
         //}
         //return this.value;
+    },
+
+    format: function (value, format) {
+        if (this.value instanceof Date) {
+            return LogiXML.Formatter.formatDate(value, format);
+        } else {
+            return LogiXML.Formatter.format(value, format);
+        }
+            //    return LogiXML.Formatter.formatNumber(this.value, format, lang, global);
+            //} else if (typeof this.value === 'string') {
+            //    return LogiXML.Formatter.formatString(this.value, format, lang, global);
+            //}
+            //return this.value;
     }
 }

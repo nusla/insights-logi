@@ -2,7 +2,7 @@
 /*global LogiXML, YUI, document, window */
 
 YUI.add('attribute-helpers', function(Y) {
-	"use strict";
+	//"use strict";
 	
 	var helpers = Y.namespace('LogiXML.Attribute'),
 		Lang = Y.Lang;

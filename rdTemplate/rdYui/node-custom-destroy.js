@@ -2,7 +2,7 @@
 /*global LogiXML, YUI, document, window */
 
 YUI.add('node-custom-destroy', function(Y) {
-	"use strict";
+	//"use strict";
 
 	var customClasses = [],
 		originalNodeDestroy = Y.Node.prototype.destroy;
